@@ -1,22 +1,23 @@
 # API Enhancement Proposals
 
-The [AEP Project](https://aep.dev) is an API design specification and ecosystem
-of clients and tooling for protobuf and HTTP REST APIs.
+**TL;DR:** AIPs are lots of documents on how we do APIs.
 
 ## Overview
 
-See [GOVERNANCE.md](./GOVERNANCE.md).
+AEP stands for **API Enhancement Proposal**, which is a design document
+providing high-level, concise documentation for API development. The goal is
+for these documents to serve as the source of truth for API-related
+documentation at Thryv and the way API teams discuss and come to consensus on
+API guidance. The program is named and styled after Python's enhancement
+proposals (PEPs) which have seemed to work pretty well over the years.
 
-## Learn and Connect
+## Have an idea for an AEP?
 
-If you'd like to get involved in the AEP community, we'd love to have you! The
-following channels of communication are available:
+If you **have an idea for an AEP that isn't written yet** (yes, there are
+plenty!) check out [Contributing to the project][] to see how you can write
+AEPs for others to follow.
 
-- [The #aep channel in the CNCF Slack](https://cloud-native.slack.com/archives/C04TX46UCTV).
-  Sign up at https://slack.cncf.io.
-- [The AEP Google Calendar, to view any upcoming meetings](https://calendar.google.com/calendar/u/0/embed?src=7e35dd3df194a32f4fa7c03a3454e24ba3651e6f568248efe1ddf1e34a7bee9e@group.calendar.google.com&ctz=America/Los_Angeles)
-  - A weekly project meeting is held, which anyone interested is welcome to
-    attend!
+[contributing to the project]: ./CONTRIBUTING.md
 
 ## License
 
@@ -28,5 +29,7 @@ For the full text of each license, see [`LICENSE.md`](./LICENSE.md). For
 additional details, see the developer.google.com [Site Policies][3].
 
 [1]: https://creativecommons.org/licenses/by/4.0/
+
 [2]: https://www.apache.org/licenses/LICENSE-2.0
+
 [3]: https://developers.google.com/terms/site-policies

@@ -1,110 +1,142 @@
-# Methods
+# Actions
 
-An API is composed of one or more methods, which represent a specific operation
-that a service can perform on behalf of the consumer.
+An API is composed of one or more actions, which represent a specific operation
+that a service can perform on a resource on behalf of the consumer.
+
+In HTTP REST APIs, actions map to HTTP methods applied to resource endpoints.
 
 ## Guidance
 
-### Categories of Methods
+### Standard Actions
 
-The following enumerates multiple categories of methods that exist, often
-grouped up under some object (e.g. collection or resource) that the method
-operates upon.
+REST APIs **should** use standard actions on resources and collections where applicable. Not every resource requires
+every action; API authors **should** implement only the actions that make sense for their specific resource. The
+following table defines the standard actions and their corresponding HTTP methods:
 
-| Category Name                                                                                                                                                                                                                                         | Related AIPs                                                | [Declarative client][] integration | CLI / UI integration | SDK integration |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------- | -------------------- | --------------- |
-| _Standard Methods_                                                                                                                                                                                                                                    |                                                             |                                    |                      |                 |
-| **Standard collection methods**: operate on a collection of resources (List or Create).                                                                                                                                                               | [resources], [list], [create]                               | automatable                        | automatable          | automatable     |
-| **Standard resource methods**: fetch or mutate a single resource (Get, Update, Delete).                                                                                                                                                               | [resources], [get], [update], [delete]                      | automatable                        | automatable          | automatable     |
-| **Batch resource methods**: fetch or mutate multiple resources in a collection by name.                                                                                                                                                               | [batch-get], [batch-create], [batch-update], [batch-delete] | may be used to optimize queries    | automatable          | automatable     |
-| **Aggregated list methods**: fetch or mutate multiple resources of the same type across multiple collections.                                                                                                                                         | [reading-across-collections]                                | not useful nor automatable         | automatable          | automatable     |
-| _Custom Fetch Methods_                                                                                                                                                                                                                                |                                                             |                                    |                      |                 |
-| **Custom collection fetch methods**: fetch information across a collection that cannot be expressed via a standard method.                                                                                                                            | [custom-methods]                                            | handwritten                        | automatable          | automatable     |
-| **Custom resource fetch methods**: fetch information for a single resource that cannot be expressed via a standard method.                                                                                                                            | [custom-methods]                                            | handwritten                        | automatable          | automatable     |
-| _Custom Mutation Methods_                                                                                                                                                                                                                             |                                                             |                                    |                      |                 |
-| **Backing up a resource**: storing a copy of a resource at a particular point in time.                                                                                                                                                                | [resource-revisions]                                        | unused or handwritten              | automatable          | automatable     |
-| **Restoring a resource**: setting a resource to a version from a particular point in time.                                                                                                                                                            | [resource-revisions]                                        | unused or handwritten              | automatable          | automatable     |
-| **Renaming a resource**: modify the resource's name or id while preserving configuration and data.                                                                                                                                                    | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| **Custom collection mutation methods**: perform an imperative operation referencing a collection that may mutate one or more resources within that collection in fashion that cannot be easily achieved by standard methods (e.g. state transitions). | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| **Custom resource mutation methods**: perform an imperative operation on a resource that may mutate it in a way a standard method cannot (e.g. state transitions).                                                                                    | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| _Misc Custom Methods_                                                                                                                                                                                                                                 |                                                             |                                    |                      |
-| **Stateless Methods**: a method that has no permanent effect on any data within the API (e.g. translating text)                                                                                                                                       | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| _None of the above_                                                                                                                                                                                                                                   |                                                             |                                    |                      |                 |
-| **Streaming methods**: methods that communicate via client, server, or bi-directional streams.                                                                                                                                                        |                                                             | handwritten                        | handwritten          | automatable     |
+| Action | HTTP Method  | Applied To          | Purpose                                       |
+|--------|--------------|---------------------|-----------------------------------------------|
+| Fetch  | [GET]        | Resource            | Retrieve a single resource by its identifier  |
+| List   | [GET]        | Collection          | Retrieve multiple resources from a collection |
+| Create | [POST]/[PUT] | Collection/Resource | Create a new resource                         |
+| Update | [PATCH]      | Resource            | Modify an existing resource                   |
+| Apply  | [PUT]        | Resource            | Completely replace (or create) a resource     |
+| Delete | [DELETE]     | Resource            | Remove a resource                             |
 
-### Choosing a method category
+### Custom Actions
 
-While designing a method, API authors should choose from the defined categories
-in the following order:
+Custom actions perform operations that don't fit the standard action patterns. They **may** be read-only (information
+retrieval) or mutative (state changes).
 
-1. Standard methods (on collections and resources)
-1. Standard batch or aggregate methods
-1. Custom methods (on collections, resources, or stateless)
-1. Streaming methods
+Custom actions **should** only be used when an action cannot be represented as a resource
+(see [reification](/121#reification)). When custom actions are necessary, they **should** be mounted to a specific
+resource or collection.
 
-### OperationIDs and RPC names
+Examples of custom actions include: archiving a resource, publishing a draft, or canceling an operation.
+
+### Choosing Actions
+
+When designing API operations, API authors **should** prefer actions in the following order:
+
+1. Standard actions (Fetch, List, Create, Update, Apply, Delete)
+2. Reifying actions as resources (e.g., `/orders/123/cancellations` instead of `/orders/123:cancel`)
+3. Custom actions mounted to a resource or collection
+
+Standard actions provide the most consistency across APIs and are the most familiar to developers with REST experience.
+
+**Note:** Reifying actions as resources is preferred over custom action endpoints. For example, instead of creating a
+custom action endpoint like `/orders/123:cancel`, create a cancellations resource at `/orders/123/cancellations`. This
+maintains the [resource-oriented] model and allows the full power of standard actions to be applied to these reified
+resources. See AEP-121 for more information.
+
+### Bulk Actions
+
+Bulk operations that _modify_ multiple resources **may** be implemented as custom actions, as they cannot use the same
+endpoint as single-resource operations without causing conflicts.
+
+For example, bulk create operations might use:
+
+```
+POST /books:batch
+```
+
+However, API authors **should** first consider whether reifying the bulk operation as a resource would be more
+appropriate:
+
+```
+POST /books/imports
+```
+
+### OperationIDs
 
 The OpenAPI specification includes an
 [operationId](https://spec.openapis.org/oas/latest.html#fixed-fields-7) field
-to uniquely identify an operation, as well as provide a name for the operation
+to uniquely identify an operation (action), as well as provide a name for the operation
 in tools and libraries.
 
-In a similar fashion, gRPC has
-[RPCs definition within a service](https://grpc.io/docs/what-is-grpc/core-concepts/#service-definition).
+The `operationId` **must** clearly convey the action being performed. It **must** be `camelCase` and follow the
+following format:
 
-The operationId and RPCs names **must** follow the following format:
+- `{actionName}{ResourceSingular}` for standard and custom resource actions
+- `list{ResourcePlural}` for list actions
+- `batch{actionName}{ResourcePlural}` for batch actions
 
-- `{standard-method-name}{resource-singular}` for non-list standard methods.
-- `List{resource-plural}` for lists.
-- `:{custom-method-name}{resource-singular}` for custom methods (omit the
-  leading colon for gRPC).
+**Note:** Many Java OpenAPI libraries use the method name as the operationId by default.
 
-Some examples include:
+Examples:
 
-- `CreateBook`
-- `GetBook`
-- `ApplyBook`
-- `ListBooks`
-- `:ArchiveBook`
+- `getBook`
+- `listBooks`
+- `createBook`
+- `updateBook`
+- `applyBook`
+- `deleteBook`
+- `batchCreateBooks`
+- `archiveBook` (custom action)
+- `publishBook` (custom action)
+
+{% tab proto %}
+
+{% tab oas %}
+
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.operationId' %}
+
+{% endtabs %}
 
 ## Rationale
 
-Resource-oriented standard and custom methods are recommended first, as they
-can be expressed in the widest variety of clients (Declarative clients, CLIs,
-UIs, and so on), and offer the most uniform experience that allows users to
-apply their knowledge of one API to another.
+Resource-oriented design with standard actions provides consistency across APIs, allowing developers to apply knowledge
+from one API to another. Standard actions can be easily understood by anyone familiar with REST principles and HTTP
+semantics.
 
-If a standard method is unsuitable, then custom methods (that are mounted to a
-resource or collection) offer a lesser, but still valuable level of
-consistency, helping the user reason about the scope of the action and the
-object whose configuration is read to inform that action. Although mutative
-custom methods are not uniform enough to have an automated integration with
-exclusively resource-oriented clients such as [Declarative clients][], they are
-still a pattern that can be easily recognized by CLIs, UIs, and SDKs.
+The distinction between Update (PATCH) and Apply (PUT) is important because PUT semantics require complete replacement
+of a resource. Conflating these operations can lead to accidental data loss when developers expect partial updates, but
+the API performs complete replacement.
 
-If one cannot express their APIs in a resource-oriented fashion at all, then
-the operation falls in a category where the lack of uniformity makes it
-difficult for any client aside from SDKs to model the operation. This category
-is preferred last due to the fact that a user cannot rely on their knowledge of
-similar APIs, as well as the issue that integration with many clients will
-likely have to be hand-written.
+Reifying actions as resources rather than using custom action endpoints maintains the resource-oriented model and
+provides greater flexibility. A cancellation resource can be listed, fetched, and potentially modified or deleted,
+whereas a cancel action endpoint is a one-way operation.
 
-[batch-create]: /batch-create
-[batch-delete]: /batch-delete
-[batch-get]: /batch-get
-[batch-update]: /batch-update
-[create]: /create
-[custom-methods]: /custom-methods
-[Declarative client]: ./0003.md#declarative-clients
-[Declarative clients]: ./0003.md#declarative-clients
-[delete]: /delete
-[get]: /get
-[list]: /list
-[update]: /update
-[reading-across-collections]: /reading-across-collections
-[resource-revisions]: /resource-revisions
-[resources]: /resources
+## Further Reading
+
+- [OpenAPI operationId specification](https://swagger.io/docs/specification/v3_0/paths-and-operations/#operationid)
+- [Resource Oriented Design][resource-oriented]
+
+[GET]: /http-get
+
+[POST]: /http-post
+
+[PUT]: /http-put
+
+[PATCH]: /http-patch
+
+[DELETE]: /http-delete
+
+[resource-oriented]: /resource-oriented-design
 
 ## Changelog
 
-- **2024-04-10**: Imported from https://aip.dev/130.
+- **2026-02-09**: Initial creation, adapted from [Google AIP-130][] and aep.dev [AEP-130][].
+
+[Google AIP-130]: https://google.aip.dev/130
+
+[AEP-130]: https://aep.dev/130

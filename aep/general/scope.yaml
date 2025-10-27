@@ -6,23 +6,19 @@ categories:
     title: Meta
   - code: general
     title: General
+  - code: http
+    title: HTTP
+  - code: rest
+    title: REST
   - code: resources
     title: Resources
-  - code: standard-methods
-    title: Standard Methods
+  - code: actions
+    title: Actions
   - code: fields
     title: Fields
-  - code: types
-    title: Types
   - code: design-patterns
     title: Design Patterns
-  - code: batch-methods
-    title: Batch Methods
   - code: security
     title: Security
-  - code: governance
-    title: Governance
   - code: best-practices
     title: Best Practices
-  - code: protobuf
-    title: Protocol buffers

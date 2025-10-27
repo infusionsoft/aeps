@@ -1,0 +1,9 @@
+---
+id: 50
+state: approved
+slug: rest
+created: 2025-10-31
+updated: 2025-10-31
+placement:
+  category: rest
+redirect_from: '/representational-state-transfer'

@@ -1,4 +1,4 @@
-# Standard fields
+# Standard Names
 
 Certain concepts are common throughout any corpus of APIs. In these situations,
 it is useful to have a standard field name and behavior that is used
@@ -9,131 +9,173 @@ consistently to communicate that concept.
 Standard fields **should** be used to describe their corresponding concept, and
 **should not** be used for any other purpose.
 
-### Resource paths and IDs
+### Tenancy
 
-#### path
+Our software is multi-tenanted, meaning users exist only within their own tenant instance and cannot access data from
+other tenants. A **tenant** represents an isolated instance of the application with its own data, users, and
+configuration.
 
-Every resource **must** have a `string path` field, used for the
-[resource path](/resource-paths), which **should** be the first field in the
-resource.
+The following terms are synonymous and refer to the same concept:
 
-#### parent
+- Tenant
+- Tenant ID
+- App Name
+- App ID
 
-The `string parent` field refers to the resource name of the parent of a
-collection, and **must** be used in [`List`](/list) and [`Create`](/create)
-requests except for top-level resources.
+APIs **must** use the term "tenant" in all _**new**_ development. The legacy terms "app name" and "app ID" are
+deprecated and exist only for backward compatibility in existing APIs.
 
-### Names
+### HTTP headers
 
-#### display_name
+#### `X-AEP-Version`
 
-The `string display_name` field **should** be a mutable, user-settable field
-where the user can provide a human-readable name to be used in user interfaces.
+Response only. Required. Identifies which set of organizational API design standards the service follows, independent of
+the API's own version number. APIs **must** include this header in all responses. Clients **must not** send this header
+in requests.
 
-Display names **should not** have uniqueness requirements, and **should** be
-limited to <= 63 characters.
+#### `X-Tenant`
 
-**Note:** The `_name` suffix **should not** be used to describe other types of
-names unless otherwise covered in this AEP.
+**Must** be a string. The tenant this request or response is scoped to. **Must** be included in both requests and
+responses for tenant-scoped operations, even if the tenant identifier appears elsewhere (path, query parameters, or
+body). **Must not** be included for non-tenanted operations. This replaces legacy headers such as `x-is-app-name`,
+`x-keap-tenant`, `x-is-tenant`, etc.
 
-#### title
+### JSON field names
 
-The `string title` field **should** be the official name of an entity, such as
-a company's name. This is a more formal variant of `string display_name`.
+APIs **should** use the standard field names defined in this section for their corresponding concepts.
+See [JSON Payloads] for complete guidance.
 
-#### given_name
+#### `id`
 
-The `string given_name` field **must** refer to a human or animal's given name.
-Resources **must not** use `first_name` for this concept, because the given
-name is not placed first in many cultures.
+**Must** be a string. The unique identifier for the resource. This is the resource's own ID; use the pattern
+`{resource}Id` (e.g., `authorId`, `publisherId`) when referencing other resources.
 
-#### family_name
+#### `tenant`
 
-The `string family_name` field **must** refer to a human or animal's family
-name. Resources **must not** use `last_name` for this concept, because the
-family name is not placed last in many cultures.
+**Must** be a string. The tenant identifier. The `X-Tenant` header **must** be the source of truth for tenant scope;
+this field **should** generally be omitted from request and response bodies. When a tenant identifier is needed in the
+body, use `tenant` for a single tenant or `tenants` for a list.
 
-### Timestamps
+#### `createdTime`
 
-See [common components](/common-components) for more information about
-`Timestamp` and `Duration`.
+**Must** be a timestamp. Read-only. When the resource was created. This **may** be either the time creation was
+initiated or the time it was completed. See [Time and duration] for format requirements.
 
-#### create_time
+#### `updatedTime`
 
-The output only `Timestamp create_time` field **must** represent the timestamp
-when the resource was created. This **may** be either the time creation was
-initiated or the time it was completed.
+**Must** be a timestamp. Read-only. When the resource was last updated. Any change made by users **must** refresh
+this value; changes made internally by the service **should** refresh this value. See [Time and duration] for format
+requirements.
 
-#### update_time
+#### `deletedTime`
 
-The output only `Timestamp update_time` field **must** represent the timestamp
-when the resource was most recently updated. Any change to the resource made by
-users **must** refresh this value; changes to a resource made internally by the
-service **may** refresh this value.
+**Must** be a timestamp. Read-only. When the resource was soft deleted. This **may** correspond to either when the
+user requested deletion or when the service successfully soft deleted the resource. See [Time and duration] for format
+requirements.
 
-#### delete_time
+#### `purgeTime`
 
-The output only `Timestamp delete_time` field **must** represent the timestamp
-that a resource was soft deleted. This **may** correspond to either the time
-when the user requested deletion, or when the service successfully soft deleted
-the resource. If a resource is not soft deleted, the `delete_time` field
-**must** be empty.
+**Must** be a timestamp. Read-only. The time when a soft deleted resource will be purged from the system (see AIP-164).
+Resources that support soft delete **should** include this field.
 
-Resources that support [soft delete](/soft-delete) **should** provide this
-field.
+Services **may** provide a `purgeTime` value that is inexact, but the resource **must not** be purged from the system
+before that time.
 
-#### expire_time
+#### `createdBy`
 
-The `Timestamp expire_time` field **should** represent the time that a given
-resource or resource attribute is no longer useful or valid (e.g. a rotating
-security key). It **may** be used for [expiration](/resource-expiration).
+**Must** be a string. Read-only. The identifier of the user or service that created the resource.
 
-Services **may** provide an `expire_time` value that is inexact, but the
-resource **must not** expire before that time.
+#### `updatedBy`
 
-#### purge_time
+**Must** be a string. Read-only. The identifier of the user or service that last modified the resource.
 
-The `Timestamp purge_time` field **should** represent the time when a soft
-deleted resource will be purged from the system (see AEP-164). It **may** be
-used for similar forms of expiration as described in AEP-214. Resources that
-support soft delete **should** include this field.
+#### `displayName`
 
-Services **may** provide a `purge_time` value that is inexact, but the resource
-**must not** be purged from the system before that time.
+**Must** be a string. A user-friendly name for the resource, suitable for display in UIs. **Should** be mutable and
+user-settable. **Should not** have uniqueness requirements.
 
-### Well known string fields
+#### `description`
 
-#### IP address
+**Must** be a string. A detailed textual description of the resource.
 
-A field that represents an IP address **must** comply with the following:
+#### `state`
 
-- use type `string`
-- use the name `ip_address` or end with the suffix `_ip_address` e.g.
-  `resolved_ip_address`
-- specify the IP address version format via one of the supported formats
-  `IPV4`, `IPV6`, or if it can be either, `IPV4_OR_IPV6` (see
-  [fields](/fields)).
+**Must** be an enum. The current lifecycle state of the resource (e.g., `ACTIVE`, `PENDING`, `DELETED`). Use `state`
+rather than `status` to avoid confusion with HTTP status codes. See [States] for guidance on defining state enums.
 
-#### uid
+#### `nextPageToken`
 
-The output only `string uid` field refers to a system-assigned unique
-identifier for a resource. When provided, this field **must** be a [UUID4][]
-and **must** specify this format via the `UUID4` format extension (see
-[fields](/fields)).
+**Must** be a string. Token for retrieving the next page in [Pagination].
 
-## Further reading
+#### `prevPageToken`
 
-- For standardized codes, see AEP-143.
-- For the `etag` field, see AEP-154.
-- For the `request_id` field, see AEP-155.
-- For the `filter` field, see AEP-160.
-- For fields related to resource revisions, see AEP-162.
-- For the `validate_only` field, see AEP-163.
-- For fields related to soft delete and undelete, see AEP-164.
+**Must** be a string. Token for retrieving the previous page in [Pagination].
+
+#### IP addresses
+
+Fields representing IP addresses **must** comply with the following:
+
+- Use type `string`
+- Use the name `ipAddress` or end with the suffix `IpAddress` (e.g., `resolvedIpAddress`, `sourceIpAddress`)
+- Specify the IP address version format via one of the supported formats: `IPV4`, `IPV6`, or `IPV4_OR_IPV6` if either
+  version is acceptable
+
+### Query parameters
+
+APIs **should** use the standard query parameter names defined in this section. See [Query Parameters] for complete
+guidance.
+
+#### `pageToken`
+
+**Must** be a string. Cursor for next page. Token-based pagination. See [Pagination] for complete guidance.
+
+#### `pageSize`
+
+**Must** be an integer. Maximum number of results to return. Token-based pagination. See [Pagination] for complete
+guidance.
+
+#### `offset`
+
+**Must** be an integer. Starting position. Offset-based pagination. See [Pagination] for complete guidance.
+
+#### `limit`
+
+**Must** be an integer. Maximum number of results. Offset-based pagination. See [Pagination] for complete guidance.
+
+#### `q`
+
+**Must** be a string. Free-text search query. See [Filtering] for complete guidance.
+
+#### `orderBy`
+
+**Must** be a string. Field(s) to sort results by. See [Filtering] for complete guidance.
+
+#### `cascade`
+
+**Must** be a boolean. Used in [Delete] operations to indicate whether child resources should be deleted along with the
+parent resource. When `cascade` is `true`, the API deletes the specified resource and all its child resources. When
+`cascade` is unset, it **must** default to `false`.
+
+#### `tenant`
+
+**Must** be a string. The tenant identifier. The `X-Tenant` header **must** be the source of truth for tenant scope;
+this query parameter **should** generally be omitted. When a tenant identifier is needed in the query string (like for
+filtering), use `tenant` for a single tenant or `tenants` for a list.
+
+#### `updateMask`
+
+**Must** be a string. Fields to update in [PATCH requests](/134#field-masking).
+
+#### `readMask`
+
+**Must** be a string. Fields to include in [partial responses](/partial-responses).
+
+#### `showDeleted`
+
+**Must** be a boolean (`true`/`false`). Indicates if [soft deleted](/soft-delete) resources should be included in
+responses.
 
 ## Rationale
-
-### Well known string fields
 
 Some fields represent very well defined concepts or artifacts that sometimes
 also have strict governance of their semantics. For such fields, presenting an
@@ -141,9 +183,33 @@ equally standardized API surface is important. This enables development of
 improved API consumer tools and documentation, as well as a more unified user
 experience across the platform.
 
-<!-- prettier-ignore -->
-[declarative-friendly resources]: ./0128.md#resources
-[kubernetes limits]:
-  https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/#syntax-and-character-set
-[uuid4]:
-  https://en.wikipedia.org/wiki/Universally_unique_identifier#Version_4_(random)
+### Why `createdTime` over `createdAt`?
+
+`createdAt` could also refer to a location. `createdTime` avoids that language ambiguity while remaining slightly more
+"standard" for REST APIs than the more database-centric `createdTimestamp`.
+
+[Pagination]: /pagination
+
+[Filtering]: /filtering
+
+[States]: /states
+
+[Time and duration]: /time-and-duration
+
+[JSON payloads]: /json-payloads
+
+[Query Parameters]: /query-parameters
+
+[delete]: /delete
+
+## Changelog
+
+* **2026-02-20**: Add `cascade`
+* **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
+* **2026-01-21**: Add new terms `purgeTime` and `show_deleted`.
+* **2026-01-20**: Add rationale for `createdTime` over `createdAt`.
+* **2026-01-13**: Initial creation, adapted from [Google AIP-148][] and aep.dev [AEP-148][].
+
+[Google AIP-148]: https://google.aip.dev/148
+
+[AEP-148]: https://aep.dev/148

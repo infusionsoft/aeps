@@ -4,12 +4,11 @@ info:
   title: Library
   version: 1.0.0
 paths:
-  /projects/{projectId}:translateText:
+  /projects/{projectId}:translate:
     post:
-      operationId: translateText
+      operationId: translate
       description: Translates the provided text from one language to another.
       requestBody:
-        description:
         content:
           application/json:
             schema:
@@ -37,7 +36,7 @@ paths:
             application/json:
               schema:
                 description: |
-                  Response structure for the translateText operation.
+                  Response structure for the translate operation.
                 properties:
                   translated_text:
                     type: string

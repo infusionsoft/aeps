@@ -1,8 +1,9 @@
 ---
 id: 135
 state: approved
+created: 2026-02-09
+updated: 2026-02-20
 slug: delete
-created: 2024-02-11
 placement:
-  category: standard-methods
+  category: actions
   order: 50

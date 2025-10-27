@@ -1,13 +1,13 @@
 # Designing an API
 
-This AEP serves as a high-level guide to designing an AEP-compliant API. AEPs.
+This AEP serves as a high-level guide for designing AEP-compliant APIs.
 
 ## Process summary
 
 1. Enumerate the use cases you would like your API to satisfy.
-1. Identify resources.
-1. Identify standard operations.
-1. Identify custom operations.
+2. Identify resources.
+3. Identify standard operations.
+4. Identify custom operations.
 
 ## Enumerate use cases
 
@@ -39,9 +39,8 @@ Some best practices:
 
 ## Identify resources
 
-Once your use cases are defined, consider how many of those can be represented
-by an [API Resource Type][]: entities that are created, read, updated, and
-deleted.
+Once your use cases are defined, consider how to represent those as resources: entities that are created, read, updated,
+and deleted.
 
 Examples include:
 
@@ -57,44 +56,37 @@ API.
 
 Resources can relate to each other. For example:
 
-- A parent-child relationship defining ownership/scope (A user who created a
-  VM).
-- A resource dependency, where one resource depends on another to function (A
-  VM depending on a disk).
+- A parent-child relationship defining ownership/scope (A user who created a VM).
+- A resource dependency, where one resource depends on another to function (A VM depending on a disk).
 
 See the following AEPs to learn more about resource-oriented design:
 
 - [resource-oriented design][aep-121]
 - [resource paths][aep-122]
-- [resource types][aep-4]
 
 ## Identify standard operations
 
-Once the resources are defined, identify one or more standard methods for each
-of those resources. Standard methods operate on the lifecycle of a resource
-lifecycle: namely, they create, read, update, delete, and list resources.
+Once the resources are defined, identify one or more standard operations for each of those resources. Standard
+operations perform actions on resources by creating, reading, updating, deleting, and listing them. Each of these
+operations maps to a specific HTTP verb (`POST`, `GET`, `PUT`, `PATCH`, `DELETE`). See AEP-64 to learn more.
 
-Ideally all five standard methods should be exposed for every resource.
-
-See the following AEPs to learn more about the standard methods:
-
-- [Get][aep-131]
-- [List][aep-132]
-- [Create][aep-133]
-- [Update][aep-134]
-- [Delete][aep-135]
+APIs **should** use standard methods whenever possible. However, there are cases where custom methods are more
+appropriate.
 
 ## Identify custom operations
 
-To accomplish some of the user journeys, resources may need to support
-operations other than [Create][aep-133], [Update][aep-134], [Delete][aep-135],
-[Get][aep-131], and [List][aep-132] them. Some examples include:
+As mentioned above, in some cases, it may be more appropriate to define a custom method rather than using a standard
+method. Some examples include:
 
 - restarting a virtual machine
-- triggering a CI build
-- wiping a disk
+- bulk create and update operations
+- simple state changes
 
 Break down each of the actions into granular operations, then follow the
 [custom operations][aep-136] AEP on how to design them.
 
-[API Resource Type]: /3#api-resource-type
+## Changelog
+
+- **2025-10-30**: Initial AEP-5 for Thryv, adapted from aep.dev [AEP-5][].
+
+[AEP-5]: https://aep.dev/5

@@ -1,4 +1,4 @@
-# Idempotency
+# Idempotency-Key
 
 It is sometimes useful for an API to have a unique, customer-provided
 identifier for particular requests. This can be useful for several purposes,
@@ -16,126 +16,89 @@ only processed once.
 
 ## Guidance
 
-APIs **may** add a `aep.api.IdempotencyKey idempotency_key` parameter to
-request messages (including those of standard methods) in order to uniquely
+APIs **may** support the experimental [Idempotency-Key] header to uniquely
 identify particular requests. API servers **must not** execute requests with
-the same `idempotency_key` more than once.
+the same `Idempotency-Key` more than once.
 
-```proto
-message CreateBookRequest {
-  // The parent resource where this book will be created.
-  // Format: publishers/{publisher_id}
-  string parent = 1 [
-    (aep.api.field_info) = { resource_reference: [ "library.example.com/book" ], field_behavior: [ FIELD_BEHAVIOR_REQUIRED ] }
-  ];
+Idempotency keys are for state-changing operations. [POST] and [PATCH] requests are the primary use case for idempotency
+keys, since they are non-idempotent by their HTTP specs. [GET] requests are safe methods and **must not** accept
+idempotency keys. [PUT] and [DELETE] are idempotent by the HTTP specification, but **may** accept idempotency keys if
+additional guarantees against duplicate processing are needed (e.g., preventing double charges in payment systems).
 
-  // The book to create.
-  Book book = 2 [(google.api.field_behavior) = REQUIRED];
-
-  // This request is only idempotent if `idempotency_key` is provided.
-  //
-  // This key will be honored for at least one hour after the first time it is
-  // seen by the server.
-  //
-  // The key is restricted to 36 ASCII characters. A random UUID is recommended.
-  aep.api.IdempotencyKey idempotency_key = 3 [
-      (aep.api.field_info).minimum_lifetime = { seconds: 3600 }
-  ];
-}
-```
-
-- [`aep.api.IdempotencyKey`][IdempotencyKey] has a `key` and a `first_sent`
-  timestamp.
-
-  - `key` is simply a unique identifier.
-
+- Idempotency keys **must** be UUIDs (either v4 or v7).
+    - The format restrictions for idempotency keys **must** be documented.
+- Keys **must** be scoped to the combination of endpoint + HTTP method + resource. A key used for `POST /orders`
+  **must** be different from a key for `POST /payments`.
+- The idempotency key **must** be provided in a header called `Idempotency-Key` (and it **must not** be a field in the
+  resource).
 - Providing an idempotency key **must** guarantee idempotency.
-
-  - If a duplicate request is detected, the server **must** return one of:
-
-    - A response equivalent to the response for the previously successful
-      request, because the client most likely did not receive the previous
-      response.
-    - An error indicating that the `first_sent` field of the idempotency key is
-      invalid or cannot be honored (expired, in the future, or differs from a
-      previous `first_sent` value with the same `key`).
-    - An error, if returning an equivalent response is not possible.
-
-      For example, if a resource was created, then deleted, and then a
-      duplicate request to create the resource is received, the server **may**
-      return an error if returning the previously created resource is not
-      possible.
-
-  - APIs **should** honor idempotency keys for at least an hour.
-    - When using protocol buffers, idempotency keys that are UUIDs **must** be
-      annotated with a minimum lifetime using the extension
-      [`(aep.api.field_info).minimum_lifetime`][minimum_lifetime].
-
-- The `idempotency_key` field **must** be provided on the request message to
-  which it applies (and it **must not** be a field on resources themselves).
-
-  - The `first_sent` field can be used by API servers to determine if a key is
-    expired. API servers **must** reject requests with expired keys, and
-    **must** reject requests with keys that are in the future. When feasible,
-    API servers **should** reject requests that use the same `key` but have a
-    different `first_sent` timestamp.
-  - The `key` field **must** be able to be a UUID, and **may** allow UUIDs to
-    be the only valid format. The format restrictions for idempotency keys
-    **must** be documented.
-
+    - If a duplicate request is detected, the server **must** return one of:
+        - A response equivalent to the response for the previously successful
+          request, because the client most likely did not receive the previous
+          response. The response **must** contain the same status code and response body as the original response.
+        - An error, see [Errors](#errors) below.
+    - APIs **should** honor idempotency keys for _at least_ an hour.
 - Idempotency keys **should** be optional.
+- Idempotency keys **must not** be used for read-only operations.
+
+### Errors
+
+A server **should** provide error responses in the following cases:
+
+* `400 Bad Request`: The key is not a valid UUID; or the header is omitted for an endpoint that is documented as
+  requiring it.
+* `409 Conflict`: A request with the same key is currently/still being processed, or returning an equivalent response is
+  not possible (see example below).
+* `422 Unprocessable Content`: The key is already being used for a different request payload.
+
+In the case of a `409 Conflict` response, clients will need to wait before retrying. For all the other errors, clients
+will need to amend the requests before resending.
+
+APIs **should** also respond with an error if returning an equivalent response is not possible. For example, if a
+resource was created, then deleted, and then a duplicate request to create the resource is received, the server **should
+** return `409 Conflict` if returning the previously created resource is not possible. The error response **should**
+explain that the idempotency key was previously used, but the resource state has changed in a way that makes replay
+impossible.
 
 ## Further reading
 
-- For which codes to retry, see [AEP-194](https://aep.dev/194).
-- For how to retry errors in client libraries, see
-  [AEP-4221](https://aep.dev/4221).
+- Active draft RFC to standardize the Idempotency-Key
+  header: [The Idempotency-Key HTTP Header Field](https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/)
 
 ## Rationale
 
-### Naming the field `idempotency_key`
+### Using an experimental header
 
-The original content from which this AEP is derived defines a `request_id`
-field; we define `idempotency_key` instead for two reasons:
-
-1. There is an [active Internet-Draft][idempotency-key-draft] to standardize an
-   HTTP header named `Idempotency-Key`.
-1. There may be edge cases in which separately identifying idempotent requests
-   is useful; `request_id` would be more appropriate for such use cases. For
-   example, an API producer might be testing the idempotency behavior of the
-   API server, and might want to issue multiple requests with the same
-   `idempotency_key` and trace the behavior of each request separately.
+Although the `Idempotency-Key` header is defined in a draft RFC, however the specification is mature and has achieved
+broad industry adoption. The core semantics have remained stable across multiple revisions, and major API providers
+already implement this header. Using the draft standard provides better interoperability with existing tooling and
+positions our APIs to adopt the finalized standard with minimal changes once ratified. The benefits of standardization
+outweigh the low risk of minor adjustments during finalization.
 
 ### Using UUIDs for request identification
 
-When a value is required to be unique, leaving the format open-ended can lead
-to API consumers incorrectly providing a duplicate identifier. As such,
-standardizing on a universally unique identifier drastically reduces the chance
-for collisions when done correctly.
+While the [Idempotency-Key] header definition says the server defines the key format, our org chooses to use UUIDs. When
+a value is required to be unique, leaving the format open-ended can lead to API consumers incorrectly providing a
+duplicate identifier. As such, standardizing on a universally unique identifier drastically reduces the chance for
+collisions when done correctly. It also removes the burden from developers to design their own identifier
+generation strategy and ensures consistent behavior across all APIs within the organization.
 
 ## Changelog
 
-- **2023-23-20**: Adopt AEP from from Google's AIP with the following changes:
-  - Rename field from `request_id` to `idempotency_key` (plus some minor
-    releated rewording).
-  - Add a common component [`aep.api.IdempotencyKey`][IdempotencyKey] and use
-    this rather than `string` for the `idempotency_key` field; add related
-    guidance about `IdempotencyKey.first_seen`.
-  - Remove guidance about annotating `idempotency_key` with
-    `(google.api.field_info).format`.
-  - Add guidance about annotating `idempotency_key` with
-    [`(aep.api.field_info).minimum_lifetime`].
-  - Update guidance about responses to be more explicit about success and error
-    cases, while allowing "equivalent" rather than identical responses for
-    subsequent requests.
-  - Temporarily removed the section about stale success responses, pending
-    further discussion.
-- **2023-10-02**: Add UUID format extension guidance.
-- **2019-08-01**: Changed the examples from "shelves" to "publishers", to
-  present a better example of resource ownership.
+* **2025-12-23**: Initial creation, adapted from [Google AIP-155][] and aep.dev [AEP-155][].
 
-<!-- prettier-ignore-start -->
-[idempotency-key-draft]: https://datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header/
-[IdempotencyKey]: https://buf.build/aep/api/file/main:aep/api/idempotency_key.proto#L21
-[minimum_lifetime]: https://buf.build/aep/api/file/main:aep/api/field_info.proto#L35
-<!-- prettier-ignore-end -->
+[Google AIP-155]: https://google.aip.dev/155
+
+[AEP-155]: https://aep.dev/155
+
+[Idempotency-Key]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Idempotency-Key
+
+[GET]: /http-get
+
+[POST]: /http-post
+
+[PUT]: /http-put
+
+[PATCH]: /http-patch
+
+[DELETE]: /http-delete

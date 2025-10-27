@@ -1,148 +1,297 @@
-# Resource types
+# API Versioning Strategy
 
-Most APIs expose _resources_ (their primary nouns) which users are able to
-create, retrieve, and manipulate. APIs are allowed to name their resource types
-as they see fit, and are only required to ensure uniqueness within that API.
-This means that it is possible (and often desirable) for different APIs to use
-the same type name. For example, a Memcache and Redis API would both want to
-use `Instance` as a type name.
-
-When mapping the relationships between APIs and their resources, however, it
-becomes important to have a single, globally-unique type name. Additionally,
-tools such as Kubernetes or GraphQL interact with APIs from multiple providers.
+Organizations need clear, consistent versioning strategies that balance evolution flexibility with client simplicity.
+This document establishes the standard approach for versioning APIs within our microservices architecture, ensuring
+uniform practices across all services
 
 ## Guidance
 
-APIs **must** define a resource type for each resource in the API, according to
-the following pattern: `{API Name}/{Type Name}`. Also see
-[API Name](/apis#api-name).
+### Global API Versioning
 
-### Type name
+APIs **must** use [Semantic Versioning].
 
-The type name is an identifier that **must** be unique within the API, as
-indicated by it's namespacing within the API name.
+All APIs **must** use global versioning. The version identifier applies to the entire API surface of a microservice and
+is exposed as a path prefix.
 
-The type name:
+**URI Format**
 
-- **must** Only contain ASCII alphanumeric characters.
-- **must** Start with a lowercase letter.
-- **must** Be of the singular form of the resource.
-- **must** Use kebab case.
+* The version **must** appear at the start of the path.
+* APIs **must** use only the major version component (e.g., `v1`, `v5`). Minor and patch versions **must not** be
+  exposed in the URI.
+* Format: `/v{major}/...`
 
-### Examples
+Examples:
 
-Examples of API names and resource types include:
+```http
+GET /v5/books/123
+POST /v5/publishers
+GET /v5/books/456/reviews
+```
 
-- `networking.istio.io/instance`
-- `pubsub.example.com/topic`
-- `pubsub.example.com/subscription`
-- `spanner.example.com/database`
-- `spanner.example.com/instance`
-- `apis.example.com/user/user-event`
+**Version Scope**
 
-### Annotating resource types
+Each microservice **must** represent a single versioning boundary. All resources and endpoints within a microservice
+**must** share the same version namespace.
 
-APIs **must** annotate the resource types for each resource in the API
+When *any* endpoint requires a breaking change, the entire API version for that service **must** be incremented.
+
+**Example service evolution:**
+
+Version 1:
+
+```
+/v1/books
+/v1/publishers
+/v1/reviews
+```
+
+Version 2 (even if only `books` changed):
+
+```
+/v2/books        (New behavior)
+/v2/publishers   (Identical behavior to v1, but distinct endpoint)
+/v2/reviews      (Identical behavior to v1, but distinct endpoint)
+```
+
+### Implementation Strategy
+
+To support the global versioning strategy defined above, the following internal code structure is recommended.
+
+**Code Organization**
+
+Projects **should** organize their code by API version using separate directories. While teams may choose other
+patterns, this structure is strongly encouraged to ensure clean separation of contracts.
+
+Example Java project structure:
+
+```text
+api/
+  v1/
+    books/
+      BooksController.java
+      BookModel.java
+    publishers/
+      PublishersController.java
+  v2/
+    books/
+      BooksController.java
+      BookModel.java
+    publishers/
+      PublishersController.java
+```
+
+**Migration Process**
+
+When creating a new API version, teams **should**:
+
+1. Duplicate the entire previous version directory (e.g., copy `v1/` to `v2/`)
+2. Apply breaking changes only in the new directory (`v2/`)
+3. Serve both versions simultaneously
+4. When the old version reaches its sunset date, delete the `v1/` directory entirely
+
+This "Copy-Modify-Delete" approach ensures that old versions remain stable and touch-free while new versions are
+developed. It also makes removing dead code trivial (delete the folder) compared to unwinding complex inheritance or
+shared logic.
+
+### AEP Versioning
+
+APIs **must** declare which API specification version they follow using a custom header. See AEP-3 for complete details.
+
+Response header:
+
+```
+X-AEP-Version: v3
+```
+
+This identifies which set of organizational API design standards the service follows, independent of the API's own
+version number.
+
+### Resource-level versioning
+
+APIs **must not** use resource-level versioning (having different resources at different versions within the same API).
+
+Not allowed:
+
+```
+/v5/publishers/...  (at version 5)
+/v2/books/...       (at version 2 in the same API)
+```
+
+Not allowed:
+
+```
+/v5/books?version=v2
+/v5/legacy-v2/books/...
+```
+
+All resources within an API **must** share the same version. See the [Rationale](#why-global-versioning) section below
+for the reasoning behind this decision.
+
+### OpenAPI documentation
+
+OpenAPI specifications **should** clearly document both the API version and specification version. For example:
 
 {% tab proto %}
 
-For protobuf, use the [`google.api.resource`][resource] annotation:
-
-```proto
-// A representation of a user event.
-message UserEvent {
-  option (google.api.resource) = {
-    type: "user.example.com/user-event"
-    singular: "user-event"
-    plural: "user-events"
-    // define one or more patterns, e.g. if a resource has more than one parent.
-    pattern: "projects/{project_id}/user-events/{user_event_id}"
-    pattern: "folder/{folder_id}/user-events/{user_event_d}"
-    pattern: "users/{user_id}/events/{user_event_id}"
-  };
-
-  // Name and other fields...
-```
-
 {% tab oas %}
 
-For OpenAPI 3.0, Resources must be defined in `#components/schemas` and use the
-[`x-aep-resource`](https://aep.dev/json-schema/extensions/x-aep-resource.json)
-extension:
+```yaml
+openapi: 3.1.0
+info:
+  title: Books API
+  version: 5.0.0
+  description: Books management API following AEP v3 specification
+  x-aep-version: v3
 
-```json
-{
-  "components": {
-    "schemas": {
-      "UserEvent": {
-        "type": "object",
-        "x-aep-resource": {
-          "type": "user.example.com/user-event",
-          "singular": "user-event",
-          "plural": "user-events",
-          "patterns": [
-            "projects/{project_id}/user-events/{user_event_id}",
-            "folder/{folder_id}/user-events/{user_event_id}",
-            "users/{user_id}/events/{user_event_id}"
-          ]
-        }
-      }
-    }
-  }
-}
+servers:
+  - url: https://api.company.com/v5
+    description: Production server (v5)
+  - url: https://api.company.com/v4
+    description: Production server (v4 - deprecated)
 ```
 
 {% endtabs %}
 
-- The `type` field **must** be the resource type `{API Name}/{Type Name}`
-- The `singular` field **must** be the kebab-case singular type name.
-- The `plural` field **must** be the kebab-case plural of the singular.
+### Deprecation and Migration
 
-The `pattern` field **must** match the `pattern` rule in the following grammar,
-expressed as [EBNF][EBNF]:
+When a new API version is released, the previous version enters its sunset phase.
 
-```ebnf
-pattern = element, { "/", element };
-element = variable | literal;
-variable = "{", literal, "}";
+**Support Window**
+
+* Both old and new versions **must** remain fully supported.
+* Teams **should** determine an appropriate window based on client needs, but deprecated versions **must** be removed
+  within **12 months maximum**.
+* Teams **should** provide clear migration guides explaining breaking changes.
+* After the sunset date, old version endpoints **must** be removed.
+
+**Deprecation Headers**
+
+Deprecated API versions **should** include `Deprecation` and `Sunset` headers in all responses. These allow clients to
+programmatically detect deprecated endpoints and plan migrations.
+
+Example:
+
+```http
+Deprecation: true
+Sunset: Sat, 01 Jan 2027 00:00:00 GMT
 ```
 
-Where `literal` matches the regex `[a-z][a-z0-9\-_]*[a-z0-9]`.
+**Header Format Requirements**
 
-- Patterns **must** match the possible [paths](/paths) of the resource.
-- Pattern variables (the segments within braces) **must** match the singular of
-  the resource whose id is being matched by that value, suffixed with `_id`.
+* The `Deprecation` header **must** be a boolean (`true`/`false`).
+* The `Sunset` header **must** use the HTTP-date format: `Day, DD Mon YYYY HH:MM:SS GMT`.
+    * `Day`: Three-letter day abbreviation (e.g., `Sat`)
+    * `DD`: Two-digit date (01-31)
+    * `Mon`: Three-letter month abbreviation (e.g., `Jan`)
+    * `YYYY`: Four-digit year
+    * `HH:MM:SS`: Time in 24-hour format with leading zeros
+    * `GMT`: Timezone **must** be GMT
 
-#### Pattern uniqueness
+### When to Version
 
-If multiple patterns are defined within a resource, the patterns defined **must
-not** overlap in the set of resource paths that they can match. In other words,
-a resource path may match at most one of the patterns.
+Increment the major API version when making any of these breaking changes:
 
-For example, the following two patterns would not be valid for the same
-resource:
+* Removing or renaming fields in responses
+* Changing field types or formats
+* Removing endpoints
+* Changing endpoint behavior in incompatible ways
+* Modifying required request parameters
+* Changing authentication or authorization requirements
+* Changing error codes, or error JSON response structure
 
-- `user/{user}`
-- `user/{user_part_1}~{user_part_2}`
+Backward-compatible changes do not require version increments:
+
+* Adding new optional fields to responses
+* Adding new endpoints
+* Adding new optional request parameters
+* Fixing bugs that restore documented behavior
 
 ## Rationale
 
-### Singular and Plural
+### Why global versioning
 
-Well-defined singular and plurals of a resource enable clients to determine the
-proper name to use in code and documentation.
+We prohibit resource-level versioning (different resources at different versions within the same API) for several
+reasons:
 
-google.aip.dev uses UpperCamelCase for resource types, while aep.dev uses
-kebab-case. This is to enforce better consistency in the representation of
-various multipart strings, as collection identifiers use kebab case.
+* Resource-level versioning pushes complexity onto every API consumer. Clients must track which resources are at which
+  versions, creating mental overhead and increasing the likelihood of errors. A developer using the Books API shouldn't
+  need to remember "books are v2, publishers are v5, reviews are v3."
+* With global versioning, documentation clearly states "Books API v5" and all endpoints are understood to be at that
+  version. Resource-level versioning requires complex matrices showing which resources are at which versions, making
+  documentation harder to maintain and understand.
+* Global versioning allows straightforward testing of "the v5 API." Resource-level versioning creates combinatorial
+  explosion: do v2 books work correctly with v5 publishers? What about v3 reviews with v2 books? The testing matrix
+  becomes unmanageable.
+* With resource-level versioning, deprecating old versions becomes ambiguous. If some resources are still on v1 while
+  others moved to v5, when can you sunset v1? Global versioning provides clear deprecation timelines: "v4 will be
+  deprecated on X date."
+* Our microservices architecture already provides version granularity. Each microservice owns a bounded domain and can
+  version independently of other services. Resource-level versioning adds unnecessary granularity within an
+  already-small domain.
+* Operations teams need clear answers to "what version is this service on?" Resource-level versioning makes this
+  question unanswerable. Global versioning provides clear service version metrics.
+* We optimize for client simplicity over implementation convenience. A small amount of consistency work for API teams
+  prevents complexity from propagating to every consumer.
 
-<!-- prettier-ignore-start -->
-[API Group]: https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-groups
-[nested collections]: ./0122.md#collection-identifiers
-[Object]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-architecture/api-conventions.md#types-kinds
-[resource]: https://github.com/googleapis/googleapis/blob/master/google/api/resource.proto
-[service configuration]: https://github.com/googleapis/googleapis/blob/master/google/api/service.proto
-[EBNF]: https://en.wikipedia.org/wiki/Extended_Backus%E2%80%93Naur_form
-<!-- prettier-ignore-end -->
+### Why path-based versioning
+
+Path-based versioning (`/v5/books`) is chosen over alternatives (headers, query parameters, content negotiation) for
+several reasons:
+
+* The version is obvious in URLs, logs, documentation, and debugging tools without inspecting headers or parameters.
+* CDNs, proxies, and API gateways can easily route and cache based on path. Header-based versioning complicates caching
+  strategies.
+* OpenAPI/Swagger, API testing tools, and development frameworks work naturally with path-based versions.
+* Developers can call versioned APIs easily from browsers, curl, or any HTTP client without constructing complex
+  headers.
+* Path-based versioning is the de facto standard among major API providers (Stripe, GitHub, Twilio), making it familiar
+  to developers.
+* While path-based versioning technically violates pure REST/HATEOAS principles (URIs should be treated as identifiers
+  discovered through hypermedia links rather than constructed by clients), the practical benefits far outweigh
+  theoretical purity. We prioritize pragmatic REST principles that provide real value: resource-oriented design, proper
+  HTTP methods, stateless requests, and appropriate status codes.
+* Our organization already uses path-based versioning across most APIs, making it a familiar pattern for both API
+  developers and consumers. While usage has been inconsistent, this AEP standardizes the approach rather than
+  introducing an entirely new paradigm. Moving to header-based versioning would require retraining teams and updating
+  existing integration patterns, creating unnecessary disruption for minimal benefit.
+
+### Why version-specific directories
+
+The recommended project structure intentionally duplicates code across version directories, which may appear to violate
+the DRY (Don't Repeat Yourself) principle. However, this is a valid and beneficial exception for several reasons:
+
+* Versions are independent contracts. Each API version represents a distinct contract with clients. Once published, a
+  version should remain stable and unchanged. Sharing code between versions creates hidden coupling where a change
+  intended for `v3` could inadvertently affect `v2`, violating the stability guarantee.
+* When investigating issues or reviewing code, having self-contained version directories means developers can examine
+  everything relevant to that version in one place. There's no need to trace through shared abstractions or conditional
+  logic to understand how a specific version behaves.
+* Teams can refactor and improve code in newer versions without fear of breaking older versions. If `v2` has technical
+  debt, `v3` can be implemented with better patterns while `v2` remains untouched and stable for its remaining
+  lifecycle.
+* When a version reaches end-of-life, teams simply delete the entire directory. With shared code, determining what's
+  safe to remove requires careful analysis of what other versions depend on it.
+* Developers working on a specific version don't need to understand conditional logic, inheritance hierarchies, or
+  abstractions created to share code between versions. Each version is straightforward and explicit.
+* Code duplication between versions is time-bounded. Once the old version is sunset (within 12 months maximum), the
+  duplicated code is deleted. This is fundamentally different from permanent duplication across a codebase.
+* The cost of duplication (slightly more disk space and initial copying effort) is minimal compared to the benefits
+  (version isolation, simpler debugging, safe cleanup). Modern version control systems handle file copying efficiently,
+  and the duplication exists only during the transition period.
+* The principle underlying this approach: Optimize for version independence and operational safety over code reuse. In
+  versioned APIs, isolation is more valuable than abstraction.
+
+## References
+
+* [RFC 8594] The Sunset HTTP Header Field
+* [RFC 9745] The Deprecation HTTP Response Header Field
+
+[RFC 8594]: https://datatracker.ietf.org/doc/html/rfc8594
+
+[RFC 9745]: https://datatracker.ietf.org/doc/html/rfc9745
+
+[Semantic Versioning]: https://semver.org/
 
 ## Changelog
+
+**2025-11-19**: Initial creation
