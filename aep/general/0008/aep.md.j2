@@ -41,12 +41,6 @@ clients or their authors, including but not limited to:
 - Visual User Interfaces for visualization and one-off manual actions.
 - Users.
 
-Examples of enhancements include:
-
-- Requiring new proto annotations that enable more descriptive interfaces on
-  clients (e.g. requiring `singular` and `plural` on a `google.api.resource`
-  annotation).
-
 AEP guidance **must not** be a significant detriment to a client's usability or
 implementation difficulty, or maintenance difficulty.
 
@@ -76,6 +70,7 @@ AEPs **must** have appropriate front matter.
 id: 8
 state: reviewing
 created: 2019-05-28
+updated: 2019-05-28
 permalink: /8
 redirect_from:
   - /08
@@ -87,22 +82,22 @@ redirect_from:
 Front matter for AEPs **must** include:
 
 - The `aep` key:
-  - `id`: Required. The ID for the given AEP, as an integer.
-  - `state`: Required. The current state of the AEP, in all lower-case. The
-    valid states are listed in [AEP-1][], and common states are `draft`,
-    `reviewing`, and `approved`.
-  - `created`: Required. The ISO-8601 date (`yyyy-mm-dd`) when the AEP was
-    originally drafted, with no quotes.
-  - `updated`: The ISO-8601 date (`yyyy-mm-dd`) when the AEP was last revised.
-  - `scope`: The scope for the AEP. This **must** match the directory name for
-    that scope. Required for AEPs with IDs >= 1000, prohibited otherwise.
+    - `id`: **Required**. The ID for the given AEP, as an integer.
+    - `state`: **Required**. The current state of the AEP, in all lower-case. The
+      valid states are listed in [AEP-1][], and common states are `draft`,
+      `reviewing`, and `approved`.
+    - `created`: **Required**. The ISO-8601 date (`yyyy-mm-dd`) when the AEP was
+      originally drafted, with no quotes.
+    - `updated`: The ISO-8601 date (`yyyy-mm-dd`) when the AEP was last revised.
+    - `scope`: The scope for the AEP. This **must** match the directory name for
+      that scope. Required for AEPs with IDs >= 1000, prohibited otherwise.
 - The `permalink` key (required): This **must** be set to
   `/{aep.scope}/{aep.id}`. If there is no scope, use `/{aep.id}` instead.
 - The `redirect_from` key: This should include a list of any `/{aep.id}`
   permutations that a reader would be likely to enter, including:
-  - `/{aep.id}` (for AEPs where the permalink includes the scope)
-  - AEP IDs with zero-padding, for each level of zero-padding up to four digits
-    (for example: `/08`, `/008`, `/0008`).
+    - `/{aep.id}` (for AEPs where the permalink includes the scope)
+    - AEP IDs with zero-padding, for each level of zero-padding up to four digits
+      (for example: `/08`, `/008`, `/0008`).
 
 ### Document structure
 
@@ -210,17 +205,9 @@ complete understanding, but **must not** contain guidance (and RFC-2119 terms
 
 ### Code examples
 
-API design examples in AEPs **should** be presented in both [OpenAPI][] and
-[protocol buffers][]. Examples **should** cover only enough syntax to explain
-the concept. When using RPCs in examples, a `google.api.http` annotation
-**should** be included.
-
-[OpenAPI][] examples **must** be authored as
-[OAS version 3.1](https://spec.openapis.org/oas/v3.1.1.html).
-
-AEPs should use snake-case naming for parameters and properties (fields), for
-consistency across OpenAPI and protocol buffers, but other casing conventions
-may be used as long as they are applied uniformly.
+API design examples in AEPs **should** use the [OpenAPI][] spec.
+Examples **should** cover only enough syntax to explain
+the concept.
 
 ### Referencing AEPs
 
@@ -235,10 +222,10 @@ subdirectory); this ensures that the link works both on the AEP site, when
 viewing the Markdown file on GitHub, using the local development server, or a
 branch.
 
-### Error codes
+### Response Codes
 
-When referencing a error code, the prose **should** use the format
-`{google.api.error_code} / {http_status_code}`. For example, `OK / 200`.
+When referencing an HTTP response code, the prose **should** use the format
+`{reason_phrase} / {status_code}`. For example, `OK / 200`.
 
 ## Rationale
 
@@ -254,11 +241,16 @@ API guidance must in turn consider the impact broadly across these clients.
 
 ## Changelog
 
-- **2024-03-02**: From from https://google.aip.dev/8
+- **2025-10-30**: Initial AEP-8 for Thryv, adapted from [Google AIP-8][] and aep.dev [AEP-8][].
 
 <!-- Links -->
 
-[Declarative clients]: ./0003.md#declarative-clients
+[Declarative clients]: ./0009.md#declarative-clients
+
 [OpenAPI]: https://www.openapis.org/
-[protocol buffers]: https://developers.google.com/protocol-buffers/
+
 [rfc 2119]: https://www.ietf.org/rfc/rfc2119.txt
+
+[Google AIP-8]: https://google.aip.dev/8
+
+[AEP-8]: https://aep.dev/8
