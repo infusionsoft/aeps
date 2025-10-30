@@ -85,11 +85,11 @@ Update methods implement a common request pattern:
 - A `path` field **must** be included.
   - The field **must** be
     [annotated as required](/field-behavior-documentation).
-  - The field **must** identify the [resource type][aep-4] that it references.
+  - The field **must** identify the [resource type][aep-120] that it references.
 - The request message field for the resource **must** map to the `PATCH` body.
 - The request message field for the resource **should** be [annotated as
   required][aep-203].
-  - The field **must** identify the [resource type][aep-4] of the resource
+  - The field **must** identify the [resource type][aep-120] of the resource
     being updated.
 - If partial resource update is supported, a field mask **must** be included.
   It **must** be of type `google.protobuf.FieldMask`, and it **must** be called
