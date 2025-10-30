@@ -1,17 +1,7 @@
 # AEP Purpose and Guidelines
 
-Service APIs on the Internet continue to proliferate; having a machine-readable
-API is an expectation and prerequisite to adoption for many services. By some
-estimates, there are now more than 20,000 public REST APIs available.
-
-As this corpus continues to grow, many companies struggle with API Governance:
-even as companies grow and disparate teams work to deliver discrete services,
-APIs ought to remain simple, intuitive, and consistent.
-
-Therefore, it is increasingly necessary to have a corpus of documentation for
-API producers, reviewers, and other interested parties to reference. The AEP
-collection provides a way to provide consistent documentation for API design
-guidance.
+As Thryv's API ecosystem grows, we need consistent documentation and design patterns to ensure our APIs are intuitive,
+reliable, and easy to use. AEPs provide a standardized way to document and share API design decisions across Thryv.
 
 ## What is an AEP?
 
@@ -21,83 +11,75 @@ providing high-level, concise documentation for API development.
 Companies that adopt the AEP program use them as a source of truth for
 API-related documentation, and the means by which service producers discuss and
 come to consensus on API guidance. AEPs are maintained as Markdown files with
-metadata in the AEP GitHub repository.
+metadata in the [AEP GitHub repository][].
 
-### Technical leadership
+[AEP GitHub repository]: https://github.com/infusionsoft/aeps
 
-See [governance](/governance).
+## Types of AEPs
+
+There are several different types of AEPs, described below. The list of AEP
+types may evolve over time as necessary.
+
+### Guidance
+
+These AEPs describe guidance on API design. These are provided as instruction
+for API producers to help write simple, intuitive, and consistent APIs and are
+used by API reviewers as a basis for review comments.
+
+### Process
+
+These AEPs describe a process surrounding API design. They often affect the AEP
+process itself and are used to enhance the way in which AEPs are handled.
+
+## Stakeholders
+
+### Editors
+
+The AEP editors are responsible for:
+
+* Reviewing and approving AEPs
+* Maintaining AEP quality and consistency
+* Managing the AEP workflow and numbering
+* Ensuring AEPs are clear, actionable, and well-written
+
+Current editors are the members of the [Gryffindor team][].
+
+[Gryffindor team]: https://github.com/orgs/infusionsoft/teams/gryffindor
 
 ## States
 
 At any given time, AEPs may exist in a variety of states as they work their way
 through the process. The following is a summary of each state.
 
+### Draft
+
+The initial state for an AEP is the "Draft" state. This means that the AEP is
+being discussed and iterated upon.
+
 ### Reviewing
 
-Initial discussion on most AEPs occurs in the initial pull request to submit
-the AEP. Once this PR is merged, the AEP exists in the "Reviewing" state. This
-means that the authors and the technical steering committee have reached a
-general consensus on the proposal.
-
-At this stage, the committee may request changes or suggest alternatives to the
-proposal before moving forward, but there is a general expectation that the
-proposal will move forward and it is usually safe to "early adopt" it.
-
-An AEP **must** be in the reviewing state for at least 14 days before being
-approved, and the committee **should** send appropriate communication regarding
-the pending approval.
-
-**Note:** As a formal matter, one AEP approver (other than the author) **must**
-provide formal signoff to advance an AEP to the reviewing state. Additionally,
-there **must not** be formal objections ("changes requested" on the GitHub PR)
-from other approvers.
+The AEP has a solid proposal and is under formal review by the AEP maintainers.
+Changes may still be requested before approval.
 
 ### Approved
 
-Once an AEP has been agreed upon, it enters "approved" state and is considered
-"best current practice".
-
-AEPs **may** be edited after they are approved, either to correct grammar or
-word choices, or to clarify semantic guidance (in response to reader
-questions). In rare occasions, new guidance **may** be added.
-
-Clarifications and new guidance **must** be reflected in the changelog.
-Correction of typos or minor language alterations **may** be done silently.
-
-**Note:** As a formal matter, two AEP approvers (other than the author)
-**must** provide formal signoff to advance an AEP to the approved state.
-Additionally, there **must not** be formal objections ("changes requested" on
-the GitHub PR) from other approvers.
-
-### Final
-
-If an AEP has been approved for a significant period and the technical steering
-committee is certain that no further guidance will be needed, they **may** move
-the AEP in to "final" state.
-
-AEPs in the final state **must not** be amended with new guidance. They **may**
-be editied to correct spelling, grammar, or clarity provided there are no
-semantic changes.
-
-**Note:** As a formal matter, two AEP approvers **must** provide formal signoff
-to advance an AEP to the final state. Additionally, there **must not** be
-formal objections ("changes requested" on the GItHub PR) from other approvers.
-
-### Replaced
-
-If an AEP has been replaced by another AEP, it enters "replaced" state. The AEP
-**must** include a notice explaining the replacement and rationale (the
-replacement AEP **should** also clearly explain the rationale).
-
-In general, service producers rely primarily on AEPs in the "approved" state.
-Service producers **may** rely on AEPs in the "reviewing" state
+The AEP is approved and represents Thryv's current best practice.
+This is the state you should follow for API design.
 
 ### Withdrawn
 
-If an AEP is withdrawn by the author or champion, or is rejected by the
-technical steering committee after reaching the "reviewing" state, it enters
-"withdrawn" state. Withdrawn AEPs remain accessible, but are removed from the
-indexes; they provide documentation and reference to inform future discussions.
+If an AEP is withdrawn by the author or champion, it enters "withdrawn" state.
+AEPs that are withdrawn may be taken up by another champion.
+
+### Rejected
+
+If an AEP is rejected by the AEP editors, it enters "rejected" state. AEPs that
+are rejected remain and provide documentation and reference to inform future
+discussions.
+
+### Replaced
+
+The AEP has been superseded by a newer AEP with updated guidance.
 
 ## Workflow
 
@@ -114,29 +96,32 @@ graph LR
   classDef mistyrose fill:#FFE4E1,stroke:#000,stroke-width:1px;
   classDef lightsteelblue fill:#B0C4DE,stroke:#000,stroke-width:1px;
 
-  github_pr((GitHub PR)):::orange
+  draft[Draft]:::orange
   reviewing[Reviewing]:::lightskyblue
   approved[Approved]:::palegreen
-  final[Final]:::palegreen
   withdrawn[Withdrawn]:::mistyrose
+  rejected[Rejected]:::mistyrose
   replaced[Replaced]:::lightsteelblue
 
-  github_pr --> reviewing
+  draft --> reviewing
+  draft -.-> withdrawn
   reviewing --> approved
   reviewing -.-> withdrawn
-  approved --> final
+  reviewing -.-> rejected
   approved -.-> replaced
-  final -.-> replaced
+  reviewing -.-> replaced
 ```
 
 ### Proposing an AEP
+
+Anyone at Thryv can propose a AEP!
 
 In order to propose an AEP, first open a pull request with a draft AEP; the AEP
 should conform to the guidance in AEP-8. Most AEPs **should** be no more than
 two pages if printed out.
 
 If the technical steering committee has suggested an AEP number, use that;
-otherwise use 99 (and expect to change it during the course of the review).
+otherwise use 9999 (and expect to change it during the course of the review).
 
 **Important:** Ensure that the PR is editable by maintainers.
 
@@ -161,6 +146,9 @@ committee members requesting significant changes (indicated by the use of the
 **Note:** If an AEP editor is the primary author of an AEP, then at least two
 _other_ editors must approve it.
 
+Once the AEP is approved, the editors will update the state of the AEP to
+reflect this and submit the PR.
+
 ### Withdrawing or Rejecting an AEP
 
 The author of an AEP may decide, after further consideration, that an AEP
@@ -176,13 +164,25 @@ state accordingly and submit the PR.
 ### Replacing an AEP
 
 In rare cases, it may be necessary to replace an AEP with another one. This is
-not general practice: minor edits to approved AEPs are acceptable, and AEPs
-only enter final state when there is high confidence that further edits will
-not be necessary.
+not general practice: minor edits to approved AEPs are acceptable and will be
+the common way to tweak guidance. However, if new guidance fundamentally alters
+the old guidance in some way, then the AEP editors shall create a new AEP that,
+once approved, will replace the old one. The old one then enters the "Replaced"
+state and will link to the new, current AEP.
 
-However, if new guidance fundamentally alters the old guidance in some way,
-then the technical steering committee **should** create a new AEP that, once
-approved, will replace the old one. The old one then enters "Replaced" state,
-and will link to the new, current AEP.
+## Questions?
 
-[aep.dev]: https://aep.dev/
+* Slack: [#ask-pd-api][]
+* Repository: [GitHub Issues][]
+
+[#ask-pd-api]: https://keaporg.enterprise.slack.com/archives/C5HG5M4FP
+
+[GitHub Issues]: https://github.com/infusionsoft/aeps/issues
+
+## Changelog
+
+- **2025-10-30**: Initial AEP-1 for Thryv, adapted from [Google AIP-1][] and aep.dev [AEP-1][].
+
+[Google AIP-1]: https://google.aip.dev/1
+
+[AEP-1]: https://aep.dev/1
