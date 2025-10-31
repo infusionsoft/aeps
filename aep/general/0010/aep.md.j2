@@ -1,0 +1,105 @@
+# REST Fundamentals
+
+This AEP is an educational primer. It establishes a shared vocabulary and mental model for REST so that later AEPs
+(which contain prescriptive guidelines) can reference these fundamentals without re‑explaining them. It is intentionally
+technology‑agnostic but uses HTTP examples because HTTP is the most common transport for RESTful systems.
+
+Audience: API designers, backend engineers, platform engineers, and reviewers who need a clear understanding of REST and
+how it maps to practical HTTP APIs in our org.
+
+Scope: What REST is, why it matters, and the core constraints and concepts you should recognize in API design. This is
+not a style guide; prescriptive rules and conventions come in subsequent AEPs.
+
+## What is REST?
+
+[Representational State Transfer (REST)] is an architectural style for distributed hypermedia systems described
+by [Roy Fielding]. It is not a protocol or a standard. In practice, when people say "REST API," they typically mean an
+HTTP API that adheres to REST constraints closely enough to gain the intended properties: simplicity, evolvability,
+scalability, and interoperability.
+
+Key ideas:
+
+- **Resources**: Conceptual things your system exposes (users, invoices, sessions), identified by URIs.
+- **Representations**: Concrete formats that represent resource state (e.g., JSON, XML, HTML). Clients transfer
+  representations of resource state, not server internals.
+- **Uniform interface**: A small, consistent set of operations and semantics applied uniformly, enabling loose coupling.
+
+**Why this matters**: When you design with REST in mind, you optimize for independent evolution of clients and servers,
+horizontal scalability, and cache‑friendly interactions.
+
+[Representational State Transfer (REST)]: https://en.wikipedia.org/wiki/REST
+
+[Roy Fielding]: https://en.wikipedia.org/wiki/Roy_Fielding
+
+## Why REST?
+
+- **Simplicity and familiarity**: HTTP is ubiquitous; developers, tooling, and infrastructure already speak it.
+- **Interoperability**: A uniform, resource‑oriented interface lowers coupling across teams and languages.
+- **Scalability**: Stateless interactions and cacheability enable horizontal scaling and global delivery via
+  CDNs/intermediaries.
+- **Observability and operability**: HTTP semantics (methods, status codes, headers) are structured and inspectable.
+- **Ecosystem**: Standards like TLS, OAuth 2.0/OIDC, OpenAPI, JSON Schema, and web caches integrate naturally.
+
+## The REST Constraints
+
+REST is defined by constraints. The more faithfully you apply them, the more you gain the intended properties.
+Violations are trade‑offs that should be explicit.
+
+1. Client–Server
+    - Separation of concerns: the client handles UX/state presentation; the server handles data and business rules.
+    - **Benefit**: independent evolution and simpler scaling.
+2. Stateless
+    - Each request contains all the information necessary to understand it; the server does not rely on stored session
+      state between requests.
+    - **Benefit**: horizontal scalability, easier failure handling, simpler operations.
+3. Cacheable
+    - Responses must define themselves as cacheable or not via standard headers.
+    - **Benefit**: latency reduction, lower server load, higher availability through intermediaries.
+4. Uniform Interface
+    - Resource identification: stable URIs identify resources, e.g., `/users/{id}`.
+    - Resource manipulation through representations: clients use standard methods (`GET`, `POST`, `PUT`, `PATCH`,
+      `DELETE`) on URIs to manipulate state.
+    - Self‑descriptive messages: messages include enough metadata (`Content-Type`, caching headers, etc.) for clients
+      and intermediaries to process them correctly.
+    - [Hypermedia as the engine of application state (HATEOAS)]: representations contain links/actions to guide clients
+      through available state transitions.
+        - **Note**: While theoretically important, HATEOAS is often the most relaxed constraint in practice. Many "REST"
+          APIs omit hypermedia links while still gaining most REST benefits.
+    - **Benefit**: decoupling, evolvability, and consistent learnability.
+5. Layered System
+    - Clients need not know whether they are connected to the origin server, a proxy, or a gateway.
+    - **Benefit**: cross‑cutting concerns (auth, rate‑limit, caching, routing) can be implemented in layers.
+6. Code‑on‑Demand (optional)
+    - Servers may extend client functionality by transferring executable code.
+
+[Hypermedia as the engine of application state (HATEOAS)]: https://en.wikipedia.org/wiki/HATEOAS
+
+## REST Concepts in HTTP Context
+
+- **Resources**: Identified by URLs (e.g., `/users/123`, `/orders/456`)
+- **Representations**: Typically JSON payloads, but could be XML, HTML, etc.
+- **Uniform interface**: HTTP methods (`GET`, `POST`, `PUT`, `DELETE`) + status codes
+- **Stateless**: Each HTTP request is independent; no server-side sessions
+- **Cacheable**: HTTP caching headers (`Cache-Control`, `ETag`, etc.)
+
+**Example**: `GET /users/123` returns a JSON representation of user 123. `PUT /users/123` replaces that user's state
+with the provided representation.
+
+## Common Misconceptions
+
+- **"REST = HTTP"**: REST is an architectural style; HTTP is just one (common) implementation.
+- **"REST = JSON over HTTP"**: While common, REST doesn't mandate JSON or any specific format.
+- **"RESTful = having endpoints"**: Having endpoints doesn't make an API RESTful; following the constraints does.
+- **"REST is always the right choice"**: REST optimizes for certain properties; other styles may be better for specific
+  use cases.
+
+## References
+
+- Fielding, Roy Thomas (2000). ["Chapter 5: Representational State Transfer (REST)"]. Architectural Styles and the
+  Design of Network-based Software Architectures (Ph.D.). University of California, Irvine.
+
+["Chapter 5: Representational State Transfer (REST)"]: https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm
+
+## Changelog
+
+- **2025-10-31**: Initial creation.
