@@ -63,14 +63,15 @@ Violations are trade‑offs that should be explicit.
       and intermediaries to process them correctly.
     - [Hypermedia as the engine of application state (HATEOAS)]: representations contain links/actions to guide clients
       through available state transitions.
-        - **Note**: While theoretically important, HATEOAS is often the most relaxed constraint in practice. Many "REST"
-          APIs omit hypermedia links while still gaining most REST benefits.
     - **Benefit**: decoupling, evolvability, and consistent learnability.
 5. Layered System
     - Clients need not know whether they are connected to the origin server, a proxy, or a gateway.
     - **Benefit**: cross‑cutting concerns (auth, rate‑limit, caching, routing) can be implemented in layers.
 6. Code‑on‑Demand (optional)
     - Servers may extend client functionality by transferring executable code.
+
+**Note:** While theoretically important, HATEOAS is often the most relaxed constraint in practice. Many "REST" APIs omit
+hypermedia links while still gaining most REST benefits.
 
 [Hypermedia as the engine of application state (HATEOAS)]: https://en.wikipedia.org/wiki/HATEOAS
 
@@ -82,7 +83,7 @@ Violations are trade‑offs that should be explicit.
 - **Stateless**: Each HTTP request is independent; no server-side sessions
 - **Cacheable**: HTTP caching headers (`Cache-Control`, `ETag`, etc.)
 
-**Example**: `GET /users/123` returns a JSON representation of user 123. `PUT /users/123` replaces that user's state
+**Example:** `GET /users/123` returns a JSON representation of user 123. `PUT /users/123` replaces that user's state
 with the provided representation.
 
 ## Common Misconceptions
