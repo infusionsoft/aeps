@@ -4,7 +4,7 @@ In REST APIs, it is customary to make a `PUT` request to a resource's URI (for
 example, `/v1/publishers/{publisher_id}/books/{book_id}`) in order to create or
 replace a resource.
 
-[Resource-oriented design](/resources) honors this pattern through the `Apply`
+[Resource-oriented design](/resource-oriented-design) honors this pattern through the `Apply`
 method. These operations accept the resource and its path, which it uses to
 create or replace the resource. The operation returns the final resource.
 
@@ -32,7 +32,7 @@ Apply methods are specified using the following pattern:
   request. In this situation, the API **should** use a
   [long-running operation](/long-running-operations).
 - The operation **must** have
-  [strong consistency](/resources#strong-consistency).
+  [strong consistency](/resource-oriented-design#strong-consistency).
 - The HTTP URI path of the `PUT` method **must** be the resource path.
 
 {% tab proto %}
