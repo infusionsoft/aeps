@@ -4,7 +4,7 @@ export AEP_LOCATION="${PWD}"
 export SG_DIRECTORY="/tmp/site-generator"
 
 if [ ! -d "${SG_DIRECTORY}" ]; then
-    git clone https://github.com/aep-dev/site-generator.git "${SG_DIRECTORY}"
+    git clone git@github.com:infusionsoft/aep-site-generator.git "${SG_DIRECTORY}"
 fi
 
 cd "${SG_DIRECTORY}" || exit
