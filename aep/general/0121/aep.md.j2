@@ -69,7 +69,7 @@ A resource **must** support at minimum [Get][]: clients must be able to
 validate the state of resources after performing a mutation such as [Create][],
 [Update][], or [Delete][].
 
-A resource **must** also support [List][], except for [singleton resources][]
+A resource **must** also support [List][], except for singleton resources
 where more than one resource is not possible.
 
 **Custom methods (actions):** In REST, do not invent new HTTP verbs. Prefer the
@@ -172,8 +172,6 @@ users don't have to manually specify these values, they don't increase resource 
 [collection]: ./9#collection
 
 [resource references]: ./0122#fields-representing-another-resource
-
-[singleton resources]: ./0156
 
 [soft delete]: ./0164
 
