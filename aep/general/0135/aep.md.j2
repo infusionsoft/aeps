@@ -74,7 +74,7 @@ Delete methods implement a common request pattern:
 {% sample '../example.proto', 'message DeleteBookRequest' %}
 
 - A `path` field **must** be included. It **should** be called `path`.
-  - The field **should** be [annotated as required][aep-203].
+  - The field **should** be annotated as required.
 - The comment for the field **should** document the resource pattern.
 - The request message **must not** contain any other required fields, and
   **should not** contain other optional fields except those described in this

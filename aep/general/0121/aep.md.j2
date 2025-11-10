@@ -96,7 +96,7 @@ made.
 User-settable fields (fields that clients provide) **must** return the same value on all subsequent requests after an
 operation completes, until another mutation changes the resource.
 
-[Output only][output only] fields (system-managed fields like `created_at`, `status`, or IDs) **should** also return
+Output-only fields (system-managed fields like `created_at`, `status`, or IDs) **should** also return
 consistent values after an operation completes.
 
 - However, there's an exception for fields that represent "live state" that takes significant time to stabilize (for
@@ -117,7 +117,7 @@ Clients often need to perform multiple operations in sequence (for example, crea
 that depends on A). Strong consistency ensures that when an operation completes, clients can immediately proceed to the
 next step without worrying whether their changes are visible yet.
 
-Output only fields ideally follow the same guidelines, but since these fields often represent a resource's live state,
+Output-only fields ideally follow the same guidelines, but since these fields often represent a resource's live state,
 they may sometimes need to change after a mutation operation to reflect ongoing state transitions.
 
 ### Cyclic References
@@ -164,8 +164,6 @@ users don't have to manually specify these values, they don't increase resource 
 [get]: ./0131
 
 [list]: ./0132
-
-[output only]: ./0203#output-only
 
 [rest]: ./10
 

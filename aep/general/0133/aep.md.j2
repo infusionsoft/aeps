@@ -70,7 +70,7 @@ Create methods implement a common request message pattern:
 
 - A `parent` field **must** be included unless the resource being created is a
   top-level resource. It **should** be called `parent`.
-  - The field **should** be [annotated as `REQUIRED`][aep-203].
+  - The field **should** be annotated as `REQUIRED`.
 
 {% tab oas %}
 
@@ -93,8 +93,7 @@ Create methods implement a common request message pattern:
 - The response **must** be the resource itself. There is no separate response
   schema.
   - The response **should** include the fully-populated resource, and **must**
-    include any fields that were provided unless they are input only (see
-    AEP-203).
+    include any fields that were provided unless they are input only.
 
 {% endtabs %}
 
@@ -195,7 +194,6 @@ path and use it in references from other resources.
 
 [data plane]: ./0111.md#data-plane
 [errors]: ./0193
-[field_behavior]: ./0203
 [Declarative clients]: ./0003.md#declarative-clients
 [permission-denied]: ./0193.md#permission-denied
 [strong consistency]: ./0121.md#strong-consistency

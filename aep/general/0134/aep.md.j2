@@ -28,7 +28,7 @@ changes to the resources without causing side effects.
 - The response schema **must** be the resource itself.
   - The response **should** include the fully-populated resource, and **must**
     include any fields that were sent and included in the update mask unless
-    they are input only (see AEP-203).
+    they are input only.
 
 {% tab proto %}
 
@@ -83,11 +83,9 @@ Update methods implement a common request pattern:
 {% sample '../example.proto', 'message UpdateBookRequest' %}
 
 - A `path` field **must** be included.
-  - The field **must** be
-    [annotated as required](/field-behavior-documentation).
+  - The field **must** be annotated as required.
 - The request message field for the resource **must** map to the `PATCH` body.
-- The request message field for the resource **should** be [annotated as
-  required][aep-203].
+- The request message field for the resource **should** be annotated as required.
 - If partial resource update is supported, a field mask **must** be included.
   It **must** be of type `google.protobuf.FieldMask`, and it **must** be called
   `update_mask`.
@@ -236,7 +234,5 @@ preconditions.
 [permission-denied]: ./0193.md#permission-denied
 [state fields]: ./0216
 [strong consistency]: ./0121.md#strong-consistency
-[required]: ./0203.md#required
-[optional]: ./0203.md#optional
 [IETF RFC 7396]: https://datatracker.ietf.org/doc/html/rfc7396
 <!-- prettier-ignore-end -->

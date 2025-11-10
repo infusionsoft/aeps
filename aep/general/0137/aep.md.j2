@@ -79,8 +79,7 @@ Apply methods implement a common request message pattern:
 {% sample '../example.proto', 'message ApplyBookRequest' %}
 
 - A `path` field specifying the path of the resource **must** be included.
-  - The field **must** be
-    [annotated as `REQUIRED`](/field-behavior-documentation).
+  - The field **must** be annotated as `REQUIRED`.
 
 {% tab oas %}
 
@@ -95,8 +94,7 @@ Apply methods implement a common request message pattern:
 - The response **must** be the resource itself. There is no separate response
   schema.
   - The response **should** include the fully-populated resource, and **must**
-    include any fields that were provided unless they are input only (see
-    [field behavior](/field-behavior-documentation)).
+    include any fields that were provided unless they are input only.
 
 {% tab proto %}
 
@@ -111,7 +109,7 @@ Apply methods implement a common request message pattern:
 ### Errors
 
 If an resource does not have a field set which is labeled with required (either
-the protobuf [field behavior](/0203#required) or present in the JsonSchema
+the protobuf field behavior or present in the JsonSchema
 `required` field), the request **must** fail with
 ``INVALID_ARGUMENT / 400 Bad Request`.
 

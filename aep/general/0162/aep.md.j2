@@ -225,10 +225,9 @@ message AliasBookRevisionRequest {
 {% endtabs %}
 
 - The request message **must** have a `path` field:
-  - The field **must** be
-    [annotated as required](/field-behavior-documentation).
+  - The field **must** be annotated as required.
 - The request message **must** have a `alias` field:
-  - The field **must** be [annotated as required][aip-203].
+  - The field **must** be annotated as required.
 - If the user calls the method with an existing `alias` with `overwrite` set to
   true, the request **must** succeed and the alias will be updated to refer to
   the provided revision. If `overwrite` is false, the request must fail with an
@@ -311,9 +310,7 @@ message RollbackBookRequest {
 - The method **should** return a resource revision.
 - The request message **must** have a `path` field, referring to the resource
   revision whose configuration the resource should be rolled back to.
-  - The field **must** be [annotated as required][aip-203].
-  - The field **must** identify the [resource type][aip-123] that it
-    references.
+  - The field **must** be annotated as required.
 
 ### Child resources
 
