@@ -1,7 +1,7 @@
 # Reading across collections
 
 Sometimes, it is useful for a user to be able to retrieve resources across
-multiple collections, or retrieve a single resource without needing to know
+multiple collections or retrieve a single resource without needing to know
 what collection it is in.
 
 ## Guidance
@@ -10,7 +10,7 @@ APIs **may** support reading resources across multiple collections by allowing
 users to specify a `-` (the hyphen or dash character) as a wildcard character
 in a standard [`List`](./list) method:
 
-```
+```http request
 GET /v1/publishers/-/books?filter=...
 ```
 
@@ -31,21 +31,9 @@ possibility of partial failures due to unreachable parents (such as when
 listing across locations), the method **must** indicate this following the
 guidance in [unreachable resources].
 
-{% tab proto %}
-
-- The URI pattern in the `google.api.http` annotation **must** still be
-  specified with `*` and permit the collection to be specified; a URI pattern
-  **must not** hard-code the `-` character.
-
-{% tab oas %}
-
-Note: OAS guidance is yet to be written.
-
-{% endtabs %}
-
 ### Unique resource lookup
 
-Sometimes, a resource within a sub-collection has an identifier that is unique
+Sometimes, a resource within a subcollection has an identifier that is unique
 across parent collections. In this case, it may be useful to allow a
 [`Get`](./get) method to retrieve that resource without knowing which parent
 collection contains it. In such cases, APIs **may** allow users to specify the
@@ -68,47 +56,17 @@ GET https://library.exampleapis.com/v1/publishers/-/books/{book_id}
   `publishers/123/books/456`, _not_ `publishers/-/books/456`.
 - The resource ID **must** be unique within parent collections.
 
-### Reading across collections with different path patterns
-
-Sometimes, a resource may have multiple possible path patterns. This typically
-happens when a resource, or one of its ancestors, may have more than one
-possible parent resource (including having no parent).
-
-For example, `Book` might have the following path patterns:
-
-- `publishers/{publisher_id}/books/{book_id}` for books with a publisher
-- `books/{book_id}` for self-published books
-
-In this case, APIs **may** allow users to read across _all_ collections of
-books by using the `--` global wildcard sequence:
-
-`GET /v1/--/books`
-
-Here, `--` is not a wildcard for a resource ID within a specific collection.
-Rather, it is a wildcard for the entire path pattern. This allows users to
-retrieve a book regardless of its resource ancestry.
-
-This pattern may also be used to search all subcollections of a specific
-collection. For example, a `Playlist` resource might have the following path
-patterns:
-
-- `games/{game}/users/{user}/playlists/{playlist}` for playlists created by a
-  user within a game
-- `games/{game}/zones/{zone}/playlists/{playlist}` for playlists specific to a
-  game zone
-
-A client could read across all collections of both zone and user playlists
-_within_ game `123` with:
-
-`GET /v1/games/123/--/playlists`
-
 ## Further reading
 
 - For partial failures due to unreachable resources, see [unreachable
   resources].
 
-<!-- prettier-ignore-start -->
-
 [unreachable resources]: ./unreachable-resources
 
-<!-- prettier-ignore-end -->
+## Changelog
+
+* **2025-11-10**: Initial AIP-159 for Thryv, adapted from [Google AIP-159][] and aep.dev [AEP-159][].
+
+[Google AIP-159]: https://google.aip.dev/159
+
+[AEP-159]: https://aep.dev/159
