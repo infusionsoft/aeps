@@ -10,26 +10,24 @@ values are.
 APIs **may** expose enum objects for sets of values that are expected to change
 infrequently:
 
-```typescript
+```java
 // Possible formats in which a book may be published.
-enum Format {
+public enum Format {
   // The printed format, in hardback.
-  Hardback = 'HARDBACK',
+  HARDBACK,
 
   // The printed format, in paperback.
-  Paperback = 'PAPERBACK',
+  PAPERBACK,
 
   // An electronic book format.
-  Ebook = 'EBOOK',
+  EBOOK,
 
   // An audio recording.
-  Audiobook = 'AUDIOBOOK',
+  AUDIOBOOK
 }
 ```
 
-- All enum values **should** use a consistent case format across an
-  organization. In many cases, this is dictated by the IDL the organization
-  uses.
+- All enum values **should** use a consistent case format across an API.
 - Enums **should** document whether the enum is frozen or they expect to add
   values in the future.
 
@@ -49,7 +47,7 @@ representation **must** match.
 ### Alternatives
 
 Enums **should not** be used when there is a competing, widely-adopted standard
-representation (such as with [language codes][bcp-47] or [media types][]).
+representation (such as with [language codes][bcp-47] or [media types]).
 Instead, that standard representation **should** be used. This is true even if
 only a small subset of values are permitted, because using enums in this
 situation often leads to frustrating lookup tables when trying to use multiple
@@ -57,11 +55,9 @@ APIs together.
 
 For enumerated values where the set of allowed values changes frequently, APIs
 **should** use a `string` field instead, and **must** document the allowed
-values. String fields with enumerated values **should** use a uniform case
-system (`snake_case`, `kebab-case`, etc.) throughout an organization.
+values.
 
-Boolean fields **may** be used in situations where it is clear that no further
-flexibility will be needed. The default value **must** be `false`.
+String fields with enumerated values **should** use `snake_case`.
 
 ### Compatibility
 
@@ -88,12 +84,6 @@ Services **may** add new values to existing enums; however, they **should** add
 enums carefully; think about what will happen if a client system does not know
 about a new value.
 
-Additionally, in IDLs where enum values are presented in a specific order,
-services **should** only add new values to the end. An exception to this rule
-is if the enum conforms to an external standard (for example, an enum
-representing HTTP status codes would add a new 3xx value alongside the others,
-not at the end).
-
 ## Interface Definitions
 
 {% tab proto %}
@@ -119,11 +109,10 @@ choice (although `google.protobuf.BoolValue` is also available).
 
 {% tab oas %}
 
-{% sample 'enum.oas.yaml', '$.components.schema.Book.properties.format.enum' %}
+{% sample 'enum.oas.yaml', '$.components.schemas.Book.properties.format.enum' %}
 
 - Enumerated fields **should** be strings.
-- If the enum is optional, The `null` value **should** be used as the empty
-  value, and **should** be the first value specified.
+- If the enum is optional, `null` **should** be used as the empty value.
 
 **Note:** If `null` is a valid value, OpenAPI 3.0 also requires that
 `nullable: true` is specified for the field.
@@ -136,3 +125,11 @@ choice (although `google.protobuf.BoolValue` is also available).
 
 [bcp-47]: https://en.wikipedia.org/wiki/IETF_language_tag
 [media types]: https://en.wikipedia.org/wiki/Media_type
+
+## Changelog
+
+* **2025-11-10**: Initial AIP-126 for Thryv, adapted from [Google AIP-126][] and aep.dev [AEP-126][].
+
+[Google AIP-126]: https://google.aip.dev/126
+
+[AEP-126]: https://aep.dev/126

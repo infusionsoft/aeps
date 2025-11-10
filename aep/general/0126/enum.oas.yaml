@@ -4,7 +4,7 @@ info:
   title: Library
   version: 1.0.0
 components:
-  schema:
+  schemas:
     Book:
       description: A representation of a single book.
       properties:
@@ -26,14 +26,14 @@ components:
             type: string
           description: The author or authors of the book.
         rating:
-          type: float
+          type: number
+          format: float
           description: The rating assigned to the book.
         format:
           type: string
           description: The format of the book.
           nullable: true
           enum:
-            - null
             - HARDCOVER
             - PAPERBACK
             - EBOOK
