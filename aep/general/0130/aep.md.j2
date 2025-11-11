@@ -1,107 +1,196 @@
 # Methods
 
-An API is composed of one or more methods, which represent a specific operation
-that a service can perform on behalf of the consumer.
+This AEP establishes standards for how APIs use HTTP methods. Consistent and correct use of HTTP methods ensures
+that APIs are predictable, maintainable, and align with REST principles and HTTP standards defined in [RFC 9110].
+
+HTTP methods are standardized actions that indicate the desired operation to be performed on a resource. The method
+represents the _action_ (verb) being performed on the _resource_ (noun) identified by the URI path. The request method
+is the primary source of request semantics; it indicates the purpose for which the client has made the request and what
+the client expects as a successful result.
+
+This AEP provides general guidance applicable to all HTTP methods. Detailed requirements for individual methods are
+covered in separate AEPs (see Method Details table below).
 
 ## Guidance
 
-### Categories of Methods
+### Choosing the Right Method
 
-The following enumerates multiple categories of methods that exist, often
-grouped up under some object (e.g. collection or resource) that the method
-operates upon.
+APIs **must** use HTTP methods in accordance with their standardized semantics as defined in [RFC 9110]. This means:
 
-| Category Name                                                                                                                                                                                                                                         | Related AIPs                                                | [Declarative client][] integration | CLI / UI integration | SDK integration |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------- | -------------------- | --------------- |
-| _Standard Methods_                                                                                                                                                                                                                                    |                                                             |                                    |                      |                 |
-| **Standard collection methods**: operate on a collection of resources (List or Create).                                                                                                                                                               | [resources], [list], [create]                               | automatable                        | automatable          | automatable     |
-| **Standard resource methods**: fetch or mutate a single resource (Get, Update, Delete).                                                                                                                                                               | [resources], [get], [update], [delete]                      | automatable                        | automatable          | automatable     |
-| **Batch resource methods**: fetch or mutate multiple resources in a collection by name.                                                                                                                                                               | [batch-get], [batch-create], [batch-update], [batch-delete] | may be used to optimize queries    | automatable          | automatable     |
-| **Aggregated list methods**: fetch or mutate multiple resources of the same type across multiple collections.                                                                                                                                         | [reading-across-collections]                                | not useful nor automatable         | automatable          | automatable     |
-| _Custom Fetch Methods_                                                                                                                                                                                                                                |                                                             |                                    |                      |                 |
-| **Custom collection fetch methods**: fetch information across a collection that cannot be expressed via a standard method.                                                                                                                            | [custom-methods]                                            | handwritten                        | automatable          | automatable     |
-| **Custom resource fetch methods**: fetch information for a single resource that cannot be expressed via a standard method.                                                                                                                            | [custom-methods]                                            | handwritten                        | automatable          | automatable     |
-| _Custom Mutation Methods_                                                                                                                                                                                                                             |                                                             |                                    |                      |                 |
-| **Backing up a resource**: storing a copy of a resource at a particular point in time.                                                                                                                                                                | [resource-revisions]                                        | unused or handwritten              | automatable          | automatable     |
-| **Restoring a resource**: setting a resource to a version from a particular point in time.                                                                                                                                                            | [resource-revisions]                                        | unused or handwritten              | automatable          | automatable     |
-| **Renaming a resource**: modify the resource's name or id while preserving configuration and data.                                                                                                                                                    | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| **Custom collection mutation methods**: perform an imperative operation referencing a collection that may mutate one or more resources within that collection in fashion that cannot be easily achieved by standard methods (e.g. state transitions). | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| **Custom resource mutation methods**: perform an imperative operation on a resource that may mutate it in a way a standard method cannot (e.g. state transitions).                                                                                    | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| _Misc Custom Methods_                                                                                                                                                                                                                                 |                                                             |                                    |                      |
-| **Stateless Methods**: a method that has no permanent effect on any data within the API (e.g. translating text)                                                                                                                                       | [custom-methods]                                            | unused or handwritten              | automatable          | automatable     |
-| _None of the above_                                                                                                                                                                                                                                   |                                                             |                                    |                      |                 |
-| **Streaming methods**: methods that communicate via client, server, or bi-directional streams.                                                                                                                                                        |                                                             | handwritten                        | handwritten          | automatable     |
+* Methods **must** be used for their intended purpose
+* Methods **must** respect their safety, idempotency, and cacheability properties
+* Methods **must not** be repurposed for operations that conflict with their standard semantics
 
-### Choosing a method category
+The following table summarizes standard HTTP methods and their proper use:
 
-While designing a method, API authors should choose from the defined categories
-in the following order:
+| Method    | Description                                                 | Use Case                                                   | Example                                                                        |
+|-----------|-------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [GET]     | Retrieves a representation of the specified resource        | Fetching information, reading resources                    | `GET /books` retrieves a list of books                                         |
+| [HEAD]    | Same as GET, but without the response body                  | Checking resource existence or retrieving headers          | `HEAD /books/123` retrieves headers of book with ID 123                        |
+| [POST]    | Perform resource-specific processing on the request content | Creating resources, triggering actions, or processing data | `POST /books` creates a new book                                               |
+| [PUT]     | _Fully_ replaces or creates the specified resource          | Replacing or updating an existing resource                 | `PUT /books/123` updates all fields for (or creates) book with ID 123          |
+| [PATCH]   | _Partially_ updates the specified resource                  | Modifying specific attributes of an existing resource      | `PATCH /books/123` updates only certain fields of book 123                     |
+| [DELETE]  | Deletes the specified resource                              | Removing a resource                                        | `DELETE /books/123` deletes book with ID 123                                   |
+| [OPTIONS] | Retrieves the HTTP methods supported by a resource          | Checking allowed methods or CORS preflight requests        | `OPTIONS /books` retrieves allowed methods for interacting with books resource |
 
-1. Standard methods (on collections and resources)
-1. Standard batch or aggregate methods
-1. Custom methods (on collections, resources, or stateless)
-1. Streaming methods
+**Note:** When standard HTTP methods don't fit your use case, refer to the [custom methods] AEP for guidance on
+designing custom operations within RESTful constraints.
 
-### OperationIDs and RPC names
+```mermaid
+---
+config:
+    theme: 'neutral'
+---
+flowchart TD
+    read{Is the operation read-only?}
+    responseBody{Need resource in response body?}
+    create{Does the operation create a resource?}
+    serverGen{Server/client generated ID?}
+    update{Does the operation modify an existing resource?}
+    replace{Partial update or full replace?}
+    doesDelete{Does the operation delete a resource?}
+    get([Use GET])
+    head([Use HEAD])
+    post([Use POST])
+    post2([Use POST])
+    put([Use PUT])
+    put2([Use PUT])
+    patch([Use PATCH])
+    delete([Use DELETE])
 
-The OpenAPI specification includes an
-[operationId](https://spec.openapis.org/oas/latest.html#fixed-fields-7) field
-to uniquely identify an operation, as well as provide a name for the operation
-in tools and libraries.
+    read ==>|Yes| responseBody
+    responseBody ==>|No| head
+    responseBody ==>|Yes| get
+    read ==>|No| create
+    create ==>|Yes| serverGen
+    serverGen ==>|Server| post
+    serverGen ==>|Client| put
+    create ==>|No| update
+    update ==>|No| doesDelete
+    doesDelete ==>|No| post2
+    doesDelete ==>|Yes| delete
+    update ==>|Yes| replace
+    replace ==>|Full| put2
+    replace ==>|Partial| patch
+```
 
-In a similar fashion, gRPC has
-[RPCs definition within a service](https://grpc.io/docs/what-is-grpc/core-concepts/#service-definition).
+### Method Not Allowed
 
-The operationId and RPCs names **must** follow the following format:
+Use [405 Method Not Allowed] when the server understands the HTTP method sent by a client, but the target resource does
+not support that particular method. This indicates a deliberate design decision: the resource exists, and the method is
+valid, but they are incompatible.
 
-- `{standard-method-name}{resource-singular}` for non-list standard methods.
-- `List{resource-plural}` for lists.
-- `:{custom-method-name}{resource-singular}` for custom methods (omit the
-  leading colon for gRPC).
+A `405` response means "I understand what you're asking me to do (e.g., delete), but you can't do that to this specific
+resource by design"
 
-Some examples include:
+When this happens:
 
-- `CreateBook`
-- `GetBook`
-- `ApplyBook`
-- `ListBooks`
-- `:ArchiveBook`
+* The server **must** respond with [405 Method Not Allowed]
+* The response **must** include an [Allow header] listing supported methods
+* The server **must not** respond with `404 Not Found` when the method is not allowed
+
+### Not Implemented
+
+Use [501 Not Implemented] when the server does not support the functionality required to fulfill the request. This
+applies in two scenarios:
+
+* The server does not recognize the HTTP method at all (e.g., a non-standard or custom method)
+* The server recognizes a standard method but has not yet implemented support for it
+
+A `501` response means "I'm sorry, this hasn't been implemented yet" or "I don't even understand what you're asking me
+to do"
+
+When this happens:
+
+* The server **must** respond with [501 Not Implemented]
+* The response **may** include information about when or if the functionality will be available (e.g.,
+  the [Retry-After header])
+* The server **must not** respond with `404 Not Found` when the method is unsupported or unrecognized
+
+### Common Method Properties
+
+Method implementations **must** fulfill the following properties, according to [RFC 9110 Section 9.2]:
+
+| Method    | Safe | Idempotent | Cacheable |
+|-----------|------|------------|-----------|
+| [GET]     | Yes  | Yes        | Yes       |
+| [HEAD]    | Yes  | Yes        | Yes       |
+| [POST]    | No   | No*        | No        |
+| [PUT]     | No   | Yes        | No        |
+| [PATCH]   | No   | No*        | No        |
+| [DELETE]  | No   | Yes        | No        |
+| [OPTIONS] | Yes  | Yes        | No        |
+
+\* `POST` and `PATCH` are not inherently idempotent, though specific implementations may be designed to be idempotent.
+See their respective AEPs for details.
+
+**Safe Methods**: Methods whose semantics are essentially read-only. The client does not request, and does not expect,
+any state change on the server as a result of applying a safe method to a target resource. Safe methods allow for
+prefetching, caching, and other optimizations without concern for side effects.
+
+**Idempotent Methods**: Methods where multiple identical requests have the same effect as a single request. Idempotency
+is critical for reliable operations over unreliable networks—clients can safely retry idempotent requests without fear
+of unintended side effects.
+
+**Cacheable Methods**: Methods whose responses may be stored for future reuse. Cacheability enables performance
+optimization and reduces server load. Generally, safe methods are cacheable, while methods that modify a resource state
+are not.
 
 ## Rationale
 
-Resource-oriented standard and custom methods are recommended first, as they
-can be expressed in the widest variety of clients (Declarative clients, CLIs,
-UIs, and so on), and offer the most uniform experience that allows users to
-apply their knowledge of one API to another.
+When APIs consistently use HTTP methods according to standard semantics, developers can predict behavior without
+consulting extensive documentation. An API that uses GET for retrieval and POST for creation matches developer
+expectations and reduces cognitive load.
 
-If a standard method is unsuitable, then custom methods (that are mounted to a
-resource or collection) offer a lesser, but still valuable level of
-consistency, helping the user reason about the scope of the action and the
-object whose configuration is read to inform that action. Although mutative
-custom methods are not uniform enough to have an automated integration with
-exclusively resource-oriented clients such as [Declarative clients][], they are
-still a pattern that can be easily recognized by CLIs, UIs, and SDKs.
+HTTP clients, proxies, API gateways, and monitoring tools are built with assumptions about method semantics. Using
+methods correctly ensures compatibility with:
 
-If one cannot express their APIs in a resource-oriented fashion at all, then
-the operation falls in a category where the lack of uniformity makes it
-difficult for any client aside from SDKs to model the operation. This category
-is preferred last due to the fact that a user cannot rely on their knowledge of
-similar APIs, as well as the issue that integration with many clients will
-likely have to be hand-written.
+* Browser behavior
+* Caching layers
+* API gateways and load balancers (which may handle methods differently)
+* Development tools and testing frameworks
 
-[batch-get]: /batch-get
-[create]: /create
-[custom-methods]: /custom-methods
-[Declarative client]: ./0003.md#declarative-clients
-[Declarative clients]: ./0003.md#declarative-clients
-[delete]: /delete
-[get]: /get
-[list]: /list
-[update]: /update
-[reading-across-collections]: /reading-across-collections
-[resource-revisions]: /resource-revisions
-[resources]: /resource-oriented-design
+Proper use of safe and cacheable methods enables significant performance improvements through caching at multiple
+layers (browser, CDN, reverse proxy). Idempotent methods allow for safe retry logic, improving reliability.
+
+Mixing semantics creates security vulnerabilities. For example, using GET for state changes makes operations vulnerable
+to CSRF attacks and unintended execution through prefetching or link sharing.
+
+Following standard method semantics makes it easier to evolve APIs over time, as clients and servers share a common
+understanding of behavior and expectations.
+
+[RFC 9110]: https://datatracker.ietf.org/doc/html/rfc9110
+
+[RFC 9110 Section 9.2]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.2
+
+[GET]: /get
+
+[HEAD]:  /head
+
+[POST]: /post
+
+[PUT]: /put
+
+[PATCH]: /patch
+
+[DELETE]: /delete
+
+[OPTIONS]: /options
+
+[405 Method Not Allowed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/405
+
+[Allow header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Allow
+
+[501 Not Implemented]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/501
+
+[Retry-After header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After
+
+[custom methods]: /custom-methods
 
 ## Changelog
 
-- **2024-04-10**: Imported from https://aip.dev/130.
+* **2025-11-11**: Initial AEP-130 for Thryv, adapted from [Google AIP-130][] and aep.dev [AEP-130][].
+
+[Google AIP-130]: https://google.aip.dev/130
+
+[AEP-130]: https://aep.dev/130
