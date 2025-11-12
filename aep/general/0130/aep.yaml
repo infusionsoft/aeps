@@ -2,7 +2,8 @@ id: 130
 state: approved
 created: 2025-11-11
 updated: 2025-11-11
-slug: methods
+slug: http-methods
 placement:
   category: standard-methods
   order: 1
+redirect_from: '/methods'
