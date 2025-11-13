@@ -12,8 +12,6 @@ categories:
     title: Resources
   - code: standard-methods
     title: Standard Methods
-  - code: types
-    title: Types
   - code: design-patterns
     title: Design Patterns
   - code: batch-methods
