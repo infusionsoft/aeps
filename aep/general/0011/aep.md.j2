@@ -9,10 +9,9 @@ Audience: API designers, backend engineers, platform engineers, and reviewers ma
 Scope: Decision rationale and trade-offs. For REST fundamentals, see AEP-10. Prescriptive conventions (naming,
 pagination, errors, versioning) are covered in later AEPs.
 
-**Note:** Our organizational standard for APIs is JSON REST over HTTP. JSON is our default representation, but APIs may
-use
-other media types when appropriate (e.g., `multipart/form-data` for file uploads, `text/event-stream` for SSE,
-`application/octet-stream` for binary). Alternatives to REST are allowed only by exception.
+**Note:** Our organizational standard for APIs is JSON REST over HTTP. JSON is our default representation, but APIs
+**may** use other media types when appropriate (e.g., `multipart/form-data` for file uploads, `text/event-stream` for
+SSE, `application/octet-stream` for binary). Alternatives to REST are allowed only by exception.
 
 ## Summary of our decision
 
@@ -24,7 +23,7 @@ other media types when appropriate (e.g., `multipart/form-data` for file uploads
     - gRPC for low-latency, strongly-typed service-to-service calls inside trusted networks, especially when streaming
       is required.
     - Event-driven (pub/sub, streams) for asynchronous workflows and decoupled propagation of state changes.
-- Teams proposing alternatives must document benefits, costs, and mitigation plans, and obtain approval per our
+- Teams proposing alternatives **must** document benefits, costs, and mitigation plans and obtain approval per our
   Architecture Review process.
 
 ## Architecture comparison matrix (practical trade-offs)
