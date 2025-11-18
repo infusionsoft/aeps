@@ -49,7 +49,7 @@ relationships.
 * **must** use nouns, not verbs or actions (use HTTP methods for actions)
 * **must** be plural form (`/publishers` not `/publisher`)
     * **must** use singular form if no plural exists (e.g., `metadata`, `sheep`)
-    * **must not** invent plurals (e.g., `metadatas`)
+    * **must not** invent plurals (e.g., `metadatas`, `sheeps`)
 
 **Uniqueness**
 * **must** be unique within an API
