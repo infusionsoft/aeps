@@ -21,17 +21,15 @@ APIs **must** use HTTP methods in accordance with their standardized semantics a
 * Methods **must** respect their safety, idempotency, and cacheability properties
 * Methods **must not** be repurposed for operations that conflict with their standard semantics
 
-The following table summarizes standard HTTP methods and their proper use:
+The following table summarizes the most common HTTP methods and their proper use:
 
-| Method    | Description                                                 | Use Case                                                   | Example                                                                        |
-|-----------|-------------------------------------------------------------|------------------------------------------------------------|--------------------------------------------------------------------------------|
-| [GET]     | Retrieves a representation of the specified resource        | Fetching information, reading resources                    | `GET /books` retrieves a list of books                                         |
-| [HEAD]    | Same as GET, but without the response body                  | Checking resource existence or retrieving headers          | `HEAD /books/123` retrieves headers of book with ID 123                        |
-| [POST]    | Perform resource-specific processing on the request content | Creating resources, triggering actions, or processing data | `POST /books` creates a new book                                               |
-| [PUT]     | _Fully_ replaces or creates the specified resource          | Replacing an existing resource, creating a new resource    | `PUT /books/123` updates all fields for (or creates) book with ID 123          |
-| [PATCH]   | _Partially_ updates the specified resource                  | Modifying specific attributes of an existing resource      | `PATCH /books/123` updates only certain fields of book 123                     |
-| [DELETE]  | Deletes the specified resource                              | Removing a resource                                        | `DELETE /books/123` deletes book with ID 123                                   |
-| [OPTIONS] | Retrieves the HTTP methods supported by a resource          | Checking allowed methods or CORS preflight requests        | `OPTIONS /books` retrieves allowed methods for interacting with books resource |
+| Method   | Description                                                 | Use Case                                                   | Example                                                               |
+|----------|-------------------------------------------------------------|------------------------------------------------------------|-----------------------------------------------------------------------|
+| [GET]    | Retrieves a representation of the specified resource        | Fetching information, reading resources                    | `GET /books` retrieves a list of books                                |
+| [POST]   | Perform resource-specific processing on the request content | Creating resources, triggering actions, or processing data | `POST /books` creates a new book                                      |
+| [PUT]    | _Fully_ replaces or creates the specified resource          | Replacing an existing resource, creating a new resource    | `PUT /books/123` updates all fields for (or creates) book with ID 123 |
+| [PATCH]  | _Partially_ updates the specified resource                  | Modifying specific attributes of an existing resource      | `PATCH /books/123` updates only certain fields of book 123            |
+| [DELETE] | Deletes the specified resource                              | Removing a resource                                        | `DELETE /books/123` deletes book with ID 123                          |
 
 **Note:** When standard HTTP methods don't fit your use case, refer to the [custom methods] AEP for guidance on
 designing custom operations within RESTful constraints.
@@ -43,24 +41,19 @@ config:
 ---
 flowchart TD
     read{Is the operation read-only?}
-    responseBody{Need resource in response body?}
     create{Does the operation create a resource?}
     serverGen{Server/client generated ID?}
     update{Does the operation modify an existing resource?}
     replace{Partial update or full replace?}
     doesDelete{Does the operation delete a resource?}
     get([Use GET])
-    head([Use HEAD])
     post([Use POST])
     post2([Use POST])
     put([Use PUT])
     put2([Use PUT])
     patch([Use PATCH])
     delete([Use DELETE])
-
-    read ==>|Yes| responseBody
-    responseBody ==>|No| head
-    responseBody ==>|Yes| get
+    read ==>|Yes| get
     read ==>|No| create
     create ==>|Yes| serverGen
     serverGen ==>|Server| post
@@ -86,7 +79,7 @@ resource by design"
 When this happens:
 
 * The server **must** respond with [405 Method Not Allowed]
-* The response **must** include an [Allow header] listing supported methods
+* The response **may** include an [Allow header] listing supported methods
 * The server **must not** respond with `404 Not Found` when the method is not allowed
 
 ### Not Implemented
@@ -111,15 +104,13 @@ When this happens:
 
 Method implementations **must** fulfill the following properties, according to [RFC 9110 Section 9.2]:
 
-| Method    | Safe | Idempotent | Cacheable |
-|-----------|------|------------|-----------|
-| [GET]     | Yes  | Yes        | Yes       |
-| [HEAD]    | Yes  | Yes        | Yes       |
-| [POST]    | No   | No*        | No        |
-| [PUT]     | No   | Yes        | No        |
-| [PATCH]   | No   | No*        | No        |
-| [DELETE]  | No   | Yes        | No        |
-| [OPTIONS] | Yes  | Yes        | No        |
+| Method   | Safe | Idempotent | Cacheable |
+|----------|------|------------|-----------|
+| [GET]    | Yes  | Yes        | Yes       |
+| [POST]   | No   | No*        | No        |
+| [PUT]    | No   | Yes        | No        |
+| [PATCH]  | No   | No*        | No        |
+| [DELETE] | No   | Yes        | No        |
 
 \* `POST` and `PATCH` are not inherently idempotent, though specific implementations may be designed to be idempotent.
 See their respective AEPs for details.
@@ -135,6 +126,18 @@ of unintended side effects.
 **Cacheable Methods**: Methods whose responses may be stored for future reuse. Cacheability enables performance
 optimization and reduces server load. Generally, safe methods are cacheable, while methods that modify a resource state
 are not.
+
+### Less common HTTP Methods
+
+These methods are used in HTTP and have crucial functions; however, they are less often implemented in the context
+of REST APIs, so we will only briefly cover them.
+
+| Method    | Description                                                   | Use Case                                                                 | Example                                                                                    |
+|-----------|---------------------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+| [HEAD]    | Same as GET, but without the response body                    | Checking resource existence or retrieving headers                        | `HEAD /books/123` retrieves headers of book with ID 123                                    |
+| [OPTIONS] | Retrieves the HTTP methods supported by a resource            | Checking allowed methods or CORS preflight requests                      | `OPTIONS /books` retrieves allowed methods for interacting with books resource             |
+| [TRACE]   | Performs a message loopback test along the request path       | Debugging and diagnostic purposes—verifying what is received at each hop | `TRACE /books` returns the request as received by the server, useful for debugging proxies |
+| [CONNECT] | Establishes a tunnel to a server identified by the target URI | Creating end-to-end tunnels, typically for TLS/HTTPS through proxies     | `CONNECT api.example.com:443` establishes a tunnel to enable secure HTTPS communication    |
 
 ## Rationale
 
@@ -165,8 +168,6 @@ understanding of behavior and expectations.
 
 [GET]: /get
 
-[HEAD]:  /head
-
 [POST]: /post
 
 [PUT]: /put
@@ -175,7 +176,13 @@ understanding of behavior and expectations.
 
 [DELETE]: /delete
 
-[OPTIONS]: /options
+[HEAD]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/HEAD
+
+[OPTIONS]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/OPTIONS
+
+[TRACE]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/TRACE
+
+[CONNECT]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/CONNECT
 
 [405 Method Not Allowed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/405
 
@@ -189,6 +196,7 @@ understanding of behavior and expectations.
 
 ## Changelog
 
+* **2025-12-02**: Updated method tables to include all HTTP methods and separated them into 2 sections.
 * **2025-11-11**: Initial AEP-130 for Thryv, adapted from [Google AIP-130][] and aep.dev [AEP-130][].
 
 [Google AIP-130]: https://google.aip.dev/130
