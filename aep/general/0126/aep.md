@@ -13,23 +13,24 @@ infrequently:
 ```java
 // Possible formats in which a book may be published.
 public enum Format {
-  // The printed format, in hardback.
-  HARDBACK,
+    // The printed format, in hardback.
+    HARDBACK,
 
-  // The printed format, in paperback.
-  PAPERBACK,
+    // The printed format, in paperback.
+    PAPERBACK,
 
-  // An electronic book format.
-  EBOOK,
+    // An electronic book format.
+    EBOOK,
 
-  // An audio recording.
-  AUDIOBOOK
+    // An audio recording.
+    AUDIOBOOK
 }
 ```
 
 - All enum values **should** use a consistent case format across an API.
 - Enums **should** document whether the enum is frozen or they expect to add
   values in the future.
+- String fields with enumerated values **should** use `snake_case`.
 
 ### When to use enums
 
@@ -57,7 +58,14 @@ For enumerated values where the set of allowed values changes frequently, APIs
 **should** use a `string` field instead, and **must** document the allowed
 values.
 
-String fields with enumerated values **should** use `snake_case`.
+To document allowed values on a `string` field in Java, use the `allowableValues` parameter of the `@Schema` OpenAPI
+annotation.
+
+```java
+
+@Schema(type = "string", allowableValues = {"hardback", "paperback", "audiobook"})
+String format;
+```
 
 ### Compatibility
 
@@ -124,10 +132,12 @@ choice (although `google.protobuf.BoolValue` is also available).
 - For states, a special type of enum, see AEP-216.
 
 [bcp-47]: https://en.wikipedia.org/wiki/IETF_language_tag
+
 [media types]: https://en.wikipedia.org/wiki/Media_type
 
 ## Changelog
 
+* **2025-12-03**: Add a Java example on how to document string enums.
 * **2025-11-10**: Initial AEP-126 for Thryv, adapted from [Google AIP-126][] and aep.dev [AEP-126][].
 
 [Google AIP-126]: https://google.aip.dev/126
