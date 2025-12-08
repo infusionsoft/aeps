@@ -26,25 +26,29 @@ relationships.
 ### Quick Reference
 
 **Format and Case**
+
 * **must** be all lowercase
 * **must** use `kebab-case` formatting to separate words
 * **must** begin and end with a lowercase letter or digit
 * **should** match the regex `[a-z0-9][a-z0-9-]*[a-z0-9]`
-  * start and end with an alphanumeric and only allow alphanumerics or hyphens in the middle
+    * start and end with an alphanumeric and only allow alphanumerics or hyphens in the middle
 
 **Character Set**
+
 * **should** contain only ASCII letters, digits, and hyphens
 * **should not** use characters that require URL-escaping
     * If special characters are used, encoding requirements **must** be clearly documented
 
 **Structure**
+
 * **must** use `/` to separate segments
 * **must** alternate between collections and resource IDs (e.g., `/publishers/123/books`)
 * **must not** contain empty segments (e.g., `/publishers//books`)
-* **should not** exceed 2–3 levels of nesting
-* **should not** use `/api` as the base path
+* **should not** exceed 2–3 [levels of nesting](#resource-hierarchy-and-nesting)
+* **should** use `/api` as the base path
 
 **Naming**
+
 * **must** be concise English terms
 * **must** use nouns, not verbs or actions (use HTTP methods for actions)
 * **must** be plural form (`/publishers` not `/publisher`)
@@ -52,6 +56,7 @@ relationships.
     * **must not** invent plurals (e.g., `metadatas`, `sheeps`)
 
 **Uniqueness**
+
 * **must** be unique within an API
 
 ### Syntax Rules
@@ -87,7 +92,7 @@ To summarize this, all path segments:
 * **must** begin and end with a lowercase letter or digit
 * **must** use `kebab-case` formatting to separate words
 * **should** match the regex `[a-z0-9][a-z0-9-]*[a-z0-9]`
-  * start and end with an alphanumeric and only allow alphanumerics or hyphens in the middle
+    * start and end with an alphanumeric and only allow alphanumerics or hyphens in the middle
 * **should** contain only [ASCII] letters, digits, and hyphens
 * **should not** use characters that require URL-escaping
     * any encoding requirements **must** be clearly documented
@@ -100,31 +105,26 @@ Resource paths **must** use nouns to describe resources, never verbs or actions.
 REST APIs model a domain through resources (things/nouns) rather than operations (actions/verbs). Think of resources as
 entities or objects that can be manipulated, not as procedures to be invoked. For more information, read AEP-121.
 
-When you're tempted to use a verb in your URL, reframe the action as a message being sent to a resource:
+When an operation feels like a verb (e.g., "calculating," "importing," "deploying"), consider modeling the *process* or
+the *result* of that action as a resource. This technique, known as [reification], allows you to apply standard CRUD
+patterns to complex operations.
 
-* Instead of "cancel an order" → send a cancellation message to the order's `cancellations` collection
-* Instead of "approve a request" → create an `approvals` resource for the request
-* Instead of "search users" → query the `users` collection
+For example, instead of an RPC-style endpoint like `POST /run-import` or a custom method, model the import as a
+resource: `POST /imports`. This provides significant benefits, such as state tracking (you can `GET /imports/123` to see
+progress or errors), or an audit trail (you can `GET /imports` to see a log of past operations). Common examples of
+reified resources include `/imports`, `/exports`, `/shipments`, and `/deployments`.
 
-If an operation doesn't fit neatly into standard CRUD operations, model it as a resource:
+However, strict adherence to "everything is a resource" isn't always practical. Consider the difference between a simple
+state change and a tracked process. For something like "cancelling an order":
 
-* Processes: Create a resource representing the process (e.g., `/imports`, `/exports`, `/conversions`)
-* Events: Create a resource for the event (e.g., `/shipments`, `/deployments`, `/publications`)
-* States: Create a resource for state transitions (e.g., `/activations`, `/suspensions`, `/completions`)
+* **Resource approach:** `POST /orders/123/cancellations`. This is useful if you need to know *who* canceled it, *why*
+  it was canceled, or if the cancellation requires an approval workflow.
+* **Custom method approach:** `POST /orders/123:cancel`. This is appropriate if the action is a simple state transition
+  with no additional data or history needed.
 
-For example, instead of `POST /run-report` to run a report, model the report execution as a resource:
-
-```
-POST /reports/quarterly-sales/executions
-GET /reports/quarterly-sales/executions/exec-123
-```
-
-This approach provides a resource you can check, cancel, or retrieve results from, which is more RESTful and flexible.
-
-In rare cases where an operation truly cannot be modeled as a resource or standard CRUD operation, custom methods may be
-necessary. However, custom methods should be used as a last resort only after exhausting all other options. If you
-determine that a custom method is necessary, refer to AEP-136 for guidance on implementing custom methods correctly.
-Custom methods should be the exception, not the rule, in a well-designed REST API.
+If an operation is instantaneous, has no state, and leaves no trace, a custom method (AEP-136) might be appropriate.
+However, if you need to track *who* performed the action, *when* it happened, or its *status*, you **should** reify it
+as a resource.
 
 Pluralization:
 
@@ -187,19 +187,6 @@ For international content specifically:
     * Any restrictions on specific Unicode ranges or characters.
     * Examples showing proper encoding.
 
-### Common Anti-Patterns
-
-Avoid these common mistakes:
-
-| Don't do this               | Instead do this                  | Why                             |
-|-----------------------------|----------------------------------|---------------------------------|
-| `GET /get-user-profile/123` | `GET /users/123`                 | Use HTTP methods for actions    |
-| `POST /users/create`        | `POST /users`                    | Model resources, not operations |
-| `POST /cancel-order`        | `POST /orders/123/cancellations` | Model resources, not operations |
-| `POST /orders/123:cancel`   | `POST /orders/123/cancellations` | Model resources, not operations |
-| `GET /userProfiles/123`     | `GET /user-profiles/123`         | Always use lower kebab-case     |
-| `/users-` or `/-users`      | `/users`                         | Cannot begin or end with hyphen |
-
 [RFC 1123]: https://www.rfc-editor.org/rfc/rfc1123
 
 [RFC 3986]: https://www.rfc-editor.org/rfc/rfc3986
@@ -210,8 +197,11 @@ Avoid these common mistakes:
 
 [ASCII]: https://www.ascii-code.com
 
+[reification]: https://en.wikipedia.org/wiki/Reification_(computer_science)
+
 ## Changelog
 
+* **2025-12-03**: Change Nouns, NOT Verbs section to better clarify when custom methods are appropriate.
 * **2025-11-07**: Initial AEP-122 for Thryv, adapted from [Google AIP-122][] and aep.dev [AEP-122][].
 
 [Google AIP-122]: https://google.aip.dev/122
