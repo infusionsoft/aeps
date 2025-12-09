@@ -1,173 +1,219 @@
-# POST
+# PUT
 
-In REST APIs, the `POST` method is used to create new resources, perform operations that don't fit other HTTP methods,
-or execute actions on existing resources. Unlike `GET`, `POST` requests are neither [safe] nor [idempotent], meaning
-they may modify server state and repeated identical requests may produce different results.
-
-As defined in [RFC 9110 Section 9.3.3], `POST` is used to request that the target resource process the representation
-enclosed in the request according to the resource's own specific semantics.
+In REST APIs, it is customary to make a `PUT` request to a resource's URI (for example,
+`/publishers/{publisher_id}/books/{book_id}`) to replace that resource entirely with a new representation.
+`PUT` can also be used to create a resource at a specific URI when the client specifies the identifier. As defined in
+[RFC 9110 Section 9.3.4], `PUT` requests that the state of the target resource be created or replaced with the state
+defined by the representation enclosed in the request, and is [idempotent], but not [safe].
 
 ## Guidance
 
-### When to use POST
+### When to use PUT
 
-Use `POST` for operations that create new resources where the server assigns the resource identifier, or for operations
-that do not align with the semantics of other HTTP methods.
+Use PUT for operations that completely replace a resource with a new representation or for creating a resource at a
+client-specified URI.
 
-**Use `POST` when:**
+**Use `PUT` when:**
 
-* Creating a new resource where the server generates the ID (e.g., "Create a new book").
-* Triggering an action or operation on a resource (e.g., "Send email", "Reset password").
-* Performing complex queries that cannot be expressed via `GET` due to URL length or complexity constraints (
-  see [GET with body]).
-* Executing batch operations or operations with side effects that do not map to resource creation, replacement, or
-  deletion.
+* Replacing an entire resource with a new representation (e.g., "Replace book 123 with this complete book object").
+* Creating a resource where the client specifies the full URI and identifier (e.g., "Create a book with ID 'isbn-123'").
+* You want to ensure the complete state of a resource matches the provided representation.
 
-**Do NOT use `POST` when:**
+**Do not use `PUT` when:**
 
-* The operation is purely read-only without side effects; use [GET] instead.
-* You are replacing an entire resource at a known URI; use [PUT] instead.
-* You are partially updating a resource; use [PATCH] instead.
-* You are deleting a resource; use [DELETE] instead.
+* Only partial updates are needed (use [PATCH] instead)
+* The server needs to generate or assign the resource identifier (use [POST] to a collection instead)
+* The operation has side effects that should not be repeated (use [POST] instead)
+
+A `PUT` request **must** include a complete representation of the resource in the request body.
 
 ### General requirements
 
-POST requests:
+`PUT` requests:
 
-* **must** be used to create a new resource when the server assigns the resource identifier.
+* **must** be used to replace the entire representation of a resource at a known URI.
+* **may** be used to create a resource when the client specifies the complete URI.
+* **must** include a complete representation of the resource in the request body.
+    * Omitted fields **must** be treated as explicitly set to their default or null values, effectively removing
+      previous values.
 * **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
-* **must** include a request body unless the operation explicitly requires no input data.
-* **must not** be _assumed_ to be [idempotent].
-    * Clients **should not** automatically retry failed `POST` requests without considering the consequences.
-    * If an endpoint is designed to be idempotent (for example, by accepting an [Idempotency-Key]), this **must** be
-      clearly documented.
-* **should** be used for operations that modify server state or have side effects.
+* **must** be [idempotent]. Repeating the same PUT request must produce the same result and leave the resource in the
+  same state.
+* **must not** modify read-only or server-managed fields (e.g., created_at, id). If such fields are included in the
+  request, they should be ignored or validated for consistency.
 
-APIs **must** use more specific HTTP methods when appropriate ([PUT] for full replacement, [PATCH] for partial
-updates, [DELETE] for removal) rather than overloading `POST`.
+Some resources take longer to be updated than is reasonable for a regular API request. In this situation, the API should
+use a [long-running operation].
 
-Some resources take longer to be created than is reasonable for a regular API request. In this situation, the
-API should use a [long-running operation].
+### Replacing Resources
 
-### Creating resources
+`PUT` requests for replacing existing resources:
 
-When using `POST` to create new resources:
+* **must** be made to the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
+* **must** return a `200 OK` status code with the updated resource representation in the response body.
+* **may** return `204 No Content` if no response body is included.
 
-* The request **must** be sent to the collection URI (e.g., `/publishers/{publisher_id}/books`).
-* The request body **must** contain the resource representation to be created.
-* On successful creation, the response **must** return `201 Created`.
-* The response **may** include a [Location] header containing the URI of the newly created resource.
-* The response body **should** include the complete representation of the created resource, including any
-  server-generated fields (e.g., `id`, `createdAt`, `updatedAt`).
-    * For bulk creation operations, APIs **may** return a summary or list of IDs/Status objects instead of full
-      resources to improve performance.
+### Creating Resources
 
-For example, this request:
+`PUT` requests for creating resources:
 
-```http request
-POST /v1/publishers/123/books
-Content-Type: application/json
+* **must** be made to the desired resource [URI path] with the client-specified identifier.
+* **must** return `201 Created` status code when a new resource is successfully created.
+* **may** include a [Location] header containing the URI of the newly created resource.
+* **should** include a representation of the created resource in the response body.
+* **should** only be supported when client-assigned identifiers are semantically appropriate (e.g., ISBNs, email
+  addresses, usernames).
 
-{
-    "title": "Les Misérables",
-    "author": "Victor Hugo",
-    "isbn": "9780451419439"
-}
-```
+### Partial representations
 
-Will return:
+`PUT` requires a complete representation of the resource. If a field is omitted from the request, it should be treated
+as absent from the desired state. Depending on your API's semantics:
 
-```http request
-201 Created
-Location: /v1/publishers/123/books/456
-Content-Type: application/json
+* The field may be removed from the resource
+* The field may be set to a default or null value
+* The request may be rejected as invalid if required fields are missing (`400 Bad Request`)
 
-{
-    "id": "456",
-    "title": "Les Misérables",
-    "author": "Victor Hugo",
-    "isbn": "9780451419439",
-    "createdAt": "2025-11-12T10:30:00Z",
-    "updatedAt": "2025-11-12T10:30:00Z"
-}
-```
+Document clearly how your API handles omitted fields. If you need partial updates where omitted fields remain unchanged,
+use [PATCH] instead.
 
-### Custom methods
-
-`POST` is the primary method used for "reifying" concepts; converting a process, verb, or relationship into a distinct
-resource. For best practices around this, refer to AEP-121.
-
-`POST` is used to implement custom methods for operations that don't fit standard CRUD patterns. Custom methods are
-covered in detail in AEP-136.
+**Warning:** This effectively deletes data. If a client performs a `GET`, modifies one field, and `PUT`s it back without
+including the other fields, those other fields will be erased.
 
 ### Response codes
 
-`POST` requests **must** return appropriate HTTP status codes:
+`PUT` requests **must** return appropriate HTTP status codes:
 
-* `200 OK` for successful operations that don't create resources (e.g., query operations)
+* `200 OK` for successful replacement of an existing resource with a response body
 * `201 Created` for successful resource creation
-* `202 Accepted` when the request has been accepted for processing but is not yet complete
-  (see [long-running operations])
-* `204 No Content` for successful operations with no response body
-* `400 Bad Request` for invalid request body or parameters
+* `204 No Content` for successful replacement or creation with no response body
+* `400 Bad Request` for malformed or invalid request data
 * `401 Unauthorized` when authentication is required but not provided
-* `403 Forbidden` when the client lacks permission to perform the operation
+* `403 Forbidden` when the client is authenticated but lacks permission to perform the operation
 * `404 Not Found` when the parent resource does not exist (e.g., creating a book under a non-existent publisher)
-* `409 Conflict` when the request conflicts with the current state (e.g., attempting to create a resource that already
-  exists)
+* `409 Conflict` when the request conflicts with the current state (e.g., version mismatch in optimistic concurrency)
+* `412 Precondition Failed` when conditional headers like [If-Match] are not satisfied
 * `422 Unprocessable Entity` when the request is well-formed but contains semantic errors
 * `500 Internal Server Error` for unexpected server errors
 
-### Error handling
+### Idempotency
 
-When a `POST` request fails during resource creation, the server **must not** create the resource. The operation
-**must** be atomic from the client's perspective.
+`PUT` is idempotent by definition. Making the same `PUT` request multiple times **must** result in the same resource
+state. This means:
 
-If a `POST` operation is partially completed before encountering an error, the service **should** roll back changes when
-possible. If rollback is not possible, the service **must** clearly document the potential for partial state changes.
+* The server replaces the entire resource with the provided representation on every request
+* If you need to track modification metadata, use conditional requests with [ETag] headers rather than modifying the
+  resource state
 
-### Idempotency considerations
+### Concurrency
 
-For POST operations where duplicate execution would be problematic (such as payment processing or order submission),
-APIs **should** support idempotency keys to allow safe retries.
+For concurrent modification scenarios, APIs **may** implement optimistic concurrency control using [ETags]:
 
-When implementing idempotency keys:
+* The server **may** include an [ETag] header in `GET` and `PUT` responses representing the resource version.
+* Clients **may** include an [If-Match] header with the [ETag] value when making `PUT` requests.
+* The server **must** return `412 Precondition Failed` if the [ETag] has changed, indicating another client has modified
+  the resource.
+* If no [If-Match] header is provided, the server **may** either accept the request (last-write-wins) or reject it with
+  `428 Precondition Required`, depending on the API's concurrency policy.
 
-* The API **must** accept an idempotency key via a request header (e.g., [Idempotency-Key]).
-* The server **must** store the key and associate it with the operation result.
-* Subsequent requests with the same idempotency key **must** return the same result without re-executing the operation.
-* The server should **retain** idempotency keys for a reasonable period (e.g., 24 hours).
-* The API **must** document the idempotency key behavior, including retention period and scope.
+Example: Successful update with concurrency control
 
-[RFC 9110 Section 9.3.3]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.3
+```http request
+# Client retrieves the current resource
+GET /books/123
+ETag: "v1"
+
+{
+"id": "123",
+"title": "Original Title",
+"author": "Jane Doe"
+}
+
+# Client updates the resource with the ETag
+PUT /books/123
+If-Match: "v1"
+Content-Type: application/json
+
+{
+"id": "123",
+"title": "Updated Title",
+"author": "Jane Doe"
+}
+
+# Server accepts the update
+200 OK
+ETag: "v2"
+
+{
+"id": "123",
+"title": "Updated Title",
+"author": "Jane Doe"
+}
+```
+
+Example: Concurrent modification conflict
+
+```http request
+# Client A retrieves the resource
+GET /books/123
+ETag: "v1"
+
+# Client B also retrieves the resource
+GET /books/123
+ETag: "v1"
+
+# Client A successfully updates
+PUT /books/123
+If-Match: "v1"
+...
+200 OK
+ETag: "v2"
+
+# Client B attempts to update with stale ETag
+PUT /books/123
+If-Match: "v1"
+Content-Type: application/json
+
+{
+"id": "123",
+"title": "Different Title",
+"author": "Jane Doe"
+}
+
+# Server rejects due to ETag mismatch
+412 Precondition Failed
+
+{
+"error": "Precondition Failed",
+"message": "The resource has been modified by another client. Please retrieve the latest version and retry."
+}
+```
+
+[RFC 9110 Section 9.3.4]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.4
 
 [safe]: /130#common-method-properties
 
 [idempotent]: /130#common-method-properties
 
-[GET with body]: /131#get-with-body
-
-[GET]: /get
-
-[PUT]: /put
-
-[PATCH]: /patch
-
-[DELETE]: /delete
+[Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 
 [location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
 
-[long-running operations]: /long-running-operations
+[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
 
-[Idempotency-Key]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Idempotency-Key
+[If-Unmodified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Unmodified-Since
 
-[Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
+[POST]: /post
+
+[PATCH]: /patch
+
+[URI path]: /paths
+
+[long-running operation]: /long-running-operations
 
 ## Changelog
 
-**2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
-**2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
+**2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].
 
-[Google AIP-133]: https://google.aip.dev/133
+[Google AIP-134]: https://google.aip.dev/134
 
-[AEP-133]: https://aep.dev/133
+[AEP-134]: https://aep.dev/134
