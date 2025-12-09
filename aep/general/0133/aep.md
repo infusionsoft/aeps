@@ -92,39 +92,13 @@ Content-Type: application/json
 }
 ```
 
-### Creating subordinate resources
-
-POST may be used to create subordinate resources that represent state transitions, actions, or relationships. These
-resources are nouns that capture the result or record of an action. For example:
-
-* To cancel an order, `POST` to `/orders/{order_id}/cancellations` to create a cancellation record
-* To approve a document, `POST` to `/documents/{document_id}/approvals` to create an approval record
-* To add a comment, `POST` to `/posts/{post_id}/comments` to create a comment resource
-* To transfer funds, `POST` to `/accounts/{account_id}/transfers` to create a transfer record
-
-This approach models actions as resources, which:
-
-* Provides a clear audit trail of what actions were taken and when
-* Allows actions to have their own properties (e.g., a cancellation reason, an approval timestamp)
-* Enables querying the history of actions via `GET` on the collection
-* Maintains RESTful principles by using nouns rather than verbs in URIs
-
-### Creating related resources
-
-`POST` may be used to create resources that establish relationships between existing resources:
-
-* To assign a user to a team, `POST` to `/teams/{team_id}/members` with user information
-* To add a tag to a resource, `POST` to `/users/{user_id}/tags` with tag information
-* To create a subscription, `POST` to `/users/{user_id}/subscriptions` with subscription details
-
-This pattern works well when the relationship itself has meaningful properties or when the relationship needs to be
-tracked as a first-class resource.
-
 ### Custom methods
 
-`POST` is used to implement custom methods for operations that don't fit standard CRUD patterns. Prefer
-creating [subordinate resources](#creating-subordinate-resources) over custom methods whenever the action results in a
-persisted record/audit trail. Custom methods are covered in detail in AEP-136.
+`POST` is the primary method used for "reifying" concepts; converting a process, verb, or relationship into a distinct
+resource. For best practices around this, refer to AEP-121.
+
+`POST` is used to implement custom methods for operations that don't fit standard CRUD patterns. Custom methods are
+covered in detail in AEP-136.
 
 ### Response codes
 
@@ -191,6 +165,7 @@ When implementing idempotency keys:
 
 ## Changelog
 
+**2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
 **2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
 
 [Google AIP-133]: https://google.aip.dev/133
