@@ -276,7 +276,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: force
+          name: cascade
           schema:
             type: boolean
       responses:
@@ -423,7 +423,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: force
+          name: cascade
           schema:
             type: boolean
       responses:
@@ -729,7 +729,7 @@ paths:
           schema:
             type: string
         - in: query
-          name: force
+          name: cascade
           schema:
             type: boolean
       responses:

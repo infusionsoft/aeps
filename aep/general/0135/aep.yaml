@@ -2,7 +2,8 @@
 id: 135
 state: approved
 slug: delete
-created: 2024-02-11
+created: 2025-12-10
+updated: 2025-12-10
 placement:
   category: standard-methods
-  order: 50
+  order: 100
