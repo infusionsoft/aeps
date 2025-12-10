@@ -1,9 +1,9 @@
 ---
 id: 134
 state: approved
-slug: put
-created: 2025-12-02
-updated: 2025-12-02
+slug: patch
+created: 2025-12-09
+updated: 2025-12-09
 placement:
   category: standard-methods
-  order: 40
+  order: 50
