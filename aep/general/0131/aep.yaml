@@ -7,3 +7,6 @@ updated: 2025-11-12
 placement:
   category: standard-methods
   order: 10
+redirect_from:
+  - /list
+  - /read
