@@ -29,9 +29,11 @@ relationships.
 
 * **must** be all lowercase
 * **must** use `kebab-case` formatting to separate words
-* **must** begin and end with a lowercase letter or digit
 * **should** match the regex `[a-z0-9][a-z0-9-]*[a-z0-9]`
-    * start and end with an alphanumeric and only allow alphanumerics or hyphens in the middle
+    * start and end with a lowercase letter or digit (alphanumeric)
+    * only allow alphanumerics or hyphens in the middle
+    * An exception to this is using a single hyphen `-` as a wildcard character to represent any parent collection
+      identifier when reading across collections, as described in [Reading across collections]
 
 **Character Set**
 
@@ -104,7 +106,7 @@ Resource paths **must** use nouns to describe resources, never verbs or actions.
 
 When designing resource paths, model the domain through resources (things/nouns) rather than operations (actions/verbs).
 When an operation feels like a verb, consider modeling the process or result as a resource through reification. For
-detailed guidance on resource-oriented design and when to use reified resources versus custom methods, see [AEP-121][].
+detailed guidance on resource-oriented design and when to use reified resources versus custom methods, see AEP-121.
 
 **Pluralization:**
 
@@ -176,6 +178,8 @@ For international content specifically:
 [RFC 7230]: https://www.rfc-editor.org/rfc/rfc7230
 
 [ASCII]: https://www.ascii-code.com
+
+[Reading across collections]: /reading-across-collections
 
 ## Changelog
 
