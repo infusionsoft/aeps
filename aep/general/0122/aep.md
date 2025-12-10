@@ -102,31 +102,11 @@ To summarize this, all path segments:
 Resource paths **must** use nouns to describe resources, never verbs or actions. The HTTP method (`GET`, `POST`, `PUT`,
 `DELETE`, `PATCH`) indicates the action being performed.
 
-REST APIs model a domain through resources (things/nouns) rather than operations (actions/verbs). Think of resources as
-entities or objects that can be manipulated, not as procedures to be invoked. For more information, read AEP-121.
+When designing resource paths, model the domain through resources (things/nouns) rather than operations (actions/verbs).
+When an operation feels like a verb, consider modeling the process or result as a resource through reification. For
+detailed guidance on resource-oriented design and when to use reified resources versus custom methods, see [AEP-121][].
 
-When an operation feels like a verb (e.g., "calculating," "importing," "deploying"), consider modeling the *process* or
-the *result* of that action as a resource. This technique, known as [reification], allows you to apply standard CRUD
-patterns to complex operations.
-
-For example, instead of an RPC-style endpoint like `POST /run-import` or a custom method, model the import as a
-resource: `POST /imports`. This provides significant benefits, such as state tracking (you can `GET /imports/123` to see
-progress or errors), or an audit trail (you can `GET /imports` to see a log of past operations). Common examples of
-reified resources include `/imports`, `/exports`, `/shipments`, and `/deployments`.
-
-However, strict adherence to "everything is a resource" isn't always practical. Consider the difference between a simple
-state change and a tracked process. For something like "cancelling an order":
-
-* **Resource approach:** `POST /orders/123/cancellations`. This is useful if you need to know *who* canceled it, *why*
-  it was canceled, or if the cancellation requires an approval workflow.
-* **Custom method approach:** `POST /orders/123:cancel`. This is appropriate if the action is a simple state transition
-  with no additional data or history needed.
-
-If an operation is instantaneous, has no state, and leaves no trace, a custom method (AEP-136) might be appropriate.
-However, if you need to track *who* performed the action, *when* it happened, or its *status*, you **should** reify it
-as a resource.
-
-Pluralization:
+**Pluralization:**
 
 * Resource paths **must** use the plural form (`/publishers` not `/publisher`).
     * In situations where there is no plural word (e.g., information, metadata), or where the singular and plural terms
@@ -197,10 +177,9 @@ For international content specifically:
 
 [ASCII]: https://www.ascii-code.com
 
-[reification]: https://en.wikipedia.org/wiki/Reification_(computer_science)
-
 ## Changelog
 
+* **2025-12-09**: Moved pieces about resource oriented design to AEP-121
 * **2025-12-03**: Change Nouns, NOT Verbs section to better clarify when custom methods are appropriate.
 * **2025-11-07**: Initial AEP-122 for Thryv, adapted from [Google AIP-122][] and aep.dev [AEP-122][].
 
