@@ -14,9 +14,5 @@ categories:
     title: Standard Methods
   - code: design-patterns
     title: Design Patterns
-  - code: security
-    title: Security
-  - code: governance
-    title: Governance
   - code: best-practices
     title: Best Practices
