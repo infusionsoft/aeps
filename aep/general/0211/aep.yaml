@@ -2,7 +2,8 @@
 id: 211
 state: approved
 slug: authorization
-created: 2021-02-24
+created: 2025-12-10
+updated: 2025-12-10
 placement:
   category: design-patterns
   order: 115
