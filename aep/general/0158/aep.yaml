@@ -3,7 +3,7 @@ id: 158
 state: approved
 slug: pagination
 created: 2025-12-10
-updated: 2025-12-10
+updated: 2025-12-15
 placement:
   category: design-patterns
   order: 60
