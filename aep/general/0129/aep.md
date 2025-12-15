@@ -38,24 +38,6 @@ GET /v1/books?include_archived=true
 GET /v1/orders?is_paid=false
 ```
 
-### List values
-
-When a single query parameter requires a list of values, APIs **should** use commas to separate the list elements. This
-is easier to understand, more human-readable, and reduces URL size.
-
-Correct:
-
-```http
-GET /v1/products?colors=red,blue,green
-GET /v1/books?authors=tolkien,hugo,martin
-```
-
-Incorrect:
-
-```http
-GET /v1/products?colors=red&colors=blue&colors=green
-```
-
 ### Default values
 
 APIs **should** define sensible default values for query parameters where appropriate. This improves the developer
@@ -118,4 +100,5 @@ including GitHub, Stack Exchange, and Twitter. Others, like Google and Amazon, u
 
 ## Changelog
 
+* **2025-12-15**: Remove section on list values, since that is mostly a client side thing
 * **2025-12-11**: Initial creation
