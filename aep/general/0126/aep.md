@@ -30,7 +30,7 @@ public enum Format {
 - All enum values **should** use a consistent case format across an API.
 - Enums **should** document whether the enum is frozen or they expect to add
   values in the future.
-- String fields with enumerated values **should** use `snake_case`.
+- String fields with enumerated values **should** use uppercase `SNAKE_CASE`.
 
 ### When to use enums
 
@@ -47,7 +47,7 @@ representation **must** match.
 
 ### Alternatives
 
-Enums **should not** be used when there is a competing, widely-adopted standard
+Enums **should not** be used when there is a competing, widely adopted standard
 representation (such as with [language codes][bcp-47] or [media types]).
 Instead, that standard representation **should** be used. This is true even if
 only a small subset of values are permitted, because using enums in this
