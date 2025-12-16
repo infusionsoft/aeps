@@ -55,15 +55,19 @@ consistently across all endpoints:
 * `offset` - For offset-based pagination (see [Pagination])
 * `limit` - For offset-based pagination (see [Pagination])
 * `order_by` - For sorting results
+* `update_mask` - For [PATCH updates](/134#field-masking)
 
-### Query parameters are read-only
+### Query parameters are non-actionable
 
-Query parameters **must not** be used to change the state of a resource or perform actions that would result in a change
-in the state of that resource. Query parameters are meant for filtering, sorting, limiting, or performing other
-non-mutating operations on the returned result set.
+Query parameters are declarative modifiers. They **must not** be used to define, trigger, or represent a mutating
+operation or business action.
 
-State-changing operations **must** use appropriate HTTP methods (`POST`, `PUT`, `PATCH`, `DELETE`) with request bodies
-where necessary.
+Query parameters are intended to:
+
+* Filter, sort, or paginate results
+* Control response shape
+* Declaratively scope or constrain an operation whose mutating semantics are already defined by the HTTP method
+  (e.g., [update_mask on PATCH](/134#field-masking))
 
 Correct:
 
@@ -100,5 +104,6 @@ including GitHub, Stack Exchange, and Twitter. Others, like Google and Amazon, u
 
 ## Changelog
 
+* **2025-12-16**: Clarify query parameters are non-actionable, instead of read-only
 * **2025-12-15**: Remove section on list values, since that is mostly a client side thing
 * **2025-12-11**: Initial creation
