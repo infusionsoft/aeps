@@ -96,25 +96,6 @@ about a new value.
 
 {% tab proto %}
 
-{% sample 'enum.proto', 'enum Format' %}
-
-- The zero value of the enum **should** be the name of the enum itself followed
-  by the suffix `_UNSPECIFIED`. The service **may** either allow or prohibit
-  use of this value.
-- Enums which will only be used in a single message **should** be nested within
-  that message. In this case, the enum **should** be declared immediately
-  before it is used.
-- If multiple enums are in the same namespace, they **must not** share any
-  values. (This is because enums do not provide their own namespace for their
-  values in some languages.)
-- If an enumerated value needs to be shared across APIs, an enum **may** be
-  used, but the assignment between the value names and the tag numbers **must**
-  match.
-
-**Note:** When using protocol buffers, it is impossible to distinguish between
-`false` and unset. If this is a requirement, an enum **may** be a better design
-choice (although `google.protobuf.BoolValue` is also available).
-
 {% tab oas %}
 
 {% sample 'enum.oas.yaml', '$.components.schemas.Book.properties.format.enum' %}
