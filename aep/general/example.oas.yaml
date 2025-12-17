@@ -5,10 +5,10 @@ components:
         author:
           items:
             properties:
-              family_name:
+              familyName:
                 type: string
                 x-aep-field-number: 2
-              given_name:
+              givenName:
                 type: string
                 x-aep-field-number: 1
             type: object
@@ -45,7 +45,7 @@ components:
         singular: book
     book-edition:
       properties:
-        display_name:
+        displayName:
           type: string
         path:
           description:
@@ -53,7 +53,7 @@ components:
             the service.
           type: string
       required:
-        - display_name
+        - displayName
       type: object
       x-aep-resource:
         parents:
@@ -163,7 +163,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  next_page_token:
+                  nextPageToken:
                     type: string
                   results:
                     items:
@@ -236,7 +236,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  next_page_token:
+                  nextPageToken:
                     type: string
                   results:
                     items:
@@ -369,7 +369,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  next_page_token:
+                  nextPageToken:
                     type: string
                   results:
                     items:
@@ -536,7 +536,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  next_page_token:
+                  nextPageToken:
                     type: string
                   results:
                     items:
@@ -689,7 +689,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  next_page_token:
+                  nextPageToken:
                     type: string
                   results:
                     items:
@@ -808,7 +808,7 @@ paths:
             application/json:
               schema:
                 properties:
-                  next_page_token:
+                  nextPageToken:
                     type: string
                   results:
                     items:
@@ -931,7 +931,7 @@ paths:
           application/json:
             schema:
               properties:
-                target_store:
+                targetStore:
                   type: string
               type: object
         required: true
