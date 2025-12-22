@@ -12,6 +12,8 @@ categories:
     title: Resources
   - code: standard-methods
     title: Standard Methods
+  - code: fields
+    title: Fields
   - code: design-patterns
     title: Design Patterns
   - code: security

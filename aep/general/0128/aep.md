@@ -59,8 +59,8 @@ To ensure consistency across the API ecosystem, APIs **should** use the followin
 metadata:
 
 * `id`: The unique identifier for the resource (**must** be a string).
-* `createdTime`: The timestamp when the resource was created ([Dates, times, and durations]).
-* `updatedTime`: The timestamp when the resource was last updated ([Dates, times, and durations]).
+* `createdTime`: The timestamp when the resource was created ([Time and duration]).
+* `updatedTime`: The timestamp when the resource was last updated ([Time and duration]).
 * `createdBy`: The identifier of the user or service that created the resource (**must** be a string).
 * `updatedBy`: The identifier of the user or service that last modified the resource (**must** be a string).
 * `displayName`: A user-friendly name for the resource, suitable for display in a UI.
@@ -153,42 +153,10 @@ Example:
 }
 ```
 
-### Dates, times, and durations
+### Time and duration
 
-APIs **must** use [RFC 3339] formats for dates and date-times.
-
-* date-time: `YYYY-MM-DDThh:mm:ss[.fraction](Z|±hh:mm)`
-* date: `YYYY-MM-DD`
-
-Date-times **must** include an explicit timezone designator.
-
-* If a client request is missing a timezone, the API **should** respond with `400 Bad Request`.
-* APIs **should** normalize date-times to UTC using a trailing `Z`.
-* APIs **may** specify a numeric offset (e.g., `+05:30`, `-07:00`) when the client-selected timezone/offset is
-  semantically meaningful (for example, scheduling or user display preferences). In these cases, APIs **should** also
-  store and expose the selected timezone separately (e.g., an IANA timezone like `America/Los_Angeles`) when needed to
-  preserve daylight-saving behavior.
-
-JSON payloads **should** avoid [ISO 8601 duration](https://en.wikipedia.org/wiki/ISO_8601#Durations) strings. However,
-they **may** be used if necessary. APIs **should** prefer explicit start/end timestamps when possible.
-
-Correct:
-
-```json
-{
-  "createdTime": "2025-12-17T14:30:00Z",
-  "scheduledTime": "2025-12-17T09:00:00-07:00"
-}
-```
-
-Incorrect:
-
-```json
-{
-  "createdTime": "2025-12-17 14:30:00",
-  "scheduledTime": "2025-12-17T14:30:00"
-}
-```
+All representations of dates, timestamps, and time intervals in JSON payloads **must** follow the standards defined
+in [Time and duration].
 
 ### Numbers
 
@@ -300,7 +268,7 @@ database-centric `createdTimestamp`.
 
 [States]: /states
 
-[Dates, times, and durations]: #dates-times-and-durations
+[Time and duration]: /time-and-duration
 
 ## Changelog
 
