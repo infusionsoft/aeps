@@ -37,7 +37,7 @@ resource representation.
   clients to see the full result of their changes, including any server-side transformations or computed fields.
 * **must not** be _assumed_ to be [idempotent].
     * `PATCH` operations **may** be designed to be idempotent.
-    * APIs **must** document whether their `PATCH` endpoints are idempotent.
+    * APIs **must** document if a `PATCH` endpoint is idempotent.
 
 When processing `PATCH` requests:
 
@@ -97,9 +97,8 @@ In this example, only the `name` and `address.city` fields are updated. Other fi
 While it is not strictly required to be so by the HTTP specification, `PATCH` **may** be idempotent. The idempotency of
 a `PATCH` operation depends on the patch format and the nature of the changes. The field mask approach is _typically_
 idempotent (applying the same patch multiple times produces the same result); however, it shouldn't be assumed a `PATCH`
-is idempotent unless it is clearly documented.
-
-APIs **must** clearly document the idempotency behavior of their `PATCH` endpoints.
+is idempotent unless it is clearly documented. APIs **must** clearly document if a `PATCH` endpoint is idempotent.
+`PATCH` operations that require idempotency **should** support an [Idempotency-Key].
 
 ### Concurrency
 
@@ -147,6 +146,8 @@ simple enough to be used easily, and powerful enough to handle complex resources
 [long-running operation]: /long-running-operations
 
 [idempotent]: /130#common-method-properties
+
+[Idempotency-Key]: /idempotency-key
 
 [Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 

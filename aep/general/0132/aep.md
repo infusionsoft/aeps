@@ -126,18 +126,10 @@ When a `POST` request fails during resource creation, the server **must not** cr
 If a `POST` operation is partially completed before encountering an error, the service **should** roll back changes when
 possible. If rollback is not possible, the service **must** clearly document the potential for partial state changes.
 
-### Idempotency considerations
+### Idempotency
 
-For POST operations where duplicate execution would be problematic (such as payment processing or order submission),
-APIs **should** support idempotency keys to allow safe retries.
-
-When implementing idempotency keys:
-
-* The API **must** accept an idempotency key via a request header (e.g., [Idempotency-Key]).
-* The server **must** store the key and associate it with the operation result.
-* Subsequent requests with the same idempotency key **must** return the same result without re-executing the operation.
-* The server should **retain** idempotency keys for a reasonable period (e.g., 24 hours).
-* The API **must** document the idempotency key behavior, including retention period and scope.
+For `POST` operations where duplicate execution would be problematic (such as payment processing or order submission),
+APIs **should** support an [Idempotency-Key] to allow safe retries.
 
 [RFC 9110 Section 9.3.3]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.3
 
@@ -159,7 +151,7 @@ When implementing idempotency keys:
 
 [long-running operations]: /long-running-operations
 
-[Idempotency-Key]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Idempotency-Key
+[Idempotency-Key]: /idempotency-key
 
 [Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 

@@ -12,9 +12,9 @@ standard [HTTP methods] and reified resources if possible, due to their consiste
 
 **Use custom methods when:**
 
-* The operation represents a simple action or state transition with no additional data or history requirements (e.g., 
+* The operation represents a simple action or state transition with no additional data or history requirements (e.g.,
   "cancel order" when you don't need to track who canceled it or why).
-  * Meaning, the operation is instantaneous, has no state, and leaves no trace worth tracking.
+    * Meaning, the operation is instantaneous, has no state, and leaves no trace worth tracking.
 * Using standard methods would require awkward or unintuitive resource modeling that obscures the operation's intent.
 * The action is better expressed as a verb acting on a resource rather than a state change on the resource itself.
 
@@ -56,15 +56,11 @@ APIs **must** clearly document each custom method, including:
 
 ### Idempotency
 
-Custom methods using [POST] are not inherently idempotent. If a custom method is idempotent, this **must** be clearly
-documented.
-For custom methods that require idempotency (such as payment operations or order submissions):
-
-* Add an [Idempotency-Key] header.
-* Document the idempotency behavior clearly.
-* Ensure repeated calls with the same idempotency key return the same result.
-
 Custom methods using [GET] **must** be idempotent by definition of the HTTP specification.
+
+Custom methods using [POST] are not inherently idempotent. If a custom method is idempotent, this **must** be clearly
+documented. Custom methods that require idempotency (such as payment operations or order submissions) **should**
+support an [Idempotency-Key].
 
 ### Searching and filtering
 
@@ -120,7 +116,7 @@ However, bulk read operations **must not** use custom methods. Instead, use stan
 
 [reification]: /121#reification
 
-[Idempotency-Key]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Idempotency-Key
+[Idempotency-Key]: /idempotency-key
 
 ## Changelog
 
