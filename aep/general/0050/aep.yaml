@@ -1,8 +1,9 @@
 ---
-id: 11
+id: 50
 state: approved
-slug: rest-alternatives
+slug: rest
 created: 2025-10-31
 updated: 2025-10-31
 placement:
   category: rest-fundamentals
+redirect_from: '/representational-state-transfer'
