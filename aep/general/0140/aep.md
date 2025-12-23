@@ -243,7 +243,7 @@ calculations. These errors accumulate over time and can result in incorrect tota
 decimal values encoded as strings preserves exactness across systems and programming languages. This ensures consistent
 and predictable handling of money regardless of client or backend implementation.
 
-Why `createTime` over `createdAt`?
+Why `createdTime` over `createdAt`?
 
 It avoids the natural language ambiguity while remaining slightly more "standard" for REST APIs than the more
 database-centric `createdTimestamp`.

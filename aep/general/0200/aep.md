@@ -63,7 +63,7 @@ to users to break the existing pattern only for the sake of adhering to the
 global standard.
 
 For example, if all of an API's resources use `creationTime` (instead of the
-standard field `createdTime` described in AEP-128), a new resource in that API
+standard field `createdTime` described in AEP-140), a new resource in that API
 should continue to follow the local pattern.
 
 However, others who might otherwise copy that API should be made aware that
