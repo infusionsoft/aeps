@@ -1,14 +1,8 @@
-# REST Fundamentals
+# Representational State Transfer
 
 This AEP is an educational primer. It establishes a shared vocabulary and mental model for REST so that later AEPs
 (which contain prescriptive guidelines) can reference these fundamentals without re‑explaining them. It is intentionally
 technology‑agnostic but uses HTTP examples because HTTP is the most common transport for RESTful systems.
-
-Audience: API designers, backend engineers, platform engineers, and reviewers who need a clear understanding of REST and
-how it maps to practical HTTP APIs in our org.
-
-Scope: What REST is, why it matters, and the core constraints and concepts you should recognize in API design. This is
-not a style guide; prescriptive rules and conventions come in subsequent AEPs.
 
 ## What is REST?
 

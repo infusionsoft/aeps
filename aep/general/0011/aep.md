@@ -4,11 +4,6 @@ This AEP examines REST alongside alternative API styles and explains why our org
 for public and most internal HTTP APIs. It provides a pragmatic comparison, acknowledges REST’s limitations, and
 documents when exceptions (GraphQL, gRPC, event-driven) are appropriate.
 
-Audience: API designers, backend engineers, platform engineers, and reviewers making architectural choices.
-
-Scope: Decision rationale and trade-offs. For REST fundamentals, see AEP-10. Prescriptive conventions (naming,
-pagination, errors, versioning) are covered in later AEPs.
-
 **Note:** Our organizational standard for APIs is JSON REST over HTTP. JSON is our default representation, but APIs
 **may** use other media types when appropriate (e.g., `multipart/form-data` for file uploads, `text/event-stream` for
 SSE, `application/octet-stream` for binary). Alternatives to REST are allowed only by exception.
