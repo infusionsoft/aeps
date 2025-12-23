@@ -1,9 +1,13 @@
 # Query Parameters
 
 Query parameters are a part of the URI that allows you to pass additional information to the server. They are typically
-used to filter, sort, or modify the data returned by the API. Query parameters are appended to the end of the URI after
-a question mark (`?`), and multiple parameters are separated by an ampersand (`&`). Query parameters are key-value
-pairs, where the key and value are separated by an equals sign (`=`).
+used to filter, sort, or modify the data returned by the API.
+
+## Guidance
+
+Query parameters are appended to the end of the URI after a question mark (`?`), and multiple parameters are separated
+by an ampersand (`&`). Query parameters are key-value pairs, where the key and value are separated by an equals sign (
+`=`).
 
 **Example:**
 
@@ -13,8 +17,6 @@ GET /v1/books?sort_by=title&limit=10&published_after=2020-01-01
 
 This request sorts the results by the `title` field, limits the result set to 10 items, and filters for books published
 after January 1, 2020.
-
-## Guidance
 
 ### Naming conventions
 
@@ -56,6 +58,7 @@ consistently across all endpoints:
 * `limit` - For offset-based pagination (see [Pagination])
 * `order_by` - For sorting results
 * `update_mask` - For [PATCH updates](/134#field-masking)
+* `read_mask` - For [partial responses](/partial-responses)
 
 ### Query parameters are non-actionable
 
