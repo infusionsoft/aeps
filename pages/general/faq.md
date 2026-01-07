@@ -3,20 +3,17 @@
 ## What are the differences between AEPs and AIPs?
 
 If you are familiar with Google's API Improvement Proposals
-[google.aip.dev](https://google.aip.dev), then much of the
-[API Enhancement Proposals](https://aep.dev) content will be familiar.
+[google.aip.dev](https://google.aip.dev), or aep-dev's [API Enhancement Proposals](https://aep.dev),
+then much of this content will be familiar.
 
-However, AEPs have notable philosophical differences, including:
+However, our AEPs have notable philosophical differences, including:
 
-- AEPs prioritize broadly applicable design guidance for any company, while
-  AIPs prioritized design guidance specifically for Google (e.g., providing
-  backwards-compatibility with prior decisions to meet Google-specific needs).
-- AEPs are protocol-agonistic and consider both gRPC and HTTP+JSON as
-  first-class protocols for which examples and other content are necessary.
-- AEPs focuses on a core specification that is not intended to be forked,
-  paired with a mechanism for optional organization-specific guidance to extend
-  the specification. AIPs encourage forking its guidance outright.
+- Our AEPs are written for HTTP REST APIs using JSON, while AIPs focus
+  on gRPC. This makes these AEPs directly applicable to our company's API development
+  without translation between protocols.
+- Our AEPs provide organization-specific guidance tailored to our company's needs
+  and standards, serving as our single source of truth for API design.
 
-AEPs also have the advantage of hindsight, which makes it possible in some
-cases to provide better guidance. (One small example: renaming `page_size` to
-`max_page_size` for requests to paginated API methods.)
+AEPs also have the advantage of hindsight from both AIPs and the broader AEP
+project at [aep.dev](https://aep.dev), which makes it possible in some cases to
+provide better guidance.
