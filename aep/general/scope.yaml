@@ -6,6 +6,8 @@ categories:
     title: Meta
   - code: general
     title: General
+  - code: http
+    title: HTTP
   - code: rest-fundamentals
     title: REST Fundamentals
   - code: resources
