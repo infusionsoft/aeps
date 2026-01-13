@@ -1,7 +1,7 @@
 # Filtering
 
 Filtering is a common requirement for collection endpoints in JSON HTTP REST APIs. When listing resources (for example,
-`GET /books`), clients often need to narrow results to only those that match specific criteria such as status, owner,
+`GET /books`), clients often need to narrow results to only those that match specific criteria such as state, owner,
 category, or timestamps.
 
 Filtering requirements also tend to evolve over time as products add new features and clients need new ways to query
@@ -25,7 +25,7 @@ APIs **may** support filtering on collection endpoints (for example, `GET /books
 * Filtering **should** be expressed using query parameters on a [GET] request (not request bodies).
 * Filtering parameters **must not** change the meaning of the resource model; they only constrain which items appear in
   the collection response.
-* Filtering **should** be modeled as explicit query parameters (e.g., `status=active`,
+* Filtering **should** be modeled as explicit query parameters (e.g., `state=active`,
   `created_after=2025-01-01T00:00:00Z`) rather than a single `filter` string with a custom grammar.
 * APIs **must** document:
     * Supported filter parameters
@@ -45,14 +45,14 @@ Query parameters **must** follow the naming and encoding rules in AEP-129.
 
 Filtering parameter names **must** be stable (do not rename lightly), specific, and self-explanatory.
 
-APIs **should** use the direct field name for exact matches (e.g. `status=active`, `category=books`).
+APIs **should** use the direct field name for exact matches (e.g. `state=active`, `category=books`).
 
 APIs **should** use suffix modifiers for common comparisons. Use consistent suffixes and only introduce them when there
 is more than one plausible comparison. Recommended suffix set (use a subset as appropriate):
 
 | Suffix / operator            | Meaning                                                            | Notes                                                                                                                             |
 |------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `_eq`                        | Equals                                                             | Prefer the bare parameter name for equality (e.g., `status=active`) Use `_eq` only if needed to disambiguate from other variants. |
+| `_eq`                        | Equals                                                             | Prefer the bare parameter name for equality (e.g., `state=active`) Use `_eq` only if needed to disambiguate from other variants. |
 | `_ne`                        | Not equals                                                         | Use when you need explicit inequality filtering.                                                                                  |
 | `_lt`, `_lte`, `_gt`, `_gte` | Less than, less than or equal, greater than, greater than or equal | Typically for numbers. Define value formats.                                                                                      |
 | `_before`, `_after`          | Timestamp-specific `<` / `>`                                       | Use for time-based fields instead of `_lt/_gt` (e.g., `created_after=...`).                                                       |
@@ -120,10 +120,10 @@ When multiple different filter parameters are provided, the API **must** combine
 Example:
 
 ```http request
-GET /products?category=books&status=active
+GET /products?category=books&state=active
 ```
 
-Meaning: products that are in the `category` "books" AND have `status` "active".
+Meaning: products that are in the `category` "books" AND have `state` "active".
 
 ### Repeated parameters (`OR`)
 
@@ -145,14 +145,14 @@ commas as special).
 
 ### `OR` across different fields
 
-Modeling a general `OR` across different fields (e.g., `category=books OR status=active`) is difficult to represent
+Modeling a general `OR` across different fields (e.g., `category=books OR state=active`) is difficult to represent
 cleanly in query parameters and often leads to adhoc mini-languages.
 
 Therefore, APIs **should not** support arbitrary boolean logic across different fields in query strings.
 If a real use case requires it, APIs **should** consider:
 
 * Defining a dedicated endpoint with well-defined semantics (still RESTful), or
-* Defining a small number of explicit "union" parameters (e.g., `any_of_status=...`) where the meaning is unambiguous,
+* Defining a small number of explicit "union" parameters (e.g., `any_of_state=...`) where the meaning is unambiguous,
   or
 * Providing a specialized search endpoint.
 

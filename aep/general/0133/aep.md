@@ -39,7 +39,7 @@ A `PUT` request **must** include a complete representation of the resource in th
 * **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
 * **must** be [idempotent]. Repeating the same PUT request must produce the same result and leave the resource in the
   same state.
-* **must not** modify read-only or server-managed fields (e.g., created_at, id). If such fields are included in the
+* **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
   request, they should be ignored or validated for consistency.
 
 Some resources take longer to be updated than is reasonable for a regular API request. In this situation, the API should

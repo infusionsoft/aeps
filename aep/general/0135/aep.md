@@ -22,7 +22,7 @@ Use `DELETE` for operations that remove a resource from the system.
 
 * You're deactivating or archiving a resource rather than deleting it; use [PATCH] or [PUT] to update the resource
   instead.
-    * (e.g., `PATCH /users/123` with `{"status": "inactive"}`).
+    * (e.g., `PATCH /users/123` with `{"state": "inactive"}`).
 * The operation involves complex business logic beyond simple deletion; consider using [POST] to a reified resource or
   custom method
     * e.g.,`POST /orders/123/cancellations` or `POST /orders/123:cancel`.
@@ -91,7 +91,7 @@ deletion (permanently removing data).
   deleted resources.
 * The resource **may** be recoverable through an undelete operation (e.g., `POST /books/123:undelete`).
 * Soft delete **may** be implemented either as a `DELETE` operation that marks the resource as deleted, or as a `PATCH`
-  operation that updates a status field (e.g., `{"status": "deleted"}`). Both approaches are valid; choose based on your
+  operation that updates a state field (e.g., `{"state": "deleted"}`). Both approaches are valid; choose based on your
   API's semantic requirements and whether you want deletion to feel like removal or state change.
 
 **Hard delete:** The resource is permanently removed.

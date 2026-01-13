@@ -34,9 +34,9 @@ Content-Type: application/json
 
 {
   "id": "op_abc123xyz",
-  "status": "pending",
+  "state": "pending",
   "metadata": {
-    "created_at": "2025-12-02T10:30:00Z"
+    "createdTime": "2025-12-02T10:30:00Z"
   }
 }
 ```
@@ -57,13 +57,13 @@ The service **should** provide a `GET /operations` endpoint to list operations. 
 
 The `Operation` object returned:
 
-* **must** include the current `status` of the operation.
+* **must** include the current `state` of the operation.
 * **should** include progress information in the `metadata` field when available (e.g., percentage complete, items
   processed).
-* **must** include the operation result in the `result` field when status is succeeded.
-* **must** include error details in the `errors` array when status is failed.
+* **must** include the operation result in the `result` field when state is succeeded.
+* **must** include error details in the `errors` array when state is failed.
 
-APIs **may** include additional status values if needed, but **must** document them clearly.
+APIs **may** include additional state values if needed, but **must** document them clearly.
 
 ### Cancellation
 
@@ -72,7 +72,7 @@ APIs **may** support cancelling long-running operations when feasible. Cancellat
 * **must** be implemented via `POST /operations/{operation_id}:cancel`.
 * **must** return `200 OK` with the updated `Operation` object if the operation was successfully canceled.
 * **must** return `404 Not Found` if the operation does not exist.
-* may not take effect immediately; the operation `status` **should** transition to canceled once cancellation is
+* may not take effect immediately; the operation `state` **should** transition to canceled once cancellation is
   complete.
 
 Not all operations can be safely canceled. APIs must document which operations
@@ -107,7 +107,7 @@ Errors that prevent a long-running request from _starting_ **must** return an
 [error response][aep-193], similar to any other method.
 
 Errors that occur _during_ the operation's execution **must** be reflected in the `Operation` object with
-`status: "failed"` and detailed error information in the `errors` array.
+`state: "failed"` and detailed error information in the `errors` array.
 
 ## Interface Definitions
 
@@ -121,13 +121,13 @@ Operation:
   description: Represents a long-running operation.
   required:
     - id
-    - status
-    - created_at
+    - state
+    - createdTime
   properties:
     id:
       type: string
       description: The unique identifier for this operation.
-    status:
+    state:
       type: string
       enum:
         - pending
@@ -135,18 +135,18 @@ Operation:
         - succeeded
         - failed
         - cancelled
-      description: The current status of the operation.
+      description: The current state of the operation.
     metadata:
       type: object
       description: Service-specific metadata about the operation, such as progress information.
       additionalProperties: true
     result:
       type: object
-      description: The result of the operation when status is 'succeeded'.
+      description: The result of the operation when state is 'succeeded'.
       additionalProperties: true
     errors:
       type: array
-      description: Error details when status is 'failed'.
+      description: Error details when state is 'failed'.
       items:
         type: object
         properties:

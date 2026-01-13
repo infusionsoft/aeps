@@ -31,7 +31,7 @@ resource representation.
 * **must** be used to partially update a resource at a known URI.
 * **must** include a request body that describes the changes to be applied.
 * **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
-* **must not** modify read-only or server-managed fields (e.g., `created_at`, `id`). If such fields are included in the
+* **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
   request, they should be ignored or return `400 Bad Request`.
 * **should** return the complete updated resource in the response, not just the fields that were modified. This allows
   clients to see the full result of their changes, including any server-side transformations or computed fields.

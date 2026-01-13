@@ -111,7 +111,7 @@ made.
 User-settable fields (fields that clients provide) **must** return the same value on all subsequent requests after an
 operation completes, until another mutation changes the resource.
 
-Output-only fields (system-managed fields like `created_at`, `status`, or IDs) **should** also return
+Output-only fields (system-managed fields like `createdTime`, `state`, or IDs) **should** also return
 consistent values after an operation completes.
 
 - However, there's an exception for fields that represent "live state" that takes significant time to stabilize (for
