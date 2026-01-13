@@ -9,7 +9,7 @@ categories:
   - code: http
     title: HTTP
   - code: rest
-    title: REST Fundamentals
+    title: REST
   - code: resources
     title: Resources
   - code: standard-methods
