@@ -8,7 +8,7 @@ categories:
     title: General
   - code: http
     title: HTTP
-  - code: rest-fundamentals
+  - code: rest
     title: REST Fundamentals
   - code: resources
     title: Resources
