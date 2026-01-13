@@ -39,8 +39,9 @@ it requires mapping or transformation from the storage layer.
 
 To ensure consistent semantics across fields, APIs **should** follow these naming patterns:
 
-* **Timestamps**: Use the suffix `Time` (e.g., `expireTime`, `publishTime`).
-* **Dates**: Use the suffix `Date` (e.g., `birthDate`, `usageDate`).
+* **Timestamps**: Use the suffix `Time` (e.g., `expireTime`, `publishTime`). See [Time and duration] for format
+  requirements.
+* **Dates**: Use the suffix `Date` (e.g., `birthDate`, `usageDate`). See [Time and duration] for format requirements.
 * **Booleans**: Use the prefix `is` (e.g., `isActive`, `isDefault`).
 * **Quantities**: Use the suffix `Count` (e.g., `itemCount`, `retryCount`).
 * **Identifiers**: Use the suffix `Id` (e.g., `publisherId`, `authorId`). These **must** be strings.
@@ -53,20 +54,10 @@ Initialisms **must** be treated as words in `camelCase`:
 * `apiKey`, not `APIKey`
 * `url`, not `URL`
 
-### Standard field names
+### Standard fields
 
-To ensure consistency across the API ecosystem, APIs **should** use the following standardized names for common resource
-metadata:
-
-* `id`: The unique identifier for the resource (**must** be a string).
-* `createdTime`: The timestamp when the resource was created ([Time and duration]).
-* `updatedTime`: The timestamp when the resource was last updated ([Time and duration]).
-* `createdBy`: The identifier of the user or service that created the resource (**must** be a string).
-* `updatedBy`: The identifier of the user or service that last modified the resource (**must** be a string).
-* `displayName`: A user-friendly name for the resource, suitable for display in a UI.
-* `description`: A detailed textual description of the resource.
-* `state`: The current lifecycle state of the resource (e.g., `ACTIVE`, `PENDING`). APIs **should** use `state` rather
-  than `status` to avoid confusion with HTTP or protocol-level status codes. See [States] for more information.
+To ensure consistency across the API ecosystem, APIs **should** use the standard field names defined
+in [Standard Names] for common terms.
 
 ### Values and types
 
@@ -266,9 +257,9 @@ database-centric `createdTimestamp`.
 
 [Errors]: /errors
 
-[States]: /states
-
 [Time and duration]: /time-and-duration
+
+[Standard Names]: /standard-names
 
 ## Changelog
 

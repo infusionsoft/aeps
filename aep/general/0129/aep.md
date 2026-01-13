@@ -47,18 +47,10 @@ experience by making simple use cases work without requiring extensive parameter
 
 Default values **must** be documented in the API specification.
 
-### Reserved query parameters
+### Standard query parameters
 
-The following query parameter names are reserved for common pagination and filtering operations and **should** be used
-consistently across all endpoints:
-
-* `page_token` - For cursor-based pagination (see [Pagination])
-* `page_size` - For cursor-based pagination (see [Pagination])
-* `offset` - For offset-based pagination (see [Pagination])
-* `limit` - For offset-based pagination (see [Pagination])
-* `order_by` - For sorting results
-* `update_mask` - For [PATCH updates](/134#field-masking)
-* `read_mask` - For [partial responses](/partial-responses)
+To ensure consistency across the API ecosystem, APIs **should** use the query parameters defined in [Standard Names]
+for common terms.
 
 ### Query parameters are non-actionable
 
@@ -75,7 +67,7 @@ Query parameters are intended to:
 Correct:
 
 ```http
-GET /v1/books?status=published
+GET /v1/books?state=published
 DELETE /v1/books/123
 ```
 
