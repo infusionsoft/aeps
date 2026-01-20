@@ -97,7 +97,7 @@ Some operations may return an empty response body after successfully completing 
 of a response body depends on the status code, HTTP method, and the nature of the operation.
 
 For detailed guidance on content negotiation, media types, and how clients should interpret the response body, see
-AEP-127. For specific guidance on structuring JSON payloads, see AEP-140. For guidance on error response formats, see
+AEP-105. For specific guidance on structuring JSON payloads, see AEP-140. For guidance on error response formats, see
 AEP-193.
 
 [HTTP specification]: https://datatracker.ietf.org/doc/html/rfc9110

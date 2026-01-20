@@ -86,7 +86,7 @@ processing.
 Not all requests include a body. The presence and content of a request body depends on the HTTP method being used and
 the nature of the operation being performed.
 
-For detailed guidance on content negotiation, media types, and how the server interprets the request body, see AEP-127.
+For detailed guidance on content negotiation, media types, and how the server interprets the request body, see AEP-105.
 For specific guidance on structuring JSON payloads, see AEP-140.
 
 ## Next Steps
