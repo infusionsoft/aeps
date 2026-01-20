@@ -106,7 +106,7 @@ state. This means:
 
 ### Concurrency
 
-For concurrent modification scenarios, APIs **may** implement optimistic concurrency control using [ETags]:
+For concurrent modification scenarios, APIs **may** implement optimistic concurrency control using [ETag]:
 
 * The server **may** include an [ETag] header in `GET` and `PUT` responses representing the resource version.
 * Clients **may** include an [If-Match] header with the [ETag] value when making `PUT` requests.
@@ -209,6 +209,8 @@ Content-Type: application/json
 [URI path]: /paths
 
 [long-running operation]: /long-running-operations
+
+[ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
 
 ## Changelog
 

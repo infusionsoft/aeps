@@ -46,8 +46,7 @@ POST requests:
 APIs **must** use more specific HTTP methods when appropriate ([PUT] for full replacement, [PATCH] for partial
 updates, [DELETE] for removal) rather than overloading `POST`.
 
-Some resources take longer to be created than is reasonable for a regular API request. In this situation, the
-API should use a [long-running operation].
+Some resources take longer to be created than is reasonable for a regular API request. See [long-running operations].
 
 ### Creating resources
 
@@ -58,7 +57,7 @@ When using `POST` to create new resources:
 * On successful creation, the response **must** return `201 Created`.
 * The response **may** include a [Location] header containing the URI of the newly created resource.
 * The response body **should** include the complete representation of the created resource, including any
-  server-generated fields (e.g., `id`, `createdAt`, `updatedAt`).
+  server-generated fields (e.g., `id`, `createdTime`, `updatedTime`).
     * For bulk creation operations, APIs **may** return a summary or list of IDs/Status objects instead of full
       resources to improve performance.
 
@@ -87,8 +86,8 @@ Content-Type: application/json
     "title": "Les Misérables",
     "author": "Victor Hugo",
     "isbn": "9780451419439",
-    "createdAt": "2025-11-12T10:30:00Z",
-    "updatedAt": "2025-11-12T10:30:00Z"
+    "createdTime": "2025-11-12T10:30:00Z",
+    "updatedTime": "2025-11-12T10:30:00Z"
 }
 ```
 
@@ -157,8 +156,8 @@ APIs **should** support an [Idempotency-Key] to allow safe retries.
 
 ## Changelog
 
-**2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
-**2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
+* **2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
+* **2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
 
 [Google AIP-133]: https://google.aip.dev/133
 

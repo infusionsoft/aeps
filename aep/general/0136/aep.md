@@ -64,7 +64,7 @@ support an [Idempotency-Key].
 
 ### Searching and filtering
 
-A common misuse of custom methods is using them for searches (`:search`). Searching and filtering **should** be
+A common misuse of custom methods is using them for searches (`:search`). Searching and [filtering] **should** be
 implemented as [GET] requests with query parameters on the collection resource instead.
 
 Incorrect:
@@ -117,6 +117,8 @@ However, bulk read operations **must not** use custom methods. Instead, use stan
 [reification]: /121#reification
 
 [Idempotency-Key]: /idempotency-key
+
+[filtering]: /filtering
 
 ## Changelog
 

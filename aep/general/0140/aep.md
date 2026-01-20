@@ -128,22 +128,6 @@ omitted from the payload.
 
 List endpoints **must** include pagination metadata in an envelope object, see [Pagination].
 
-Example:
-
-```json
-{
-  "tags": [],
-  "comments": [
-    {
-      "id": "123"
-    },
-    {
-      "id": "456"
-    }
-  ]
-}
-```
-
 ### Time and duration
 
 All representations of dates, timestamps, and time intervals in JSON payloads **must** follow the standards defined

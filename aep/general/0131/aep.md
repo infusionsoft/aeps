@@ -60,7 +60,7 @@ collections.
   resources.
 * **should** return a `404 Not Found` if the parent resource does not exist (e.g., requesting
   `/publishers/{invalid_id}/books` when the publisher doesn't exist).
-* **should** implement sorting and filtering mechanisms to allow clients to sort and narrow results.
+* **should** implement sorting and [filtering] mechanisms to allow clients to sort and narrow results.
     * The filters **must** follow the guidelines on [query parameters].
 * **must** ensure a deterministic default sort order to guarantee stable [pagination].
 
@@ -136,6 +136,8 @@ consistency across paginated requests.
 [If-Modified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since
 
 [304 Not Modified]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
+
+[filtering]: /filtering
 
 ## Changelog
 

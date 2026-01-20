@@ -134,8 +134,8 @@ Content-Type: application/json
 
 {
   "id": "123",
-  "deleted_at": "2024-12-02T10:30:00Z",
-  "cascade_deleted": [
+  "deletedTime": "2024-12-02T10:30:00Z",
+  "cascadeDeleted": [
     {"type": "review", "id": "review-1"},
     {"type": "review", "id": "review-2"}
   ]
