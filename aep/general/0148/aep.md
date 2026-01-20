@@ -22,8 +22,8 @@ The following terms are synonymous and refer to the same concept:
 - App Name
 - App ID
 
-APIs **must** use the term "tenant" in all _**new**_ development. The legacy terms "app name" and "app ID" are deprecated
-and exist only for backward compatibility in existing APIs.
+APIs **must** use the term "tenant" in all _**new**_ development. The legacy terms "app name" and "app ID" are
+deprecated and exist only for backward compatibility in existing APIs.
 
 ### HTTP headers
 
@@ -164,6 +164,11 @@ equally standardized API surface is important. This enables development of
 improved API consumer tools and documentation, as well as a more unified user
 experience across the platform.
 
+### Why `createdTime` over `createdAt`?
+
+`createdAt` could also refer to a location. `createdTime` avoids that language ambiguity while remaining slightly more
+"standard" for REST APIs than the more database-centric `createdTimestamp`.
+
 [Pagination]: /pagination
 
 [Filtering]: /filtering
@@ -178,7 +183,8 @@ experience across the platform.
 
 ## Changelog
 
-**2026-01-13**: Initial creation, adapted from [Google AIP-148][] and aep.dev [AEP-148][].
+* **2026-01-20**: Add rationale for `createdTime` over `createdAt`.
+* **2026-01-13**: Initial creation, adapted from [Google AIP-148][] and aep.dev [AEP-148][].
 
 [Google AIP-148]: https://google.aip.dev/148
 

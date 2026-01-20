@@ -199,29 +199,24 @@ Example:
 
 ## Rationale
 
-Why `camelCase`?
+### Why `camelCase`?
 
 Most OpenAPI tooling and JSON client code generators default to `camelCase`, particularly in JavaScript and TypeScript
 ecosystems. Aligning with this convention reduces friction when generating clients and mapping payloads to native data
 structures, and it matches the property-naming style used by many commonly used programming languages.
 
-Why IDs as strings?
+### Why IDs as strings?
 
 Representing identifiers as strings prevents precision loss in languages and databases that cannot safely round-trip
 64-bit integers. It also decouples the API contract from the underlying ID generation strategy, allowing implementations
 to change formats (UUIDs, ULIDs, database sequences, or composite identifiers) without breaking clients.
 
-Why use strings for currency amount?
+### Why use strings for currency amount?
 
 Floating-point numbers cannot precisely represent many decimal fractions, which can lead to rounding errors in monetary
 calculations. These errors accumulate over time and can result in incorrect totals, balances, or comparisons. Using
 decimal values encoded as strings preserves exactness across systems and programming languages. This ensures consistent
 and predictable handling of money regardless of client or backend implementation.
-
-Why `createdTime` over `createdAt`?
-
-It avoids the natural language ambiguity while remaining slightly more "standard" for REST APIs than the more
-database-centric `createdTimestamp`.
 
 ## Further reading
 
