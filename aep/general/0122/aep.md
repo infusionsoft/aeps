@@ -230,7 +230,7 @@ difficult-to-read string. Furthermore, in user interfaces or technical documenta
 underscore (`_`) is often obscured by the underline, whereas a hyphen remains clearly visible.
 
 Using `kebab-case` for paths also creates a clear visual distinction from query parameters and JSON keys, which use
-`snake_case` (AEP-129) and `camelCase` (AEP-140) respectively. This distinction helps developers quickly identify
+`snake_case` (AEP-106) and `camelCase` (AEP-140) respectively. This distinction helps developers quickly identify
 whether they are looking at a resource location or a data attribute.
 
 [rfc 1034]: https://tools.ietf.org/html/rfc1034

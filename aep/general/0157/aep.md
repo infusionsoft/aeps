@@ -19,7 +19,7 @@ If an API supports partial responses, it **must** use a query parameter named `r
       **must** treat array fields as all-or-nothing:
         - either the entire array with all nested fields is returned, or
         - the array is omitted entirely.
-- `read_mask` **must** follow the guidelines in AEP-129 on query parameters.
+- `read_mask` **must** follow the guidelines in AEP-106 on query parameters.
 
 **Note:** Changing the default value of `read_mask` is a breaking change.
 

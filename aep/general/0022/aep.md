@@ -128,7 +128,7 @@ Common uses for query parameters in APIs include:
 Query parameter keys and values should be URL-encoded to handle special characters properly. For example, spaces are
 encoded as `%20` or `+`. A search for "Victor Hugo" would be encoded as `Victor%20Hugo` (or `Victor+Hugo`), since spaces
 are not allowed in raw URLs. Characters like `&`, `=`, and `?` must also be encoded to avoid conflicting with URL
-syntax. See AEP-129 for guidelines on query parameters.
+syntax. See AEP-106 for guidelines on query parameters.
 
 ## Further Reading
 

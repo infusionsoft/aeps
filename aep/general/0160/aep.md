@@ -41,7 +41,7 @@ named and composed (so clients can predict behavior across APIs), while preservi
 _which_ filters exist, _when_ they are offered, and _which_ operators are supported based on real use cases and
 performance considerations.
 
-Query parameters **must** follow the naming and encoding rules in AEP-129.
+Query parameters **must** follow the naming and encoding rules in AEP-106.
 
 Filtering parameter names **must** be stable (do not rename lightly), specific, and self-explanatory.
 

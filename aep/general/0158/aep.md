@@ -12,7 +12,7 @@ be paginated.
   to [offset-based pagination](#token-based-offset-pagination).
     * If using offset-based pagination, _new_ APIs **must**
       implement [token-based offset pagination](#token-based-offset-pagination).
-* Query parameters for pagination **must** follow the guidelines in AEP-129.
+* Query parameters for pagination **must** follow the guidelines in AEP-106.
 
 ### Cursor-based pagination
 
