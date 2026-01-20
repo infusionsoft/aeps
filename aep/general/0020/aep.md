@@ -87,7 +87,7 @@ Not all requests include a body. The presence and content of a request body depe
 the nature of the operation being performed.
 
 For detailed guidance on content negotiation, media types, and how the server interprets the request body, see AEP-105.
-For specific guidance on structuring JSON payloads, see AEP-140.
+For specific guidance on structuring JSON payloads, see AEP-107.
 
 ## Next Steps
 
