@@ -29,6 +29,20 @@ merged.
 - A merged AEP **must** use the next available number.
 - AEPs **must** be numbered between 1 and 9999.
 
+### AEP Blocks
+
+While AEP numbers are generally assigned sequentially, specific blocks are reserved to group AEPs by their primary
+function. This helps users distinguish between administrative processes, educational materials, and technical
+standards.
+
+The currently recognized blocks are:
+
+* **1–49**: Meta, general, and process AEPs.
+* **50–99**: Educational/fundamental AEPs. They provide the conceptual foundation required to understand and apply API
+  design standards.
+* **100–999**: API design guidance AEPs. They define technical standards and requirements for APIs within the
+  organization.
+
 ## AEP Categories
 
 To help with discovery of an AEP, each one is assigned a category: a string
@@ -91,6 +105,7 @@ granular categories as the need arises.
 
 ## Changelog
 
+- **2026-01-20**: Add section on AEP blocks, and which ones are reserved.
 - **2025-10-30**: Initial AEP-2 for Thryv, adapted from [Google AIP-2][] and aep.dev [AEP-2][].
 
 [Google AIP-2]: https://google.aip.dev/2

@@ -31,6 +31,12 @@ used by API reviewers as a basis for review comments.
 These AEPs describe a process surrounding API design. They often affect the AEP
 process itself and are used to enhance the way in which AEPs are handled.
 
+### Educational
+
+These AEPs provide the prerequisite knowledge and theoretical background for effective API design. They explain
+the "what" and "why" of industry-standard technologies (like HTTP or JSON) without necessarily imposing
+company-specific constraints.
+
 ## Stakeholders
 
 ### Editors
@@ -185,6 +191,7 @@ state and will link to the new, current AEP.
 
 ## Changelog
 
+- **2026-01-20**: Add educational AEP type.
 - **2025-10-30**: Initial AEP-1 for Thryv, adapted from [Google AIP-1][] and aep.dev [AEP-1][].
 
 [Google AIP-1]: https://google.aip.dev/1
