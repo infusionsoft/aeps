@@ -61,7 +61,7 @@ status messages are part of the [HTTP specification], they are primarily informa
 numeric status code for programmatic decision-making, as status messages can vary between servers and are not
 standardized beyond common conventions.
 
-See AEP-23 for guidance on common HTTP status codes and when to use them. For an exhaustive reference of all possible
+See AEP-63 for guidance on common HTTP status codes and when to use them. For an exhaustive reference of all possible
 status codes, see the [MDN HTTP Response Codes] documentation. For detailed guidance on how to structure error
 information when a `4xx` or `5xx` occurs, see AEP-193.
 

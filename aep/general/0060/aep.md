@@ -55,7 +55,7 @@ See AEP-130 for comprehensive guidance and information on HTTP methods, includin
 The URL (Uniform Resource Locator) identifies the specific resource or collection that the request is targeting. URLs
 provide a standardized way to address resources across the web.
 
-For an educational overview of URLs and their components, see AEP-22.
+For an educational overview of URLs and their components, see AEP-62.
 
 ### HTTP Headers
 
@@ -92,7 +92,7 @@ For specific guidance on structuring JSON payloads, see AEP-107.
 ## Next Steps
 
 Once a server receives and processes a request, it sends back an **HTTP Response**. To understand how servers
-communicate the outcome of your request, see AEP-21.
+communicate the outcome of your request, see AEP-61.
 
 [HTTP specification]: https://datatracker.ietf.org/doc/html/rfc9110
 
