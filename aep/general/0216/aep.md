@@ -48,8 +48,11 @@ APIs **must not** allow a `state` to be directly created or updated on the resou
 create/update methods (`POST`/`PUT`/`PATCH`). For example, to publish a book, do _not_ send a `PATCH` request to the
 `book` resource with body `{"state": "PUBLISHED"}`.
 
-Instead, state transitions **should** be triggered by either creating separate
-[transition resources](#state-transition-resources) or defining a [custom method](#state-transition-custom-methods).
+Instead, state transitions **should** be triggered by:
+
+* Creating separate [transition resources](#state-transition-resources).
+* Defining a [custom method](#state-transition-custom-methods).
+* Using the [DELETE](/delete) method (for transitioning to a `DELETED` state).
 
 This constraint exists because standard update methods are generally not expected to have side effects, and because
 updating state directly implies that any state value can be set arbitrarily, whereas states actually reflect a
@@ -178,6 +181,7 @@ necessary.
 
 ## Changelog
 
+* **2026-01-21**: Add clarification on using `DELETE` method for transitioning to `DELETED` state.
 * **2025-12-23**: Initial creation, adapted from [Google AIP-216][] and aep.dev [AEP-216][].
 
 [Google AIP-216]: https://google.aip.dev/216

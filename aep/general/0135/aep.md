@@ -90,9 +90,11 @@ deletion (permanently removing data).
 * The resource **should** return [404 Not Found] or [410 Gone] on `GET` requests, unless specifically querying for
   deleted resources.
 * The resource **may** be recoverable through an undelete operation (e.g., `POST /books/123:undelete`).
-* Soft delete **may** be implemented either as a `DELETE` operation that marks the resource as deleted, or as a `PATCH`
-  operation that updates a state field (e.g., `{"state": "deleted"}`). Both approaches are valid; choose based on your
-  API's semantic requirements and whether you want deletion to feel like removal or state change.
+* Soft delete **may** be implemented either as a `DELETE` operation that marks the resource as deleted, or as a
+  [custom method] (e.g., `POST /books/123:archive`).
+    * `PATCH` **must not** be used to update a `state` field for deletes, as `state` fields should be output only (see
+      AEP-216). Choose based on your API's semantic requirements and whether you want deletion to feel like removal or a
+      lifecycle transition.
 
 **Hard delete:** The resource is permanently removed.
 
@@ -174,6 +176,8 @@ this specific resource," which better matches client expectations and simplifies
 
 [long-running operation]: /long-running-operations
 
+[custom method]: /custom-methods
+
 [200 OK]: /63#200-ok
 
 [404 Not Found]: /63#404-not-found
@@ -184,6 +188,7 @@ this specific resource," which better matches client expectations and simplifies
 
 ## Changelog
 
+* **2026-01-21**: Refine soft delete guidance to disallow delete via `PATCH`.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2024-12-10:** Initial version, adapted from [Google AIP-135][] and aep.dev [AEP-135][].
 
