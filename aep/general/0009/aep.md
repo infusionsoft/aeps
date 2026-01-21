@@ -185,6 +185,8 @@ A string that identifies a resource. URIs can be URLs (which specify location an
 a name in a particular namespace). In REST API contexts, when people say "resource URI" they usually mean just the path
 portion (`/users/123`).
 
+See AEP-62 for more information on URIs, URLs, and URNs.
+
 ### URL (Uniform Resource Locator)
 
 A type of URI that specifies both the location of a resource and the mechanism to retrieve it. A URL includes the
@@ -192,10 +194,26 @@ scheme (protocol), host (domain), and path. For example, `https://api.example.co
 `https` is the scheme, `api.example.com` is the host, and `/users/123` is the path. In REST API contexts, when people
 say "URL" they usually mean the complete address (`https://api.example.com/users/123`)
 
-URI is a broader term than URL; all URLs are URIs, but not all URIs are URLs.
+URI is a broader term than URL; all URLs are URIs, but not all URIs are URLs. See AEP-62 for more information on URIs,
+URLs, and URNs.
+
+## URN (Uniform Resource Name)
+
+A type of URI that identifies a resource by a persistent, location-independent name rather than by its location or how
+to access it. URNs follow the format `urn:<namespace>:<specific-string>`, such as `urn:isbn:0-486-27557-4` for
+identifying a book by its ISBN.
+
+While URNs are not used as resource addresses in REST API URLs, they appear in API contexts as standardized identifier
+values, particularly in protocol specifications and configuration settings. For example, OAuth 2.0 uses URNs for token
+types (e.g., `urn:ietf:params:oauth:token-type:access_token`) and grant types (e.g.,
+`urn:ietf:params:oauth:grant-type:token-exchange`).
+
+URN is a broader term than URL; all URNs are URIs, but not all URIs are URNs. See AEP-62 for more information on URIs,
+URLs, and URNs.
 
 ## Changelog
 
+- **2026-01-21**: Add URN
 - **2025-10-30**: Initial AEP-9 for Thryv, adapted from [Google AIP-9][] and aep.dev [AEP-3][].
 
 [Google AIP-9]: https://google.aip.dev/9
