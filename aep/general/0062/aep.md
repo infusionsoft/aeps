@@ -17,7 +17,8 @@ interchangeably. While they are related, they have distinct meanings in technica
 * **URI** is the broad category of all identifiers.
 * **URL** is a type of URI that identifies a resource by its *location* (how to get there).
 * **URN** (Uniform Resource Name) is another type of URI that identifies a resource by a persistent _name_, regardless
-  of location (e.g., `urn:isbn:0-486-27557-4` for a book). URNs are rarely encountered in modern web API development.
+  of location (e.g., `urn:isbn:0-486-27557-4` for a book). URNs are not used as resource addresses in API URLs, though
+  they may appear as identifier values in other API contexts.
 
 **Note:** All URLs are URIs, but not all URIs are URLs.
 
@@ -64,6 +65,10 @@ Common schemes in web APIs include:
 * `https`: Secure HTTP, which encrypts communication using TLS/SSL
 * `http`: Standard HTTP without encryption
 
+The scheme is **case-*in*sensitive**, so `https://`, `HTTPS://`, and `HtTpS://` are all equivalent. However, lowercase
+is
+the standard convention.
+
 Modern web APIs almost exclusively use `https` to ensure secure communication and protect sensitive data in transit.
 Many servers and API gateways automatically redirect `http` requests to `https` or reject unencrypted connections
 entirely.
@@ -81,6 +86,9 @@ environments or services, such as:
 * `staging.mycompany.com` for staging environments
 * `dev.mycompany.com` for development environments
 
+Domain names are **case-*in*sensitive**, so `mycompany.com`, `MyCompany.COM`, and `MYCOMPANY.COM` all refer to the same
+server. By convention, domain names are typically written in lowercase.
+
 ### Port
 
 The port specifies which port on the server should handle the request. It appears after the host, separated by a colon (
@@ -97,9 +105,11 @@ server uses non-standard ports, such as `https://mycompany.com:8443` for a servi
 ### Path
 
 The path identifies the specific resource or collection being accessed on the server. In the context of REST APIs, the
-path
-represents the thing (noun) that the HTTP method (verb) acts upon. It appears after the host (and optional port),
+path represents the thing (noun) that the HTTP method (verb) acts upon. It appears after the host (and optional port),
 starting with a forward slash (`/`).
+
+Unlike the earlier parts of the URL, paths _are **case-sensitive**_, so `/v1/users` and `/v1/Users` are considered
+different. Therefore, it's important to maintain consistant naming convents throughout our APIs.
 
 Paths in APIs are typically hierarchical, using forward slashes to separate segments that represent resources and their
 relationships. For example:
@@ -125,6 +135,10 @@ Common uses for query parameters in APIs include:
 * Pagination: `?page=2&limit=50`
 * Sorting: `?sort=created_time&order=desc`
 
+Query parameter keys are typically **case-sensitive**, though this behavior can vary by server implementation. To avoid
+ambiguity, assume parameter keys are case-sensitive unless explicitly documented otherwise. Also, maintain consistent
+naming conventions throughout our APIs.
+
 Query parameter keys and values should be URL-encoded to handle special characters properly. For example, spaces are
 encoded as `%20` or `+`. A search for "Victor Hugo" would be encoded as `Victor%20Hugo` (or `Victor+Hugo`), since spaces
 are not allowed in raw URLs. Characters like `&`, `=`, and `?` must also be encoded to avoid conflicting with URL
@@ -137,4 +151,5 @@ syntax. See AEP-106 for guidelines on query parameters.
 
 ## Changelog
 
+* **2026-01-21**: Add details on case sensitivity and clarify URN usage.
 * **2026-01-16**: Initial creation.
