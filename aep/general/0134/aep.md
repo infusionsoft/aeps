@@ -32,7 +32,7 @@ resource representation.
 * **must** include a request body that describes the changes to be applied.
 * **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
 * **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
-  request, they should be ignored or return `400 Bad Request`.
+  request, they should be ignored or return [400 Bad Request].
 * **should** return the complete updated resource in the response, not just the fields that were modified. This allows
   clients to see the full result of their changes, including any server-side transformations or computed fields.
 * **must not** be _assumed_ to be [idempotent].
@@ -42,7 +42,7 @@ resource representation.
 When processing `PATCH` requests:
 
 * Fields included in the patch must be validated according to the same rules as `PUT` or `POST` requests.
-* Unknown or unrecognized fields **may** be ignored or **may** cause a `400 Bad Request` error, depending on the API's
+* Unknown or unrecognized fields **may** be ignored or **may** cause a [400 Bad Request], depending on the API's
   strictness policy.
     * This **must** be documented.
 * Read-only fields included in the patch **must** be ignored.
@@ -61,10 +61,10 @@ update.
 
 * The field mask **must** be provided as a query parameter named `update_mask`.
 * The field mask **must** be a comma-separated list of fields (e.g., `field1,field2,nested.field`)
-* If no `update_mask` is provided, the request should return `400 Bad Request` to ensure explicit intent.
+* If no `update_mask` is provided, the request should return [400 Bad Request] to ensure explicit intent.
 * Only fields listed in the `update_mask` **must** be updated on the resource.
 * Fields present in the request body but not in the `update_mask` **must** be ignored.
-* Fields listed in the `update_mask` but not present in the request body **should** return `400 Bad Request`.
+* Fields listed in the `update_mask` but not present in the request body **should** return [400 Bad Request].
 * To clear a field value, include the field in both the `update_mask` and the request body with a `null` value.
 * Array fields **must** be replaced entirely when updated. A limitation of field masking is that it does not support
   individual array element updates. To modify an array, include the array field in the `update_mask` and provide the
@@ -105,21 +105,6 @@ is idempotent unless it is clearly documented. APIs **must** clearly document if
 `PATCH` operations **may** implement optimistic concurrency control using ETags in the same manner as `PUT` requests.
 See the [PUT concurrency] section for detailed guidance and examples.
 
-### Response codes
-
-PATCH requests must return appropriate HTTP status codes:
-
-* `200 OK` for successful updates with a response body
-* `204 No Content` for successful updates with no response body
-* `400 Bad Request` for malformed or invalid request data
-* `401 Unauthorized` when authentication is required but not provided
-* `403 Forbidden` when the client is authenticated but lacks permission to perform the operation
-* `404 Not Found` when the resource does not exist
-* `409 Conflict` when the request conflicts with the current state (e.g., version mismatch in optimistic concurrency)
-* `412 Precondition Failed` when conditional headers like [If-Match] are not satisfied
-* `422 Unprocessable Entity` when the request is well-formed but contains semantic errors
-* `500 Internal Server Error` for unexpected server errors
-
 ## Rationale
 
 **Why field masking?**
@@ -159,6 +144,9 @@ simple enough to be used easily, and powerful enough to handle complex resources
 
 [RFC 7396]: https://datatracker.ietf.org/doc/html/rfc7396
 
+[400 Bad Request]: /63#400-bad-request
+
 ## Changelog
 
-**2025-12-09**: Initial creation
+* **2026-01-21**: Standardize HTTP status code references.
+* **2025-12-09**: Initial creation

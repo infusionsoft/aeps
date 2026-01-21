@@ -50,15 +50,14 @@ use a [long-running operation].
 `PUT` requests for replacing existing resources:
 
 * **must** be made to the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** return a `200 OK` status code with the updated resource representation in the response body.
-* **may** return `204 No Content` if no response body is included.
+* **must** return a [200 OK] with the updated resource representation in the response body.
 
 ### Creating Resources
 
 `PUT` requests for creating resources:
 
 * **must** be made to the desired resource [URI path] with the client-specified identifier.
-* **must** return `201 Created` status code when a new resource is successfully created.
+* **must** return [201 Created] when a new resource is successfully created.
 * **may** include a [Location] header containing the URI of the newly created resource.
 * **should** include a representation of the created resource in the response body.
 * **should** only be supported when client-assigned identifiers are semantically appropriate (e.g., ISBNs, email
@@ -71,29 +70,13 @@ as absent from the desired state. Depending on your API's semantics:
 
 * The field may be removed from the resource
 * The field may be set to a default or null value
-* The request may be rejected as invalid if required fields are missing (`400 Bad Request`)
+* The request may be rejected as invalid if required fields are missing ([400 Bad Request])
 
 Document clearly how your API handles omitted fields. If you need partial updates where omitted fields remain unchanged,
 use [PATCH] instead.
 
 **Warning:** This effectively deletes data. If a client performs a `GET`, modifies one field, and `PUT`s it back without
 including the other fields, those other fields will be erased.
-
-### Response codes
-
-`PUT` requests **must** return appropriate HTTP status codes:
-
-* `200 OK` for successful replacement of an existing resource with a response body
-* `201 Created` for successful resource creation
-* `204 No Content` for successful replacement or creation with no response body
-* `400 Bad Request` for malformed or invalid request data
-* `401 Unauthorized` when authentication is required but not provided
-* `403 Forbidden` when the client is authenticated but lacks permission to perform the operation
-* `404 Not Found` when the parent resource does not exist (e.g., creating a book under a non-existent publisher)
-* `409 Conflict` when the request conflicts with the current state (e.g., version mismatch in optimistic concurrency)
-* `412 Precondition Failed` when conditional headers like [If-Match] are not satisfied
-* `422 Unprocessable Entity` when the request is well-formed but contains semantic errors
-* `500 Internal Server Error` for unexpected server errors
 
 ### Idempotency
 
@@ -110,10 +93,10 @@ For concurrent modification scenarios, APIs **may** implement optimistic concurr
 
 * The server **may** include an [ETag] header in `GET` and `PUT` responses representing the resource version.
 * Clients **may** include an [If-Match] header with the [ETag] value when making `PUT` requests.
-* The server **must** return `412 Precondition Failed` if the [ETag] has changed, indicating another client has modified
+* The server **must** return [412 Precondition Failed] if the [ETag] has changed, indicating another client has modified
   the resource.
 * If no [If-Match] header is provided, the server **may** either accept the request (last-write-wins) or reject it with
-  `428 Precondition Required`, depending on the API's concurrency policy.
+  [428 Precondition Required], depending on the API's concurrency policy.
 
 Example: Successful update with concurrency control
 
@@ -212,9 +195,20 @@ Content-Type: application/json
 
 [ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
 
+[200 OK]: /63#200-ok
+
+[201 Created]: /63#201-created
+
+[400 Bad Request]: /63#400-bad-request
+
+[412 Precondition Failed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
+
+[428 Precondition Required]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/428
+
 ## Changelog
 
-**2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].
+* **2026-01-21**: Standardize HTTP status code references.
+* **2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].
 
 [Google AIP-134]: https://google.aip.dev/134
 

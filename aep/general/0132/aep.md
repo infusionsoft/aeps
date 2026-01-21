@@ -54,7 +54,9 @@ When using `POST` to create new resources:
 
 * The request **must** be sent to the collection URI (e.g., `/publishers/{publisher_id}/books`).
 * The request body **must** contain the resource representation to be created.
-* On successful creation, the response **must** return `201 Created`.
+* On successful creation, the response **must** return [201 Created].
+* A [404 Not Found] **should** be returned when the parent resource does not exist (e.g., creating a book under a
+  non-existent publisher)
 * The response **may** include a [Location] header containing the URI of the newly created resource.
 * The response body **should** include the complete representation of the created resource, including any
   server-generated fields (e.g., `id`, `createdTime`, `updatedTime`).
@@ -99,24 +101,6 @@ resource. For best practices around this, refer to AEP-121.
 `POST` is used to implement custom methods for operations that don't fit standard CRUD patterns. Custom methods are
 covered in detail in AEP-136.
 
-### Response codes
-
-`POST` requests **must** return appropriate HTTP status codes:
-
-* `200 OK` for successful operations that don't create resources (e.g., query operations)
-* `201 Created` for successful resource creation
-* `202 Accepted` when the request has been accepted for processing but is not yet complete
-  (see [long-running operations])
-* `204 No Content` for successful operations with no response body
-* `400 Bad Request` for invalid request body or parameters
-* `401 Unauthorized` when authentication is required but not provided
-* `403 Forbidden` when the client lacks permission to perform the operation
-* `404 Not Found` when the parent resource does not exist (e.g., creating a book under a non-existent publisher)
-* `409 Conflict` when the request conflicts with the current state (e.g., attempting to create a resource that already
-  exists)
-* `422 Unprocessable Entity` when the request is well-formed but contains semantic errors
-* `500 Internal Server Error` for unexpected server errors
-
 ### Error handling
 
 When a `POST` request fails during resource creation, the server **must not** create the resource. The operation
@@ -154,8 +138,13 @@ APIs **should** support an [Idempotency-Key] to allow safe retries.
 
 [Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 
+[201 Created]: /63#201-created
+
+[404 Not Found]: /63#404-not-found
+
 ## Changelog
 
+* **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
 * **2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
 

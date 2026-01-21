@@ -57,8 +57,8 @@ use a [long-running operation].
 
 `DELETE` operations **must** be idempotent. This means that deleting a resource multiple times must produce the same
 result as deleting it once. APIs **must** implement permissive idempotency for `DELETE` operations. When a client
-attempts to delete a resource that has already been deleted or does not exist, the API must return `204 No Content` (or
-`200 OK` if returning a response body), treating the operation as successful.
+attempts to delete a resource that has already been deleted or does not exist, the API **must**
+return [204 No Content] (or [200 OK] if returning a response body), treating the operation as successful.
 
 ```http request
 # First delete call removes the resource and returns a 204
@@ -72,11 +72,11 @@ DELETE /books/123
 ```
 
 This approach treats deletion as "ensure this resource does not exist." Both the first and subsequent deletions return
-`204 No Content`, indicating successful completion of the operation regardless of whether the resource existed. This
+[204 No Content], indicating successful completion of the operation regardless of whether the resource existed. This
 better aligns with the idempotency principle and simplifies client retry logic by eliminating the need for special
 handling of 404 errors during retries.
 
-APIs **must not** return `404 Not Found` for deletion attempts on non-existent resources, as this breaks idempotency
+APIs **must not** return [404 Not Found] for deletion attempts on non-existent resources, as this breaks idempotency
 guarantees and complicates client error handling.
 
 ### Soft delete vs hard delete
@@ -87,7 +87,7 @@ deletion (permanently removing data).
 **Soft delete:** The resource is marked as deleted but remains in the system.
 
 * The resource **should** no longer appear in list operations by default.
-* The resource **should** return `404 Not Found` or `410 Gone` on `GET` requests, unless specifically querying for
+* The resource **should** return [404 Not Found] or [410 Gone] on `GET` requests, unless specifically querying for
   deleted resources.
 * The resource **may** be recoverable through an undelete operation (e.g., `POST /books/123:undelete`).
 * Soft delete **may** be implemented either as a `DELETE` operation that marks the resource as deleted, or as a `PATCH`
@@ -98,7 +98,7 @@ deletion (permanently removing data).
 
 * The resource and its data are completely removed from the system.
 * The deletion should be irreversible.
-* The resource **should** return `404 Not Found` or `410 Gone` (if you maintain deletion history) on `GET` requests to
+* The resource **should** return [404 Not Found] or [410 Gone] (if you maintain deletion history) on `GET` requests to
   previously deleted resources.
 
 ### Cascade deletion
@@ -116,15 +116,15 @@ on the request, which the user sets to explicitly opt in to a cascading delete.
 
 {% sample 'cascading_delete.oas.yaml', '$.paths' %}
 
-The API **must** fail with a `409 Conflict` error if the `cascade` field is `false` (or unset) and child resources are
+The API **must** fail with a [409 Conflict] error if the `cascade` field is `false` (or unset) and child resources are
 present.
 
 {% endtabs %}
 
 ### Deletion with response body
 
-Delete methods **should** return `204 No Content` with no response body. This is the preferred method. However,
-exceptions exist, and APIs **may** return `200 OK` with a response body when additional information is useful:
+Delete methods **should** return [204 No Content] with no response body. This is the preferred method. However,
+exceptions exist, and APIs **may** return [200 OK] with a response body when additional information is useful:
 
 ```http request
 DELETE /books/123
@@ -148,35 +148,13 @@ This approach is useful when:
 * Returning information about cascade-deleted resources
 * Including metadata like deletion timestamps or audit information
 
-### Response codes
-
-`DELETE` requests **must** return appropriate HTTP status codes:
-
-* `200 OK` for successful deletion with a response body
-* `202 Accepted` for deletion operations that have been accepted but not yet completed
-* `204 No Content` for successful deletion with no response body (most common)
-* `400 Bad Request` for malformed requests or invalid parameters
-* `401 Unauthorized` when authentication is required but not provided
-* `403 Forbidden` when the client is authenticated but lacks permission to delete the resource
-* `409 Conflict` when the deletion cannot be completed due to the current state (e.g., cannot delete a resource with
-  active dependencies)
-* `410 Gone` when the resource previously existed but has been permanently deleted (_optional_, used to distinguish from
-  resources that never existed, if there is an audit trail to know the resource once existed)
-* `500 Internal Server` Error for unexpected server errors
-
-If the user does not have permission to access the resource, regardless of whether it exists, the service **must** error
-with `403 Forbidden`. Permission **must** be checked before checking if the resource exists.
-
-If the user does have proper permission, but the requested resource does not exist, the service **must** error with
-`404 Not found`.
-
 ## Rationale
 
 **Not Found vs No Content Response**
 
 Idempotency is crucial for `DELETE` because it allows clients to safely retry deletion operations without fear of
 unintended consequences. Network failures, timeouts, and other transient issues are common in distributed systems, and
-idempotent operations enable automatic retry logic. The debate between returning `404 Not Found` versus `204 No Content`
+idempotent operations enable automatic retry logic. The debate between returning [404 Not Found] versus [204 No Content]
 for already-deleted resources centers on the definition of "idempotent." Both approaches achieve the same end state
 (resource doesn't exist), but differ in how they signal completion. Returning `204` for all deletions (permissive
 idempotency) is recommended because it treats the operation as "ensure this resource is deleted" rather than "delete
@@ -196,9 +174,18 @@ this specific resource," which better matches client expectations and simplifies
 
 [long-running operation]: /long-running-operations
 
+[200 OK]: /63#200-ok
+
+[404 Not Found]: /63#404-not-found
+
+[409 Conflict]: /63#409-conflict
+
+[410 Gone]: /63#410-gone
+
 ## Changelog
 
-**2024-12-10:** Initial version, adapted from [Google AIP-135][] and aep.dev [AEP-135][].
+* **2026-01-21**: Standardize HTTP status code references.
+* **2024-12-10:** Initial version, adapted from [Google AIP-135][] and aep.dev [AEP-135][].
 
 [Google AIP-135]: https://google.aip.dev/135
 

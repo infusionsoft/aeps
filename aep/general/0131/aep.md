@@ -42,55 +42,40 @@ collections.
 * Some resources take longer to be retrieved than is reasonable for a regular API request. In this situation, the
   API **should** use a [long-running operation].
 
+### Individual Resources
+
 `GET` requests for individual resources:
 
 * **must** use the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** return a `200 OK` status code with the resource representation in the response body when the resource exists.
-* **must** return a `404 Not Found` status code if the resource does not exist.
+* **must** return a [200 OK] with the resource representation in the response body when the resource exists.
+* **must** return a [404 Not Found] if the resource does not exist.
+    * If the resource previously existed and has since been deleted (e.g., soft-deleted), the server **may** instead
+      respond with [410 Gone].
 * **may** support field masks or sparse fieldsets to allow clients to specify which fields they want returned, reducing
-  payload size and improving performance.
+  payload size and improving performance. See AEP-157 on partial responses for more details.
+
+### Collection Resources
 
 `GET` requests for collection resources:
 
 * **must** use the collection's [URI path] (e.g., `/publishers/{publisher_id}/books`).
-* **must** return a `200 OK` status code when resources are successfully retrieved.
+* **must** return a `[200 OK] when resources are successfully retrieved.
     * The response body **must** be a wrapper object containing the list of resources, not a raw JSON array.
     * These results **must** be [paginated].
-* **must** return a `200 OK` with an empty array (inside the wrapper object) if the collection exists but contains no
+* **must** return a [200 OK] with an empty array (inside the wrapper object) if the collection exists but contains no
   resources.
-* **should** return a `404 Not Found` if the parent resource does not exist (e.g., requesting
+* **should** return a [404 Not Found] if the parent resource does not exist (e.g., requesting
   `/publishers/{invalid_id}/books` when the publisher doesn't exist).
 * **should** implement sorting and [filtering] mechanisms to allow clients to sort and narrow results.
     * The filters **must** follow the guidelines on [query parameters].
 * **must** ensure a deterministic default sort order to guarantee stable [pagination].
 
-Caching:
+### Caching
 
 * `GET` requests **should** support HTTP caching mechanisms to improve performance and reduce server load.
 * APIs **may** include appropriate cache control headers such as [Cache-Control], [ETag], and [Last-Modified].
 * APIs **may** support conditional requests using [If-None-Match] or [If-Modified-Since] headers,
   returning [304 Not Modified] when appropriate.
-
-### Response Codes
-
-`GET` requests **must** return appropriate HTTP status codes:
-
-* `200 OK` for successful retrieval
-* `400 Bad Request` for invalid query parameters or malformed requests
-* `401 Unauthorized` when authentication is required but not provided
-* `403 Forbidden` when the client is authenticated but lacks permission to access the resource
-* `404 Not Found` when the resource does not exist
-* `500 Internal Server Error` for unexpected server errors
-
-Services **must** check permissions before checking resource existence. The response depends on the caller's permission
-level:
-
-* If the caller lacks permission to know whether the resource exists, the service **should** return `404 Not Found`,
-  regardless of whether the resource actually exists. This prevents information disclosure about resources the caller
-  should not know about.
-* If the caller has permission to know the resource exists but cannot access it, the service **should** return
-  `403 Forbidden`.
-* If the caller has proper permission but the resource does not exist, the service **must** return `404 Not Found`.
 
 ### GET with body
 
@@ -139,8 +124,15 @@ consistency across paginated requests.
 
 [filtering]: /filtering
 
+[200 OK]: /63#200-ok
+
+[404 Not Found]: /63#404-not-found
+
+[410 Gone]: /63#410-gone
+
 ## Changelog
 
+* **2026-01-21**: Standardize HTTP status code references.
 * **2025-11-12**: Initial AEP-131 for Thryv, adapted from [Google AIP-131][] and aep.dev [AEP-131][].
 
 [Google AIP-131]: https://google.aip.dev/131

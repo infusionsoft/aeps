@@ -67,39 +67,6 @@ flowchart TD
     replace ==>|Partial| patch
 ```
 
-### Method Not Allowed
-
-Use [405 Method Not Allowed] when the server understands the HTTP method sent by a client, but the target resource does
-not support that particular method. This indicates a deliberate design decision: the resource exists, and the method is
-valid, but they are incompatible.
-
-A `405` response means "I understand what you're asking me to do (e.g., delete), but you can't do that to this specific
-resource by design"
-
-When this happens:
-
-* The server **must** respond with [405 Method Not Allowed]
-* The response **may** include an [Allow header] listing supported methods
-* The server **must not** respond with `404 Not Found` when the method is not allowed
-
-### Not Implemented
-
-Use [501 Not Implemented] when the server does not support the functionality required to fulfill the request. This
-applies in two scenarios:
-
-* The server does not recognize the HTTP method at all (e.g., a non-standard or custom method)
-* The server recognizes a standard method but has not yet implemented support for it
-
-A `501` response means "I'm sorry, this hasn't been implemented yet" or "I don't even understand what you're asking me
-to do"
-
-When this happens:
-
-* The server **must** respond with [501 Not Implemented]
-* The response **may** include information about when or if the functionality will be available (e.g.,
-  the [Retry-After header])
-* The server **must not** respond with `404 Not Found` when the method is unsupported or unrecognized
-
 ### Common Method Properties
 
 Method implementations **must** fulfill the following properties, according to [RFC 9110 Section 9.2]:
@@ -126,6 +93,23 @@ of unintended side effects.
 **Cacheable Methods**: Methods whose responses may be stored for future reuse. Cacheability enables performance
 optimization and reduces server load. Generally, safe methods are cacheable, while methods that modify a resource state
 are not.
+
+### Responses
+
+The following requirements apply to all HTTP method implementations:
+
+* APIs **must** use official HTTP status codes as defined in AEP-63 in all responses.
+* If a resource exists but does not support a specific method, the API **must** return [405 Method Not Allowed]. If a
+  method is not recognized or not yet implemented, the API **must** return [501 Not Implemented]. See AEP-63 for
+  implementation details.
+
+For an overview on HTTP responses, see AEP-61.
+
+### Authorization checks
+
+The majority of operations require authorization. Services **must** check permissions before checking resource existence
+to avoid information disclosure. For detailed guidance on handling authorization vs. existence (e.g., returning
+`403 Forbidden` vs. `404 Not Found`), refer to AEP-211.
 
 ### Less common HTTP Methods
 
@@ -184,18 +168,19 @@ understanding of behavior and expectations.
 
 [CONNECT]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/CONNECT
 
-[405 Method Not Allowed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/405
-
 [Allow header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Allow
-
-[501 Not Implemented]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/501
 
 [Retry-After header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After
 
 [custom methods]: /custom-methods
 
+[405 Method Not Allowed]: /63#405-method-not-allowed
+
+[501 Not Implemented]: /63#501-not-implemented
+
 ## Changelog
 
+* **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-02**: Updated method tables to include all HTTP methods and separated them into 2 sections.
 * **2025-11-11**: Initial AEP-130 for Thryv, adapted from [Google AIP-130][] and aep.dev [AEP-130][].
 
