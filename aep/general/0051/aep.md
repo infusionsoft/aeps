@@ -174,17 +174,16 @@ All exceptions require an [ADR (Architecture Decision Record)] that includes:
 ## References
 
 - RFC 9110–9114: HTTP Semantics, HTTP Caching, HTTP/1.1, HTTP/2, HTTP/3
-    - RFC 9110 (HTTP Semantics): https://www.rfc-editor.org/rfc/rfc9110
-    - RFC 9111 (HTTP Caching): https://www.rfc-editor.org/rfc/rfc9111
-    - RFC 9112 (HTTP/1.1): https://www.rfc-editor.org/rfc/rfc9112
-    - RFC 9113 (HTTP/2): https://www.rfc-editor.org/rfc/rfc9113
-    - RFC 9114 (HTTP/3): https://www.rfc-editor.org/rfc/rfc9114
-- RFC 7578: Returning Values from Forms — `multipart/form-data`: https://www.rfc-editor.org/rfc/rfc7578
+    - RFC 9110 (HTTP Semantics): https://datatracker.ietf.org/doc/html/rfc9110
+    - RFC 9111 (HTTP Caching): https://datatracker.ietf.org/doc/html/rfc9111
+    - RFC 9112 (HTTP/1.1): https://datatracker.ietf.org/doc/html/rfc9112
+    - RFC 9113 (HTTP/2): https://datatracker.ietf.org/doc/html/rfc9113
+    - RFC 9114 (HTTP/3): https://datatracker.ietf.org/doc/html/rfc9114
+- RFC 7578: Returning Values from Forms: `multipart/form-data`: https://datatracker.ietf.org/doc/html/rfc7578
 - MDN: Server-Sent Events (EventSource): https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events
     - MDN: `text/event-stream` media
       type: https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#setting_the_right_content-type
 - MDN: `Content-Disposition` header: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition
-- IETF Problem Details for HTTP APIs (RFC 9457): https://www.rfc-editor.org/rfc/rfc9457
 - GraphQL Specification: https://spec.graphql.org/
 - gRPC Core Concepts: https://grpc.io/docs/what-is-grpc/core-concepts/
     - Protocol Buffers Language Guide (proto3): https://protobuf.dev/programming-guides/proto3/
