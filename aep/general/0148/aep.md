@@ -73,6 +73,14 @@ requirements.
 user requested deletion or when the service successfully soft deleted the resource. See [Time and duration] for format
 requirements.
 
+#### `purgeTime`
+
+**Must** be a timestamp. Read-only. The time when a soft deleted resource will be purged from the system (see AIP-164).
+Resources that support soft delete **should** include this field.
+
+Services **may** provide a `purgeTime` value that is inexact, but the resource **must not** be purged from the system
+before that time.
+
 #### `createdBy`
 
 **Must** be a string. Read-only. The identifier of the user or service that created the resource.
@@ -156,6 +164,11 @@ filtering), use `tenant` for a single tenant or `tenants` for a list.
 
 **Must** be a string. Fields to include in [partial responses](/partial-responses).
 
+#### `show_deleted`
+
+**Must** be a boolean (`true`/`false`). Indicates if [soft deleted](/soft-delete) resources should be included in
+responses.
+
 ## Rationale
 
 Some fields represent very well defined concepts or artifacts that sometimes
@@ -183,6 +196,7 @@ experience across the platform.
 
 ## Changelog
 
+* **2026-01-21**: Add new terms `purgeTime` and `show_deleted`.
 * **2026-01-20**: Add rationale for `createdTime` over `createdAt`.
 * **2026-01-13**: Initial creation, adapted from [Google AIP-148][] and aep.dev [AEP-148][].
 

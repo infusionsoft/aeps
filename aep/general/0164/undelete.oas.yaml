@@ -4,7 +4,7 @@ info:
   title: Library
   version: 1.0.0
 paths:
-  /publishers/{publisherId}/books/{bookId}:undelete:
+  /publishers/{publisher_id}/books/{book_id}:undelete:
     post:
       operationId: undeleteBook
       description: Undelete a single book.
@@ -16,7 +16,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Book'
 components:
-  schema:
+  schemas:
     Book:
       description: A representation of a single book.
       properties:
@@ -37,6 +37,3 @@ components:
           items:
             type: string
           description: The author or authors of the book.
-        rating:
-          type: float
-          description: The rating assigned to the book.

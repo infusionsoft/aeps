@@ -2,7 +2,8 @@
 id: 164
 state: approved
 slug: soft-delete
-created: 2020-10-06
+created: 2026-01-21
+updated: 2026-01-21
 placement:
   category: design-patterns
   order: 95

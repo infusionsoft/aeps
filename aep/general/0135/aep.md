@@ -16,13 +16,13 @@ Use `DELETE` for operations that remove a resource from the system.
 **Use `DELETE` when:**
 
 * Removing a specific resource by its identifier (e.g., "Delete book 123").
-* The operation permanently removes the resource or marks it as deleted.
+* The operation marks a resource as deleted.
+* The operation permanently removes the resource.
 
 **Do NOT use `DELETE` when:**
 
-* You're deactivating or archiving a resource rather than deleting it; use [PATCH] or [PUT] to update the resource
-  instead.
-    * (e.g., `PATCH /users/123` with `{"state": "inactive"}`).
+* You're deactivating, archiving, or otherwise doing something that equates to a state change in a resource. Rather than
+  deleting it, use a state change as described in AEP-216.
 * The operation involves complex business logic beyond simple deletion; consider using [POST] to a reified resource or
   custom method
     * e.g.,`POST /orders/123/cancellations` or `POST /orders/123:cancel`.
@@ -41,6 +41,8 @@ Use `DELETE` for operations that remove a resource from the system.
   deletions of an already-deleted resource must succeed without error.
 * **may** accept query parameters for additional options (e.g., `cascade=true`), but the core deletion operation must be
   determined by the URI alone.
+* **should** return [204 No Content], unless there is a valid need for additional information in the response body.
+  See [DELETE with response body](#delete-with-response-body).
 
 Some resources take longer to be deleted than is reasonable for a regular API request. In this situation, the API should
 use a [long-running operation].
@@ -79,29 +81,9 @@ handling of 404 errors during retries.
 APIs **must not** return [404 Not Found] for deletion attempts on non-existent resources, as this breaks idempotency
 guarantees and complicates client error handling.
 
-### Soft delete vs hard delete
+### Soft deletes
 
-APIs should clearly distinguish between soft deletion (marking a resource as deleted while preserving data) and hard
-deletion (permanently removing data).
-
-**Soft delete:** The resource is marked as deleted but remains in the system.
-
-* The resource **should** no longer appear in list operations by default.
-* The resource **should** return [404 Not Found] or [410 Gone] on `GET` requests, unless specifically querying for
-  deleted resources.
-* The resource **may** be recoverable through an undelete operation (e.g., `POST /books/123:undelete`).
-* Soft delete **may** be implemented either as a `DELETE` operation that marks the resource as deleted, or as a
-  [custom method] (e.g., `POST /books/123:archive`).
-    * `PATCH` **must not** be used to update a `state` field for deletes, as `state` fields should be output only (see
-      AEP-216). Choose based on your API's semantic requirements and whether you want deletion to feel like removal or a
-      lifecycle transition.
-
-**Hard delete:** The resource is permanently removed.
-
-* The resource and its data are completely removed from the system.
-* The deletion should be irreversible.
-* The resource **should** return [404 Not Found] or [410 Gone] (if you maintain deletion history) on `GET` requests to
-  previously deleted resources.
+See the full [Soft delete](/soft-delete) AEP-164 for guidance.
 
 ### Cascade deletion
 
@@ -123,7 +105,7 @@ present.
 
 {% endtabs %}
 
-### Deletion with response body
+### DELETE with response body
 
 Delete methods **should** return [204 No Content] with no response body. This is the preferred method. However,
 exceptions exist, and APIs **may** return [200 OK] with a response body when additional information is useful:
@@ -180,15 +162,16 @@ this specific resource," which better matches client expectations and simplifies
 
 [200 OK]: /63#200-ok
 
+[204 No Content]: /63#204-no-content
+
 [404 Not Found]: /63#404-not-found
 
 [409 Conflict]: /63#409-conflict
 
-[410 Gone]: /63#410-gone
-
 ## Changelog
 
-* **2026-01-21**: Refine soft delete guidance to disallow delete via `PATCH`.
+* **2026-01-21**: Refine soft delete guidance to disallow delete via `PATCH`. Move Soft delete section to its own
+  AEP-164.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2024-12-10:** Initial version, adapted from [Google AIP-135][] and aep.dev [AEP-135][].
 
