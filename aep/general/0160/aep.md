@@ -1,117 +1,68 @@
 # Filtering
 
-Filtering is a common requirement for collection endpoints in JSON HTTP REST APIs. When listing resources (for example,
+Filtering is a common requirement for collection endpoints in APIs. When listing resources (for example,
 `GET /books`), clients often need to narrow results to only those that match specific criteria such as state, owner,
 category, or timestamps.
 
-Filtering requirements also tend to evolve over time as products add new features and clients need new ways to query
-data. This AEP provides organization-wide guidance for designing predictable, REST-aligned filtering using [query
-parameters]. The goal is to keep filtering consistent across APIs (so clients can reuse knowledge and tooling), while
-still allowing each API to choose which fields are filterable.
-
-Filtering is distinct from:
+Filtering applies deterministic, field-aware constraints that are index-friendly and predictable. Filtering is distinct
+from:
 
 * Sorting (ordering results)
 * [Pagination] (windowing results)
-* Searching (full-text or relevance-ranked retrieval)
+* [Searching] (partial text matching, fuzzy queries, complex boolean logic)
 
 **Note:** Because filters are intended for a potentially non-technical audience, they sometimes borrow from patterns of
 colloquial speech rather than common patterns found in code.
 
 ## Guidance
 
-APIs **may** support filtering on collection endpoints (for example, `GET /books`). If supported:
+APIs **may** support filtering on collection endpoints. If supported:
 
-* Filtering **should** be expressed using query parameters on a [GET] request (not request bodies).
+* Filtering **must** be modeled as explicit query parameters on a [GET] request (not request body). It **must not** be
+  modeled as a single `filter` string with a custom language/grammar. Query parameters **must** follow the naming and
+  encoding rules in AEP-106.
 * Filtering parameters **must not** change the meaning of the resource model; they only constrain which items appear in
   the collection response.
-* Filtering **should** be modeled as explicit query parameters (e.g., `state=active`,
-  `created_after=2025-01-01T00:00:00Z`) rather than a single `filter` string with a custom grammar.
 * APIs **must** document:
     * Supported filter parameters
     * Accepted value formats (especially timestamps)
     * Case sensitivity rules for string matching
 
+Examples:
+
+```http request
+### Get all books created after 2025-01-01
+GET /books?created_after=2025-01-01T00:00:00Z
+
+### Get all published books
+GET /books?state=published
+```
+
 ### Naming Conventions
 
-Different APIs expose different resource models and have different user needs, so the set of filterable fields and the
-specific operators that make sense will vary from API to API. These guidelines are not intended to force every API into
-the same filter surface area or expressiveness. Instead, the goal is organizational consistency in _how_ filters are
-named and composed (so clients can predict behavior across APIs), while preserving flexibility for each API to define
-_which_ filters exist, _when_ they are offered, and _which_ operators are supported based on real use cases and
-performance considerations.
-
-Query parameters **must** follow the naming and encoding rules in AEP-106.
+Different APIs have different resource models and user needs, so the set of filterable fields and supported operators
+will vary. These guidelines ensure consistency in _how_ filters are named and composed, while allowing each API to
+decide _which_ filters to offer based on real use cases.
 
 Filtering parameter names **must** be stable (do not rename lightly), specific, and self-explanatory.
 
-APIs **should** use the direct field name for exact matches (e.g. `state=active`, `category=books`).
+APIs **must** use the direct field name for exact matches (e.g. `state=active`, `category=books`).
 
-APIs **should** use suffix modifiers for common comparisons. Use consistent suffixes and only introduce them when there
-is more than one plausible comparison. Recommended suffix set (use a subset as appropriate):
+APIs **should** use the following prefix/suffix modifiers for common comparisons. Use consistent prefixes/suffixes and
+only introduce them when there is more than one plausible comparison. APIs **should** use a subset as appropriate.
 
-| Suffix / operator            | Meaning                                                            | Notes                                                                                                                             |
-|------------------------------|--------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------|
-| `_eq`                        | Equals                                                             | Prefer the bare parameter name for equality (e.g., `state=active`) Use `_eq` only if needed to disambiguate from other variants. |
-| `_ne`                        | Not equals                                                         | Use when you need explicit inequality filtering.                                                                                  |
-| `_lt`, `_lte`, `_gt`, `_gte` | Less than, less than or equal, greater than, greater than or equal | Typically for numbers. Define value formats.                                                                                      |
-| `_before`, `_after`          | Timestamp-specific `<` / `>`                                       | Use for time-based fields instead of `_lt/_gt` (e.g., `created_after=...`).                                                       |
-| `_contains`                  | String contains                                                    | Must document case-sensitivity, locale/normalization rules, and whether it’s substring vs token-based.                            |
-| `_prefix`, `_suffix`         | String starts with / ends with                                     | If supported, document case-sensitivity and escaping rules (if any).                                                              |
-| `_in`                        | Value is in a set                                                  | Use only if repeated parameters aren’t feasible. Document list encoding rules (e.g., comma-separated) and escaping.               |
-
-Examples:
-
-```http request
-### Orders created after Jan 1, 2025 and total >= 100
-GET /orders?created_after=2025-01-01T00:00:00Z&total_gte=100
-
-### Users whose emails end with '@example.com'
-GET /users?email_suffix=@example.com
-```
-
-### Free-text search (`q`)
-
-Some list endpoints benefit from a simple "type-ahead" or keyword-style search where users enter free text and expect
-the API to find relevant results without requiring structured field filters.
-
-To support this, APIs **may** define a `q` query parameter on collection `GET` endpoints (for example,
-`GET /books?q=les+mis`). The `q` parameter is intended to be:
-
-* Unstructured: a user-entered string, not a mini-language.
-* Best-effort: APIs may match across one or more fields (e.g., title, subtitle, author name), potentially using partial
-  matches.
-* Simple: clients should not need to know the resource schema to use it.
-
-If an API supports `q`, it **must** clearly document:
-
-* Which fields are searched (e.g., `title` and `author.name`), and whether those fields may change over time.
-* Matching behavior (case sensitivity, tokenization/word splitting, diacritics, stemming/synonyms if any).
-* Whether results are _ranked_ (best match first) or simply filtered.
-* How `q` combines with other filters (by default, `q` is combined with other query parameters using logical `AND`).
-* Any limits (maximum query length, minimum characters, rate limits, etc.).
-
-APIs **should not**:
-
-* Treat `q` as a structured filter language (e.g., `q=title:foo AND author:bar`), because that reintroduces custom query
-  grammar.
-* Require wildcard syntax in `q` (such as `*`). If wildcard-like behavior is needed, it should be provided through
-  explicit filter parameters (e.g., `title_prefix`) or through a dedicated search capability.
-  See [Pattern matching and wildcards](#pattern-matching-and-wildcards) below.
-* Reuse `q` for non-search concepts (e.g., passing JSON, passing encoded filter objects, or toggling behaviors).
-
-Examples:
-
-```http request
-### Keyword search on a collection
-GET /books?q=les+mis
-
-### Keyword search combined with structured filters
-GET /books?q=hugo&language=fr&published_after=1860-01-01
-```
-
-If `q` needs clearly defined relevance ranking, fuzzy matching, cross-field boolean logic, facets, highlighting, or
-other advanced search features, APIs **should** provide a dedicated search endpoint.
+| Operator  | Meaning                                                 | Example                     |
+|-----------|---------------------------------------------------------|-----------------------------|
+|           | Equals (direct field name)                              | `status=active`             |
+| `_ne`     | Not equals                                              | `status_ne=cancelled`       |
+| `_lt`,    | Less than                                               | `price_lt=100`              |
+| `_lte`    | Less than or equal                                      | `price_lte=100`             |
+| `_gt`,    | Greater than                                            | `price_gt=0`                |
+| `_gte`    | Greater than or equal                                   | `price_gte=50`              |
+| `_before` | Timestamp-specific `<`                                  | `created_before=2025-01-01` |
+| `_after`  | Timestamp-specific `>`                                  | `created_after=2025-01-01`  |
+| `is_`     | Boolean checks                                          | `is_active=true`            |
+| `has_`    | [Nullability and existence](#nullability-and-existence) | `has_phone_number=true`     |
 
 ### Combining filters (`AND`)
 
@@ -120,10 +71,9 @@ When multiple different filter parameters are provided, the API **must** combine
 Example:
 
 ```http request
+### products that are in the "books" category AND active
 GET /products?category=books&state=active
 ```
-
-Meaning: products that are in the `category` "books" AND have `state` "active".
 
 ### Repeated parameters (`OR`)
 
@@ -133,7 +83,7 @@ see [Combining filters](#combining-filters-and)).
 
 Example (both of these requests are equivalent):
 
-```http request
+```http
 GET /products?category=books&category=electronics
 GET /products?category=books,electronics
 ```
@@ -141,26 +91,22 @@ GET /products?category=books,electronics
 In both cases, this means products with either the category "books" OR "electronics".
 
 APIs **must not** require clients to rely on ambiguous separators without documentation (for example, silently treating
-commas as special).
+commas as special). APIs **should** support both formats (repeated parameters and comma-separated values) to maximize
+client flexibility. If supporting only one format, APIs **must** clearly document which format is accepted.
 
 ### `OR` across different fields
 
 Modeling a general `OR` across different fields (e.g., `category=books OR state=active`) is difficult to represent
-cleanly in query parameters and often leads to adhoc mini-languages.
+cleanly in query parameters and often leads to ad-hoc mini-languages.
 
 Therefore, APIs **should not** support arbitrary boolean logic across different fields in query strings.
-If a real use case requires it, APIs **should** consider:
-
-* Defining a dedicated endpoint with well-defined semantics (still RESTful), or
-* Defining a small number of explicit "union" parameters (e.g., `any_of_state=...`) where the meaning is unambiguous,
-  or
-* Providing a specialized search endpoint.
+If a real use case requires it, APIs **should** implement a specialized [search] endpoint.
 
 ### Nullability and existence
 
-REST query parameters do not naturally express "field is missing" vs. "field is present but empty". APIs **should**
+Query parameters do not naturally express "field is missing" vs. "field is present but empty". APIs **should**
 avoid exposing "missing vs present" semantics unless necessary. If existence filtering is required, APIs **may** add
-explicit parameters such as `has_<field>=true|false`
+explicit parameters such as `has_{field}=true|false`
 
 Example:
 
@@ -168,7 +114,8 @@ Example:
 GET /users?has_phone_number=true
 ```
 
-APIs **must** document exactly what "has" means (non-null, non-empty string, non-empty array, etc.).
+APIs **must** document exactly what "has" means for each field (non-null, non-empty string, non-empty array, etc.). The
+semantics **must** be consistent within a single API.
 
 ### Unknown parameters and validation
 
@@ -178,13 +125,24 @@ indicating the unsupported parameter(s).
 APIs **must** validate filter values and return `400 Bad Request` for invalid formats (e.g., invalid timestamp).
 
 If the API intentionally ignores unknown parameters for backwards/forwards compatibility, that behavior **must** be
-documented (but this is generally discouraged for filtering because silent failure is hard to detect).
+documented (but this is discouraged for filtering because silent failure is hard to detect).
 
 ### Pattern matching and wildcards
 
-APIs **should** support only _deterministic_ pattern matching as filters (e.g., `<field>_prefix`, `<field>_contains`)
-when needed. APIs **must not** introduce relevance ranking, fuzziness, or cross-field query logic under "filtering". If
-requirements exceed deterministic filtering, APIs should use (a) dedicated search endpoint(s).
+APIs **should** support filtering only for _deterministic_, field-aware constraints that are index-friendly and
+predictable. APIs **must not** introduce relevance ranking, fuzziness, or cross-field query logic under "filtering". If
+requirements exceed deterministic filtering, APIs **should** use (a) dedicated [search] endpoint(s).
+
+### Pattern matching and wildcards
+
+Filtering is designed for precise, deterministic matching (e.g., "state is ACTIVE" or "price greater than 100"). APIs *
+*must** support filtering only for _deterministic_, field-aware constraints that are index-friendly and predictable.
+APIs **must not** introduce partial text matching, wildcards, relevance ranking, fuzziness, or cross-field query logic
+under "filtering". These operations belong in dedicated [search] endpoints.
+
+For example, these are NOT filtering: `name=Victor*` (wildcard), `description=~fuzzy match~` (fuzzy search).
+
+If requirements exceed deterministic filtering, APIs **must** use dedicated [search] endpoint(s).
 
 ### Performance and safety limits
 
@@ -197,20 +155,31 @@ Filtering can create expensive queries. APIs **must**:
 
 ## Rationale
 
-Query-parameter-based filtering is the most interoperable and REST-aligned approach: it is simple, cache-friendly, easy
-to document in OpenAPI, and avoids embedding custom expression languages that often drift across APIs and create
-inconsistent client experiences.
+Multi-parameter filtering using explicit query parameters is the most interoperable and REST-aligned approach. It is
+simple, cache-friendly, naturally integrates with OpenAPI documentation and SDK generation, and leverages standard query
+parameter parsing built into every web framework. This approach avoids single-parameter filter DSLs, which historically
+struggle with cross-language consistency, require custom parsers, and often result in partial implementations that
+defeat standardization benefits. For an in-depth analysis of filtering strategies and the decision process behind these
+guidelines, see
+[ADR-001: REST API Filtering and Searching Strategy](https://github.com/infusionsoft/aeps/blob/main/docs/arch/adr-001.md).
 
 [query parameters]: /query-parameters
 
 [Pagination]: /pagination
 
+[Searching]: /searching
+
+[search]: /searching
+
 [GET]: /get
 
 ## Changelog
 
+* **2026-01-27**: Removed search guidance, it will be a separate AEP. Align guidance with [ADR-001].
 * **2025-12-11**: Initial creation, adapted from [Google AIP-160][] and aep.dev [AEP-160][].
 
 [Google AIP-160]: https://google.aip.dev/160
 
 [AEP-160]: https://aep.dev/160
+
+[ADR-001]: https://github.com/infusionsoft/aeps/blob/main/docs/arch/adr-001.md
