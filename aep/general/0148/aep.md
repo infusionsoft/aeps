@@ -125,11 +125,11 @@ Fields representing IP addresses **must** comply with the following:
 APIs **should** use the standard query parameter names defined in this section. See [Query Parameters] for complete
 guidance.
 
-#### `page_token`
+#### `pageToken`
 
 **Must** be a string. Cursor for next page. Token-based pagination. See [Pagination] for complete guidance.
 
-#### `page_size`
+#### `pageSize`
 
 **Must** be an integer. Maximum number of results to return. Token-based pagination. See [Pagination] for complete
 guidance.
@@ -146,7 +146,7 @@ guidance.
 
 **Must** be a string. Free-text search query. See [Filtering] for complete guidance.
 
-#### `order_by`
+#### `orderBy`
 
 **Must** be a string. Field(s) to sort results by. See [Filtering] for complete guidance.
 
@@ -156,15 +156,15 @@ guidance.
 this query parameter **should** generally be omitted. When a tenant identifier is needed in the query string (like for
 filtering), use `tenant` for a single tenant or `tenants` for a list.
 
-#### `update_mask`
+#### `updateMask`
 
 **Must** be a string. Fields to update in [PATCH requests](/134#field-masking).
 
-#### `read_mask`
+#### `readMask`
 
 **Must** be a string. Fields to include in [partial responses](/partial-responses).
 
-#### `show_deleted`
+#### `showDeleted`
 
 **Must** be a boolean (`true`/`false`). Indicates if [soft deleted](/soft-delete) resources should be included in
 responses.
@@ -196,6 +196,7 @@ experience across the platform.
 
 ## Changelog
 
+* **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
 * **2026-01-21**: Add new terms `purgeTime` and `show_deleted`.
 * **2026-01-20**: Add rationale for `createdTime` over `createdAt`.
 * **2026-01-13**: Initial creation, adapted from [Google AIP-148][] and aep.dev [AEP-148][].

@@ -150,11 +150,11 @@ paths:
       operationId: ListIsbn
       parameters:
         - in: query
-          name: max_page_size
+          name: pageSize
           schema:
             type: integer
         - in: query
-          name: page_token
+          name: pageToken
           schema:
             type: string
       responses:
@@ -215,11 +215,11 @@ paths:
       operationId: ListPublisher
       parameters:
         - in: query
-          name: max_page_size
+          name: pageSize
           schema:
             type: integer
         - in: query
-          name: page_token
+          name: pageToken
           schema:
             type: string
         - in: query
@@ -356,11 +356,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: max_page_size
+          name: pageSize
           schema:
             type: integer
         - in: query
-          name: page_token
+          name: pageToken
           schema:
             type: string
       responses:
@@ -523,11 +523,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: max_page_size
+          name: pageSize
           schema:
             type: integer
         - in: query
-          name: page_token
+          name: pageToken
           schema:
             type: string
       responses:
@@ -668,11 +668,11 @@ paths:
       operationId: ListStore
       parameters:
         - in: query
-          name: max_page_size
+          name: pageSize
           schema:
             type: integer
         - in: query
-          name: page_token
+          name: pageToken
           schema:
             type: string
         - in: query
@@ -787,11 +787,11 @@ paths:
           schema:
             type: string
         - in: query
-          name: max_page_size
+          name: pageSize
           schema:
             type: integer
         - in: query
-          name: page_token
+          name: pageToken
           schema:
             type: string
         - in: query

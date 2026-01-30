@@ -59,26 +59,26 @@ APIs **must** use the field mask approach for `PATCH` operations.
 Field masking uses a simple partial JSON object with an explicit field mask parameter to indicate which fields to
 update.
 
-* The field mask **must** be provided as a query parameter named `update_mask`.
+* The field mask **must** be provided as a query parameter named `updateMask`.
 * The field mask **must** be a comma-separated list of fields (e.g., `field1,field2,nested.field`)
-* If no `update_mask` is provided, the request should return [400 Bad Request] to ensure explicit intent.
-* Only fields listed in the `update_mask` **must** be updated on the resource.
-* Fields present in the request body but not in the `update_mask` **must** be ignored.
-* Fields listed in the `update_mask` but not present in the request body **should** return [400 Bad Request].
-* To clear a field value, include the field in both the `update_mask` and the request body with a `null` value.
+* If no `updateMask` is provided, the request should return [400 Bad Request] to ensure explicit intent.
+* Only fields listed in the `updateMask` **must** be updated on the resource.
+* Fields present in the request body but not in the `updateMask` **must** be ignored.
+* Fields listed in the `updateMask` but not present in the request body **should** return [400 Bad Request].
+* To clear a field value, include the field in both the `updateMask` and the request body with a `null` value.
 * Array fields **must** be replaced entirely when updated. A limitation of field masking is that it does not support
-  individual array element updates. To modify an array, include the array field in the `update_mask` and provide the
+  individual array element updates. To modify an array, include the array field in the `updateMask` and provide the
   complete new array in the request body.
 * Nested fields **should** be specified using dot notation (e.g., `address.city`, `contact.email`).
     * When updating nested fields, only the specified nested field is modified; sibling fields within the same parent
       object must remain unchanged.
-    * To update multiple fields within a nested object, each field **must** be listed separately in the `update_mask` (
+    * To update multiple fields within a nested object, each field **must** be listed separately in the `updateMask` (
       e.g., `address.city`,`address.zip`).
-    * To replace an entire nested object, specify only the parent field in the update_mask (e.g., `address`). In this
+    * To replace an entire nested object, specify only the parent field in the updateMask (e.g., `address`). In this
       case, the entire object is replaced with the provided value.
 
 ```http request
-PATCH /users/456?update_mask=name,address.city
+PATCH /users/456?updateMask=name,address.city
 Content-Type: application/json
 
 {
@@ -110,7 +110,7 @@ See the [PUT concurrency] section for detailed guidance and examples.
 **Why field masking?**
 
 We've standardized on field masking as our patch format because it provides the optimal balance of simplicity,
-explicitness, and functionality. The `update_mask` parameter makes developer intent completely clear, preventing
+explicitness, and functionality. The `updateMask` parameter makes developer intent completely clear, preventing
 accidental updates and eliminating ambiguity about which fields are being modified. Developers work with familiar JSON
 objects that mirror the resource structure, without learning operation syntax like JSON Patch ([RFC 6902]) or dealing
 with the null-value ambiguity of Merge Patch ([RFC 7396]). Dot notation (e.g., `address.city`) provides a
@@ -148,5 +148,6 @@ simple enough to be used easily, and powerful enough to handle complex resources
 
 ## Changelog
 
+* **2026-01-30**: Change `update_mask` to `updateMask` to match query param spec
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-09**: Initial creation

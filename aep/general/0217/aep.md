@@ -65,7 +65,7 @@ These facts lead to the following guidance:
           publisher, there should be three pages total: first the two pages of
           books, and then a final page with no books and the unavailable publisher.
     - If the number of unreachable resources to list is very large, the response
-      **should** honor the `max_page_size` field in the same way as for
+      **should** honor the `pageSize` field in the same way as for
       resources. In this case, all pages with requested information **should**
       precede all pages with unavailable resources or locations.
     - The final page's `unreachable` field **must** _only_ include resources or
@@ -87,6 +87,7 @@ These facts lead to the following guidance:
 
 ## Changelog
 
+* **2026-01-30**: Change `max_page_size` to `pageSize` to match query param spec
 * **2025-12-10**: Initial creation, adapted from [Google AIP-217][] and aep.dev [AEP-217][].
 
 [Google AIP-217]: https://google.aip.dev/217

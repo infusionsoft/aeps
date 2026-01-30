@@ -16,22 +16,22 @@ be paginated.
 
 ### Cursor-based pagination
 
-Cursor-based pagination uses a `page_token` which is an opaque pointer to a page that must never be inspected or
+Cursor-based pagination uses a `pageToken` which is an opaque pointer to a page that must never be inspected or
 constructed by clients. It encodes the page position (i.e., the unique identifier of the first or last page element),
 the pagination direction, and the applied query filters to safely recreate the collection.
 
 When implementing cursor-based pagination:
 
-* Request messages for collections **should** define an integer `page_size` query parameter, allowing users to specify
+* Request messages for collections **should** define an integer `pageSize` query parameter, allowing users to specify
   the maximum number of results to return.
-    * The `page_size` field **must not** be required.
-    * If the request does not specify `page_size`, the API **must** choose an appropriate default.
+    * The `pageSize` field **must not** be required.
+    * If the request does not specify `pageSize`, the API **must** choose an appropriate default.
     * The API **may** return fewer results than the number requested (including zero results), even if not at the end of
       the collection.
-* Request schemas for collections **must** define a `string` `page_token` query parameter, allowing users to advance to
+* Request schemas for collections **must** define a `string` `pageToken` query parameter, allowing users to advance to
   the next page in the collection.
-    * The `page_token` field **must not** be required.
-    * If the user changes the `page_size` in a request for subsequent pages, the service **must** honor the new page
+    * The `pageToken` field **must not** be required.
+    * If the user changes the `pageSize` in a request for subsequent pages, the service **must** honor the new page
       size.
     * The user is expected to keep all other arguments to the method the same; if any arguments are different, the API
       **should** return a `400 Bad Request` error.
@@ -48,7 +48,7 @@ When implementing cursor-based pagination:
 Example:
 
 ```http request
-GET /v1/publishers/123/books?page_size=50&page_token=abc123xyz
+GET /v1/publishers/123/books?pageSize=50&pageToken=abc123xyz
 ```
 
 responds with:
@@ -75,7 +75,7 @@ encodes the offset, limit, and any filters into an opaque token.
 When implementing token-based offset pagination:
 
 * The API **must** use the same request/response structure as [cursor-based pagination](#cursor-based-pagination) (
-  `page_size`, `page_token` and `nextPageToken`)
+  `pageSize`, `pageToken` and `nextPageToken`)
 * The page token **must** internally encode the offset, limit, and query parameters
 * The implementation details **must** be hidden from the client
 
@@ -169,6 +169,7 @@ limitations are why new APIs must use either cursor-based pagination or token-ba
 
 ## Changelog
 
+* **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
 * **2025-12-15**: Added guidance on token-based offset pagination for new APIs, small collection handling, and clarified that new APIs must use cursor-based or token-based offset pagination only.
 * **2025-12-10**: Initial creation, adapted from [Google AIP-158][] and aep.dev [AEP-158][].
 

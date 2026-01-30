@@ -24,7 +24,7 @@ GET /v1/publishers/-/books?filter=...
   the child resources are guaranteed to be unique. However, services **must not** support reading across collections
   when retrieving individual resources if the child resource identifiers might collide across different parent
   collections.
-- Cross-parent requests **should not** support `order_by` query parameters. If they do, the parameter **must** document
+- Cross-parent requests **should not** support `orderBy` query parameters. If they do, the parameter **must** document
   that ordering is best effort. This is because cross-parent requests introduce ambiguity around ordering, especially if
   there is difficulty reaching a parent (see [unreachable resources]).
 
@@ -68,6 +68,7 @@ GET /v1/publishers/-/books/{book_id}
 
 ## Changelog
 
+* **2026-01-30**: Change `order_by` to `orderBy` to match query param spec
 * **2025-12-10**: Initial creation, adapted from [Google AIP-159][] and aep.dev [AEP-159][].
 
 [Google AIP-159]: https://google.aip.dev/159

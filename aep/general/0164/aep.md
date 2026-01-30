@@ -83,15 +83,15 @@ See AEP-193 for full details on error responses.
 
 ### Reading deleted resources
 
-APIs **may** provide an optional `show_deleted` query parameter on collection and individual [GET] requests. If `true`,
+APIs **may** provide an optional `showDeleted` query parameter on collection and individual [GET] requests. If `true`,
 the API **must** return the resource(s) (with the `DELETED` state value if the resource includes a
 [`state` field](/states)).
 
 Soft-deleted resources **must not** be included in responses made to `GET` collection requests (unless the query
-parameter `show_deleted` is true).
+parameter `showDeleted` is true).
 
 A `GET` request for a soft deleted individual resource **must not** return the resource (unless the query
-parameter `show_deleted` is true). If `show_deleted` is omitted or `false`, these requests **must**
+parameter `showDeleted` is true). If `showDeleted` is omitted or `false`, these requests **must**
 return [404 Not Found] or [410 Gone], see below.
 
 ### 404 Not Found vs. 410 Gone
@@ -107,7 +107,7 @@ system, but the resource is no longer available. This is most appropriate when t
 * needs to distinguish "never existed" from "previously existed but deleted", or
 * supports `:undelete` and `410` helps clients present better guidance.
 
-Regardless of whether `404` or `410` is used, when the client explicitly requests deleted data (`show_deleted=true`),
+Regardless of whether `404` or `410` is used, when the client explicitly requests deleted data (`showDeleted=true`),
 the API **must** return the deleted resource if it exists and is still retained.
 
 ### Long-running undelete
@@ -186,6 +186,7 @@ non-existent for typical read paths, which:
 
 ## Changelog
 
+* **2026-01-30**: Change `show_deleted` to `showDeleted` to match query param spec
 * **2026-01-21**: Initial creation, adapted from [Google AIP-164][] and aep.dev [AEP-164][].
 
 [Google AIP-164]: https://google.aip.dev/164

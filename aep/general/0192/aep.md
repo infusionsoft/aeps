@@ -87,7 +87,7 @@ following questions are relevant:
         - If a value is above the maximum length, do you truncate or send an error?
 - Is it always present? (Example: "Container for voting information. Present
   only when voting information is recorded.")
-- Does it have a default setting? (Example: "If `page_size` is omitted, the
+- Does it have a default setting? (Example: "If `pageSize` is omitted, the
   default is 50.")
 
 For operations, descriptions **should** clearly describe the HTTP semantics, including expected status codes and error
@@ -129,6 +129,7 @@ alternative solutions. If no alternative exists, a deprecation reason **must** b
 
 ## Changelog
 
+* **2026-01-30**: Change `page_size` to `pageSize` to match query param spec
 **2025-12-18**: Initial creation, adapted from [Google AIP-192] and aep.dev [AEP-192].
 
 [Google AIP-192]: https://google.aip.dev/192

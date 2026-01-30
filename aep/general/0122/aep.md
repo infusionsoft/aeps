@@ -229,9 +229,8 @@ Hyphens also provide a clear physical break between words, whereas `camelCase` o
 difficult-to-read string. Furthermore, in user interfaces or technical documentation where links are underlined, an
 underscore (`_`) is often obscured by the underline, whereas a hyphen remains clearly visible.
 
-Using `kebab-case` for paths also creates a clear visual distinction from query parameters and JSON keys, which use
-`snake_case` (AEP-106) and `camelCase` (AEP-107) respectively. This distinction helps developers quickly identify
-whether they are looking at a resource location or a data attribute.
+Using `kebab-case` for paths also creates a clear visual distinction from query parameters. This distinction helps
+developers quickly identify whether they are looking at a resource location or a data attribute.
 
 [rfc 1034]: https://tools.ietf.org/html/rfc1034
 

@@ -12,7 +12,7 @@ by an ampersand (`&`). Query parameters are key-value pairs, where the key and v
 **Example:**
 
 ```http
-GET /v1/books?sort_by=title&limit=10&published_after=2020-01-01
+GET /v1/books?sortBy=title&limit=10&publishedAfter=2020-01-01
 ```
 
 This request sorts the results by the `title` field, limits the result set to 10 items, and filters for books published
@@ -20,13 +20,13 @@ after January 1, 2020.
 
 ### Naming conventions
 
-Query parameter names **must** use `snake_case` (never `camelCase` or `kebab-case`).
+Query parameter names **must** use `camelCase` (never `snake_case` or `kebab-case`).
 
-* Parameter names **must** match the regex `^[a-z_][a-z_0-9]*$`
-* The first character **must** be a lowercase letter or an underscore
-* Subsequent characters **may** be a lowercase letter, an underscore, or a number
+* Parameter names **must** match the regex `^[a-z][a-zA-Z0-9]*$`
+* The first character **must** be a lowercase letter
+* Subsequent characters **may** be lowercase or uppercase letters, or digits
 
-Examples: `customer_number`, `sales_order_number`, `billing_address`, `sort_by`
+Examples: `customerNumber`, `salesOrderNumber`, `billingAddress`, `sortBy`
 
 ### Boolean values
 
@@ -36,8 +36,8 @@ and `0`). This improves clarity and is more human-readable.
 **Examples:**
 
 ```http
-GET /v1/books?include_archived=true
-GET /v1/orders?is_paid=false
+GET /v1/books?includeArchived=true
+GET /v1/orders?isPaid=false
 ```
 
 ### Default values
@@ -62,7 +62,7 @@ Query parameters are intended to:
 * Filter, sort, or paginate results
 * Control response shape
 * Declaratively scope or constrain an operation whose mutating semantics are already defined by the HTTP method
-  (e.g., [update_mask on PATCH](/134#field-masking))
+  (e.g., [updateMask on PATCH](/134#field-masking))
 
 Correct:
 
@@ -80,25 +80,22 @@ POST /v1/books?publish=true
 
 ## Rationale
 
-### Why `snake_case`?
+### Why `camelCase`?
 
-No established industry standard exists, but many popular Internet companies prefer `snake_case` for query parameters,
-including GitHub, Stack Exchange, and Twitter. Others, like Google and Amazon, use a mix of styles but not exclusively
-`camelCase`.
+No established industry standard exists, but many popular Internet companies prefer `camelCase` for query parameters,
+including Google, Microsoft, and Stripe.
 
-* Query parameters are case-sensitive. With `camelCase`, `sortBy`, `SortBy`, and `sortby` would all be treated as
-  different parameters, leading to typos and mismatches. Using `snake_case` reduces ambiguity and is less prone to
-  case-related errors.
-* `snake_case` is generally more readable, especially for longer parameter names like `billing_address` versus
-  `billingAddress`.
-* Query parameters often map to variables in code. Most programming languages have problems serializing/deserializing
-  variable names with hyphens (which rules out `kebab-case`), making `snake_case` a safer choice.
+* The vast majority of our existing APIs already use `camelCase` for query parameters. Adopting a different convention
+  would create friction for existing APIs.
+* `camelCase` aligns with our JSON response bodies, which uses `camelCase` for field names. This consistency between
+  request parameters and response fields is more cohesive.
 * Establishing a consistent look and feel across all API endpoints makes the API easier to learn and use.
 
 [Pagination]: /pagination
 
 ## Changelog
 
+* **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
 * **2025-12-16**: Clarify query parameters are non-actionable, instead of read-only
 * **2025-12-15**: Remove section on list values, since that is mostly a client side thing
 * **2025-12-11**: Initial creation
