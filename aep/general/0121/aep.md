@@ -63,7 +63,7 @@ A resource **must** support at minimum [GET][]: clients must be able to
 validate the state of resources after performing a mutation such as creation,
 updates, or deletes.
 
-APIs **must** also support listing collections of resources, except for singleton resources
+APIs **must** also support listing collections of resources, except for [singleton resources]
 where more than one resource is not possible.
 
 In REST, APIs **must not** invent new HTTP methods. When operations do not cleanly map to these standard verbs applied
@@ -185,6 +185,8 @@ resource-oriented principles and becoming an RPC API disguised as REST.
 [standard methods]: ./0130
 
 [custom methods]: ./0136
+
+[singleton resources]: /singletons
 
 [reification]: https://en.wikipedia.org/wiki/Reification_(computer_science)
 
