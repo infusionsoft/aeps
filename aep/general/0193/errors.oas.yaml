@@ -1,65 +1,79 @@
----
 openapi: 3.0.3
 info:
   title: Library
   version: 1.0.0
 components:
   schemas:
-    VndError:
+    Problem:
       type: object
       required:
-        - message
+        - type
       properties:
-        message:
-          type: string
-          description: |
-            A human-readable message related to the current error which may be displayed to the user of the API.
-          example: "Validation failed"
-        logref:
-          type: string
-          description: |
-            A numeric, alphabetic, or alphanumeric identifier to refer to the specific error on the server side for logging purposes (e.g., a request ID or trace ID).
-          example: "42"
-        path:
-          type: string
-          description: |
-            A JSON Pointer (RFC 6901) to a field in the related resource that this error is relevant for.
-          example: "/username"
-        _links:
-          type: object
-          description: Hypermedia links related to the error.
-          properties:
-            about:
-              $ref: '#/components/schemas/Link'
-            describes:
-              $ref: '#/components/schemas/Link'
-            help:
-              $ref: '#/components/schemas/Link'
-        _embedded:
-          type: object
-          description: |
-            Embedded error resources for representing multiple or nested errors.
-          properties:
-            errors:
-              type: array
-              items:
-                $ref: '#/components/schemas/VndError'
-        total:
-          type: integer
-          description: |
-            Total count of errors when multiple errors are present.
-          example: 2
-    Link:
-      type: object
-      required:
-        - href
-      properties:
-        href:
+        type:
           type: string
           format: uri
-          description: A URI or URI Template pointing to the linked resource.
-          example: "https://api.example.com/users/123"
-        templated:
-          type: boolean
-          description: Indicates whether the href is a URI Template (RFC 6570).
-          example: false
+          description: >
+            A URI reference that identifies the problem type. This serves as a permanent 
+            identifier for the category of problem. May be a URI that doesn't resolve 
+            (e.g., /problems/constraint-violation), about:blank for standard HTTP errors, 
+            or a URL that leads to documentation.
+          default: 'about:blank'
+          example: '/problems/resource-unavailable'
+        status:
+          type: integer
+          format: int32
+          description: >
+            The HTTP status code for this error. This matches the status code in the 
+            HTTP response.
+          minimum: 100
+          maximum: 600
+          exclusiveMaximum: true
+          example: 409
+        title:
+          type: string
+          description: >
+            A brief summary of the error type. This will be the same for all occurrences of 
+            this error.
+          example: 'Resource Unavailable'
+        detail:
+          type: string
+          description: >
+            A detailed explanation of what went wrong with your specific request. This 
+            describes the problem and may suggest how to resolve it.
+          example: 'The book "The Great Gatsby" is unavailable at the library "Garfield East". It is expected to be available again on 2199-05-13.'
+        instance:
+          type: string
+          format: uri
+          description: >
+            A unique identifier for this specific error occurrence. Use this when 
+            contacting support to help identify your issue in logs.
+          example: 'urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6'
+        violations:
+          type: array
+          description: >
+            A list of validation errors when your request data was invalid. Each item 
+            describes which field had an issue and what the problem was.
+          items:
+            type: object
+            required:
+              - field
+              - message
+            properties:
+              field:
+                type: string
+                description: The field that had a validation error
+                example: 'email'
+              message:
+                type: string
+                description: What was wrong with this field
+                example: 'must be a valid email address'
+        parameters:
+          type: object
+          description: >
+            Additional data related to this error. These values are referenced in the 
+            detail message and provided in a structured format for programmatic use.
+          additionalProperties: true
+          example:
+            bookTitle: 'The Great Gatsby'
+            library: 'Garfield East'
+            expectedReturnDate: '2199-05-13'

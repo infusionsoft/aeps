@@ -116,12 +116,12 @@ Document | [RFC 9110 Section 15.5.16](https://datatracker.ietf.org/doc/html/rfc9
 The request payload format is not supported by the server (e.g., client sent XML when only JSON is accepted). As this
 has a well-understood meaning, APIs **should not** document this code.
 
-#### 422 Unprocessable Entity
+#### 422 Unprocessable Content
 
 ✅ Document | [RFC 9110 Section 15.5.21](https://datatracker.ietf.org/doc/html/rfc9110#name-422-unprocessable-content)
 
-Request is well-formed but cannot be processed due to semantic errors (e.g., invalid state transition, attempting to
-purchase an out-of-stock item).
+Request is well-formed but cannot be processed due to semantic errors (e.g., attempting to purchase an out-of-stock
+item, business rule violations).
 
 #### 429 Too Many Requests
 
