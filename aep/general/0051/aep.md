@@ -1,7 +1,7 @@
 # REST vs. Alternative API Architectures
 
 This AEP examines REST alongside alternative API styles and explains why our organization chooses REST as the default
-for public and most internal HTTP APIs. It provides a pragmatic comparison, acknowledges REST’s limitations, and
+for public and most internal HTTP APIs. It provides a pragmatic comparison, acknowledges REST's limitations, and
 documents when exceptions (GraphQL, gRPC, event-driven) are appropriate.
 
 **Note:** Our organizational standard for APIs is JSON REST over HTTP. JSON is our default representation, but APIs
@@ -67,7 +67,7 @@ The following summarizes typical characteristics. Real implementations may vary;
   the broadest common denominator.
 - Maintainability at scale: Uniform semantics (methods, status codes, headers) reduce cognitive load across many teams.
 - Operability and observability: HTTP is transparent; gateways, proxies, CDNs, and logs speak it natively.
-- Risk management: REST’s simplicity lowers the blast radius of design errors and eases onboarding.
+- Risk management: REST's simplicity lowers the blast radius of design errors and eases onboarding.
 
 ### Developer experience considerations
 

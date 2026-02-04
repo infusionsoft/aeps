@@ -113,7 +113,7 @@ dominant colloquial use that avoiding it would obscure the reference
 (examples: IBM, AWS).
 
 Documentation **should** spell and capitalize trademarked names consistent with
-the trademark owner’s current branding.
+the trademark owner's current branding.
 
 ### Deprecations
 
