@@ -1,153 +1,227 @@
-# POST
+# List
 
-In REST APIs, the `POST` method is used to create new resources, perform operations that don't fit other HTTP methods,
-or execute actions on existing resources. Unlike `GET`, `POST` requests are neither [safe] nor [idempotent], meaning
-they may modify server state and repeated identical requests may produce different results.
+In REST APIs, it is customary to make a `GET` request to a resource
+collection's URI (for example, `/publishers/{publisher_id}/books`) in order to
+retrieve a list of the resources within that collection.
 
-As defined in [RFC 9110 Section 9.3.3], `POST` is used to request that the target resource process the representation
-enclosed in the request according to the resource's own specific semantics.
+Resource-oriented design AEP-121 honors this pattern through the `List` method.
+These RPCs accept a parent collection (if one exists), and return a list of
+responses matching that input.
 
 ## Guidance
 
-### When to use POST
+APIs **should** provide a `List` method for resource collections.The purpose of
+the `List` method is to return data from a finite collection (generally
+singular unless the operation supports [reading across collections][]).
 
-Use `POST` for operations that create new resources where the server assigns the resource identifier, or for operations
-that do not align with the semantics of other HTTP methods.
+When the `GET` method is used on a URI ending in a resource collection, the
+result **must** be a list of resources.
 
-**Use `POST` when:**
+### Operation
 
-* Creating a new resource where the server generates the ID (e.g., "Create a new book").
-* Triggering an action or operation on a resource (e.g., "Send email", "Reset password").
-* Performing complex queries that cannot be expressed via `GET` due to URL length or complexity constraints (
-  see [GET with body]).
-* Executing batch operations or operations with side effects that do not map to resource creation, replacement, or
-  deletion.
+{% tab proto %}
 
-**Do NOT use `POST` when:**
+{% sample '../example.proto', 'rpc ListBooks' %}
 
-* The operation is purely read-only without side effects; use [GET] instead.
-* You are replacing an entire resource at a known URI; use [PUT] instead.
-* You are partially updating a resource; use [PATCH] instead.
-* You are deleting a resource; use [DELETE] instead.
+- The RPC's name **must** begin with the word `List`. The remainder of the RPC
+  name **should** be the plural form of the resource's message name.
+- The request message **must** match the RPC name, with a `-Request` suffix.
+- The response message **must** match the RPC name, with a `-Response` suffix.
+    - The response **should** include fully-populated resources unless there is a
+      reason to return a partial response (see AEP-157).
+- The HTTP verb **must** be `GET`.
+- If the collection has a parent resource, The URI **must** contain a field
+  corresponding to the collection parent's name.
+    - This field **must** be called `parent`.
+    - The URI **must** have a variable corresponding to this field.
+    - The `parent` field **must** be the only variable in the URI path. All
+      remaining parameters **must** map to URI query parameters.
+- There **must not** be a `body` key in the `google.api.http` annotation.
+- There **should** be exactly one `google.api.method_signature` annotation with
+  a value of `"parent"` if a parent exists, and an empty string otherwise.
 
-### General requirements
+{% tab oas %}
 
-POST requests:
-
-* **must** be used to create a new resource when the server assigns the resource identifier.
-* **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
-* **must** include a request body unless the operation explicitly requires no input data.
-* **must not** be _assumed_ to be [idempotent].
-    * Clients **should not** automatically retry failed `POST` requests without considering the consequences.
-    * If an endpoint is designed to be idempotent (for example, by accepting an [Idempotency-Key]), this **must** be
-      clearly documented.
-* **should** be used for operations that modify server state or have side effects.
-
-APIs **must** use more specific HTTP methods when appropriate ([PUT] for full replacement, [PATCH] for partial
-updates, [DELETE] for removal) rather than overloading `POST`.
-
-Some resources take longer to be created than is reasonable for a regular API request. See [long-running operations].
-
-### Creating resources
-
-When using `POST` to create new resources:
-
-* The request **must** be sent to the collection URI (e.g., `/publishers/{publisher_id}/books`).
-* The request body **must** contain the resource representation to be created.
-* On successful creation, the response **must** return [201 Created].
-* A [404 Not Found] **should** be returned when the parent resource does not exist (e.g., creating a book under a
-  non-existent publisher)
-* The response **may** include a [Location] header containing the URI of the newly created resource.
-* The response body **should** include the complete representation of the created resource, including any
-  server-generated fields (e.g., `id`, `createdTime`, `updatedTime`).
-    * For bulk creation operations, APIs **may** return a summary or list of IDs/Status objects instead of full
-      resources to improve performance.
-
-For example, this request:
-
-```http request
-POST /v1/publishers/123/books
-Content-Type: application/json
-
-{
-    "title": "Les Misérables",
-    "author": "Victor Hugo",
-    "isbn": "9780451419439"
-}
+```http
+GET /v1/publishers/{publisher_id}/books HTTP/2
+Host: bookstore.example.com
+Accept: application/json
 ```
 
-Will return:
+`List` operations **must** be made by sending a `GET` request to the resource
+collection's URI:
 
-```http request
-201 Created
-Location: /v1/publishers/123/books/456
-Content-Type: application/json
+- The HTTP method **must** be `GET`.
+    - The request **must** be safe and **must not** have side effects.
+- There **must not** be a request body.
+    - If a `GET` request contains a body, the body **must** be ignored, and
+      **must not** cause an error.
+- The request **must not** require any fields in the query string.
+    - The query string **may** include fields for common design patterns relevant
+      to list methods, such as `string filter` and `string orderBy`.
+- The URI **should** contain a variable for each individual ID in the resource
+  hierarchy.
+    - The path parameter for all resource IDs **must** be in the form
+      `{resourceName}_id` (such as `book_id`), and path parameters representing
+      the ID of parent resources **must** end with `Id`.
 
-{
-    "id": "456",
-    "title": "Les Misérables",
-    "author": "Victor Hugo",
-    "isbn": "9780451419439",
-    "createdTime": "2025-11-12T10:30:00Z",
-    "updatedTime": "2025-11-12T10:30:00Z"
-}
-```
+{% endtabs %}
 
-### Custom methods
+### Requests
 
-`POST` is the primary method used for "reifying" concepts; converting a process, verb, or relationship into a distinct
-resource. For best practices around this, refer to AEP-121.
+{% tab proto %}
 
-`POST` is used to implement custom methods for operations that don't fit standard CRUD patterns. Custom methods are
-covered in detail in AEP-136.
+{% sample '../example.proto', 'message ListBooksRequest' %}
 
-### Error handling
+- A `parent` field **must** be included unless the resource being listed is a
+  top-level resource. It **should** be called `parent`.
+    - The field **must** be [annotated as required][aep-203].
+    - The field **must** identify the [resource type][] of the resource being
+      listed with a `aepi.api.field_info.resource_reference` annotation.
+    - The field **must** accept the parent [path, _not_ the id](./0122)
+- The `max_page_size` and `page_token` fields, which support pagination,
+  **must** be specified on all list request messages. For more information, see
+  AEP-158.
 
-When a `POST` request fails during resource creation, the server **must not** create the resource. The operation
-**must** be atomic from the client's perspective.
+**Note:** The `parent` field in the request object corresponds to the `parent`
+variable in the `google.api.http` annotation on the RPC. This causes the
+`parent` field in the request to be populated based on the value in the URL
+when the REST/JSON interface is used.
 
-If a `POST` operation is partially completed before encountering an error, the service **should** roll back changes when
-possible. If rollback is not possible, the service **must** clearly document the potential for partial state changes.
+{% tab oas %}
 
-### Idempotency
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.parameters' %}
 
-For `POST` operations where duplicate execution would be problematic (such as payment processing or order submission),
-APIs **should** support an [Idempotency-Key] to allow safe retries.
+{% endtabs %}
 
-[RFC 9110 Section 9.3.3]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.3
+### Responses
 
-[safe]: /130#common-method-properties
+`List` operations **must** return a page of results, with each individual
+result being a resource.
 
-[idempotent]: /130#common-method-properties
+- The array of resources **must** be named `results` and contain resources with
+  no additional wrapping.
+- The `string nextPageToken` field **must** be included in the list response
+  schema. It **must** be set if there are subsequent pages, and **must not** be
+  set if the response represents the final page. For more information, see
+  AEP-158.
+- The response struct **may** include a `int32 total_size` (or
+  `int64 total_size`) field with the number of items in the collection.
+    - The value **may** be an estimate (the field **should** clearly document
+      this if so).
+    - If filtering is used, the `total_size` field **should** reflect the size of
+      the collection _after_ the filter is applied.
+- The response message **must** include a field corresponding to the resources
+  being returned, named for the English plural term for the resource, and
+  **should not** include any other repeated fields.
+- Fields providing metadata about the list request (such as
+  `string next_page_token` or `int32 total_size`) **must** be included on the
+  response (not as part of the resource itself).
 
-[GET with body]: /131#get-with-body
+{% tab proto %}
 
-[GET]: /get
+{% sample '../example.proto', 'message ListBooksResponse' %}
 
-[PUT]: /put
+{% tab oas %}
 
-[PATCH]: /patch
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.responses.200' %}
 
-[DELETE]: /delete
+- The field "results" **must** be an array of resources, with the schema as a
+  reference to the resource (e.g. `#/components/schemas/Book`).
+- The field "nextPageToken" **must** be a string that contains the token to
+  retrieve the next page. This **must not** be set if the response represents
+  the final page.
 
-[location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
+{% endtabs %}
 
-[long-running operations]: /long-running-operations
+**Note:** List methods **may** return the complete collection to any user with
+permission to make a successful List request on the collection, _or_ **may**
+return a collection only containing resources for which the user has read
+permission. This behavior **should** be clearly documented either for each List
+method or as a standard convention in service-level documentation. Permission
+checks on individual resources may have a negative performance impact so should
+be used only where absolutely necessary.
 
-[Idempotency-Key]: /idempotency-key
+### Errors
 
-[Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
+If the user does not have sufficient permission to know that the collection
+exists, the service **should** reply with an HTTP 404 error, regardless of
+whether or not the collection exists. Permission **must** be checked prior to
+checking whether the collection exists.
 
-[201 Created]: /63#201-created
+If the user does have proper permission, but the requested collection does not
+exist (generally because the parent does not exist), the service **must** reply
+with an HTTP 404 error.
 
-[404 Not Found]: /63#404-not-found
+**Note:** An empty collection which the user has permission to access **must**
+return `200 OK` with an empty results array, and not `404 Not Found`.
 
-## Changelog
+### Advanced operations
 
-* **2026-01-21**: Standardize HTTP status code references.
-* **2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
-* **2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
+`List` methods **may** allow an extended set of functionality to allow a user
+to specify the resources that are returned in a response.
 
-[Google AIP-133]: https://google.aip.dev/133
+The following table summarizes the applicable AEPs, ordered by the precedence
+of the operation on the results.
 
-[AEP-133]: https://aep.dev/133
+| Operation                      | AEP                                |
+| ------------------------------ | ---------------------------------- |
+| filter                         | [AEP-160](/0160)                   |
+| ordering (`order_by`)          | [AEP-132](#ordering)               |
+| pagination (`next_page_token`) | [AEP-158](/0158)                   |
+| skip                           | [AEP-158](/0158/#skipping-results) |
+
+For example, if both the `filter` and `skip` fields are specified, then the
+filter would be applied first, then the resulting set would be the results that
+skip N entries of the filtered result.
+
+### Ordering
+
+`List` methods **may** allow clients to specify sorting order; if they do, the
+request message **should** contain a `string order_by` field.
+
+- Values **should** be a comma separated list of fields. For example:
+  `"foo,bar"`.
+- The default sorting order is ascending. To specify descending order for a
+  field, users append a `-` prefix; for example: `"foo,-bar"`, `"-foo,bar"`.
+- Redundant space characters in the syntax are insignificant. `"foo, -bar"`,
+  `" foo , -bar "`, and `"foo,-bar"` are all equivalent.
+- Subfields are specified with a `.` character, such as `foo.bar` or
+  `address.street`.
+
+**Note:** Only include ordering if there is an established need to do so. It is
+always possible to add ordering later, but removing it is a breaking change.
+
+### Soft-deleted resources
+
+Some APIs need to "[soft-delete][]" resources, marking them as deleted or
+pending deletion (and optionally purging them later).
+
+APIs that do this **should not** include deleted resources by default in list
+requests. APIs with soft deletion of a resource **should** include a
+`bool show_deleted` field in the list request that, if set, will cause
+soft-deleted resources to be included.
+
+## Interface Definitions
+
+{% tab proto -%}
+
+{% sample '../example.proto', 'rpc ListBooks' %}
+
+{% sample '../example.proto', 'message ListBooksRequest' %}
+
+{% sample '../example.proto', 'message ListBooksResponse' %}
+
+{% tab oas %}
+
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get' %}
+
+{% endtabs %}
+
+<!-- prettier-ignore-start -->
+[reading across collections]: ./0159
+[soft-delete]: ./0164
+[resource type]: ./0004
+
+
+<!-- prettier-ignore-end -->

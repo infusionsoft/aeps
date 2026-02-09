@@ -93,12 +93,12 @@ generation strategy and ensures consistent behavior across all APIs within the o
 
 [Idempotency-Key]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Idempotency-Key
 
-[GET]: /get
+[GET]: /http-get
 
-[POST]: /post
+[POST]: /http-post
 
-[PUT]: /put
+[PUT]: /http-put
 
-[PATCH]: /patch
+[PATCH]: /http-patch
 
-[DELETE]: /delete
+[DELETE]: /http-delete

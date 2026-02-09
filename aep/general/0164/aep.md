@@ -180,7 +180,7 @@ non-existent for typical read paths, which:
 
 ## Further reading
 
-- For the `DELETE` method, see AEP-135.
+- For the `DELETE` method, see AEP-69.
 - For long-running operations, see AEP-151.
 - For resource freshness validation (`etag`), see AEP-154.
 
@@ -193,9 +193,9 @@ non-existent for typical read paths, which:
 
 [AEP-164]: https://aep.dev/164
 
-[GET]: /get
+[GET]: /http-get
 
-[DELETE]: /delete
+[DELETE]: /http-delete
 
 [DELETE with response body]: /135#delete-with-response-body
 

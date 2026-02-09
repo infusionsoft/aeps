@@ -64,7 +64,7 @@ GET /v1/publishers/-/books/{book_id}
 
 [Resource Paths]: /paths#resource-hierarchy-and-nesting
 
-[GET]: /get
+[GET]: /http-get
 
 ## Changelog
 

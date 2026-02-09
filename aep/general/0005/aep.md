@@ -68,8 +68,7 @@ See the following AEPs to learn more about resource-oriented design:
 
 Once the resources are defined, identify one or more standard operations for each of those resources. Standard
 operations perform actions on resources by creating, reading, updating, deleting, and listing them. Each of these
-operations maps to a specific HTTP verb (`POST`, `GET`, `PUT`, `PATCH`, `DELETE`). See the [standard methods][aep-130]
-AEP to learn more.
+operations maps to a specific HTTP verb (`POST`, `GET`, `PUT`, `PATCH`, `DELETE`). See AEP-64 to learn more.
 
 APIs **should** use standard methods whenever possible. However, there are cases where custom methods are more
 appropriate.

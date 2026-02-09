@@ -1,153 +1,245 @@
-# PATCH
+# Update
 
-In REST APIs, it is customary to make a PATCH request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) to partially update that resource. Unlike [PUT], which replaces the entire
-resource, `PATCH` applies a set of changes to modify only specific fields. As defined in [RFC 5789], `PATCH` requests
-that a set of changes described in the request be applied to the resource identified by the request URI.
+In REST APIs, it is customary to make a `PATCH` or `PUT` request to a
+resource's URI (for example, `/v1/publishers/{publisher_id}/books/{book_id}`)
+in order to update that resource.
+
+Resource-oriented design AEP-121 honors this pattern through the `Update`
+method (which mirrors the REST `PATCH` behavior). These methods accept the URI
+representing that resource and return the resource.
+
+Also see the [apply](/apply) method, with guidance on how to implement `PUT`
+requests.
 
 ## Guidance
 
-### When to use PATCH
+APIs **should** provide an update method for resources unless it is not
+valuable for users to do so. The purpose of the update method is to make
+changes to the resources without causing side effects.
 
-Use `PATCH` for operations that modify specific fields of a resource without requiring the client to send the complete
-resource representation.
+### Operation
 
-**Use `PATCH` when:**
+- The method **should** support partial resource update, and the HTTP verb
+  **should** be `PATCH`.
+- The operation **must** have [strong consistency][].
+- Some resources take longer to be created than is reasonable for a regular API
+  request. In this situation, the API should use a
+  [long-running operation](/long-running-operations).
+- The response schema **must** be the resource itself.
+    - The response **should** include the fully-populated resource, and **must**
+      include any fields that were sent and included in the update mask unless
+      they are input only (see AEP-203).
 
-* Updating one or more specific fields of a resource (e.g., "Update the title of book 123").
-* The client does not have or does not want to send the complete resource representation.
-* You want to minimize bandwidth by only sending changed fields.
-* The resource is large and sending the complete representation for small changes would be inefficient.
+{% tab proto %}
 
-**Do NOT use `PATCH` when:**
+{% sample '../example.proto', 'rpc UpdateBook' %}
 
-* Replacing the entire resource; use [PUT] instead.
+Update methods are specified using the following pattern:
 
-### General requirements
+- The method's name **must** begin with the word `Update`. The remainder of the
+  method name **must** be the singular form of the resource's name.
+- The request schema's name **must** exactly match the RPC name, with a
+  `Request` suffix.
+- The request's `path` field **must** map to the URI path.
+    - The `path` field **must** be the only variable in the URI path.
+- There **must** be a `body` key in the `google.api.http` annotation, and it
+  **must** map to the resource field in the request message.
+    - All remaining fields **should** map to URI query parameters.
+- There **should** be exactly one `google.api.method_signature` annotation,
+  with a value of `"{resource},update_mask"`.
 
-`PATCH` requests:
+{% tab oas %}
 
-* **must** be made to the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** be used to partially update a resource at a known URI.
-* **must** include a request body that describes the changes to be applied.
-* **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
-* **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
-  request, they should be ignored or return [400 Bad Request].
-* **should** return the complete updated resource in the response, not just the fields that were modified. This allows
-  clients to see the full result of their changes, including any server-side transformations or computed fields.
-* **must not** be _assumed_ to be [idempotent].
-    * `PATCH` operations **may** be designed to be idempotent.
-    * APIs **must** document if a `PATCH` endpoint is idempotent.
-
-When processing `PATCH` requests:
-
-* Fields included in the patch must be validated according to the same rules as `PUT` or `POST` requests.
-* Unknown or unrecognized fields **may** be ignored or **may** cause a [400 Bad Request], depending on the API's
-  strictness policy.
-    * This **must** be documented.
-* Read-only fields included in the patch **must** be ignored.
-* Fields omitted from the patch **must** remain unchanged in the resource (unlike `PUT`, which treats omitted fields as
-  intentionally cleared).
-
-Some resources take longer to be updated than is reasonable for a regular API request. In this situation, the API should
-use a [long-running operation].
-
-### Field Masking
-
-APIs **must** use the field mask approach for `PATCH` operations.
-
-Field masking uses a simple partial JSON object with an explicit field mask parameter to indicate which fields to
-update.
-
-* The field mask **must** be provided as a query parameter named `updateMask`.
-* The field mask **must** be a comma-separated list of fields (e.g., `field1,field2,nested.field`)
-* If no `updateMask` is provided, the request should return [400 Bad Request] to ensure explicit intent.
-* Only fields listed in the `updateMask` **must** be updated on the resource.
-* Fields present in the request body but not in the `updateMask` **must** be ignored.
-* Fields listed in the `updateMask` but not present in the request body **should** return [400 Bad Request].
-* To clear a field value, include the field in both the `updateMask` and the request body with a `null` value.
-* Array fields **must** be replaced entirely when updated. A limitation of field masking is that it does not support
-  individual array element updates. To modify an array, include the array field in the `updateMask` and provide the
-  complete new array in the request body.
-* Nested fields **should** be specified using dot notation (e.g., `address.city`, `contact.email`).
-    * When updating nested fields, only the specified nested field is modified; sibling fields within the same parent
-      object must remain unchanged.
-    * To update multiple fields within a nested object, each field **must** be listed separately in the `updateMask` (
-      e.g., `address.city`,`address.zip`).
-    * To replace an entire nested object, specify only the parent field in the updateMask (e.g., `address`). In this
-      case, the entire object is replaced with the provided value.
-
-```http request
-PATCH /users/456?updateMask=name,address.city
-Content-Type: application/json
-
+```http
+PATCH /v1/publishers/{publisher_id}/books/{book_id} HTTP/2
+Host: bookstore.example.com
+Accept: application/merge-patch+json
 {
-  "name": "Bruce Wayne",
-  "address": {
-    "city": "Gotham"
-  }
+  "title": "Pride and Prejudice",
+  "author": "Jane Austen"
 }
 ```
 
-In this example, only the `name` and `address.city` fields are updated. Other fields this resource may have, like
-`address.street`, `address.state`, `email`, etc. remain unchanged.
+- The method **must** adhere to the behavior specified in [IETF RFC 7396 - Json
+  Merge Patch][].
+- The method **must** support MIME types `application/merge-patch+json` to
+  adhere to IETF RFC 7396.
 
-### Idempotency
+{% endtabs %}
 
-While it is not strictly required to be so by the HTTP specification, `PATCH` **may** be idempotent. The idempotency of
-a `PATCH` operation depends on the patch format and the nature of the changes. The field mask approach is _typically_
-idempotent (applying the same patch multiple times produces the same result); however, it shouldn't be assumed a `PATCH`
-is idempotent unless it is clearly documented. APIs **must** clearly document if a `PATCH` endpoint is idempotent.
-`PATCH` operations that require idempotency **should** support an [Idempotency-Key].
+### Requests
 
-### Concurrency
+Update methods implement a common request pattern:
 
-`PATCH` operations **may** implement optimistic concurrency control using ETags in the same manner as `PUT` requests.
-See the [PUT concurrency] section for detailed guidance and examples.
+- The request **must** contain a field for the resource.
+    - The name of this field **must** be the singular form of the resource's
+      name.
+- The request **must not** contain any required fields other than those
+  described in this section, and **should not** contain other optional fields
+  except those described in this or another AEP.
 
-## Rationale
+{% tab proto %}
 
-**Why field masking?**
+{% sample '../example.proto', 'message UpdateBookRequest' %}
 
-We've standardized on field masking as our patch format because it provides the optimal balance of simplicity,
-explicitness, and functionality. The `updateMask` parameter makes developer intent completely clear, preventing
-accidental updates and eliminating ambiguity about which fields are being modified. Developers work with familiar JSON
-objects that mirror the resource structure, without learning operation syntax like JSON Patch ([RFC 6902]) or dealing
-with the null-value ambiguity of Merge Patch ([RFC 7396]). Dot notation (e.g., `address.city`) provides a
-straightforward way to update specific fields within nested objects. While the RFC-standardized formats (Merge Patch and
-JSON Patch) have their uses, field masking occupies the sweet spot for our APIs: explicit enough to prevent errors,
-simple enough to be used easily, and powerful enough to handle complex resources.
+- A `path` field **must** be included.
+    - The field **must** be
+      [annotated as required](/field-behavior-documentation).
+    - The field **must** identify the [resource type][aep-4] that it references.
+- The request message field for the resource **must** map to the `PATCH` body.
+- The request message field for the resource **should** be [annotated as
+  required][aep-203].
+    - The field **must** identify the [resource type][aep-4] of the resource
+      being updated.
+- If partial resource update is supported, a field mask **must** be included.
+  It **must** be of type `google.protobuf.FieldMask`, and it **must** be called
+  `update_mask`.
+    - The fields used in the field mask correspond to the resource being updated
+      (not the request message).
+    - The field **may** be required or optional. If it is required, it **must**
+      include the corresponding annotation. If optional, the service **must**
+      treat an omitted field mask as an implied field mask equivalent to all
+      fields that are populated (have a non-empty value).
+    - Update masks **must** support a special value `*`, meaning full replacement
+      (the equivalent of `PUT`).
 
-[RFC 5789]: https://datatracker.ietf.org/doc/html/rfc5789
+{% tab oas %}
 
-[GET]: /get
+{% sample '../example.oas.yaml', '$.paths./publishers.post.requestBody' %}
 
-[PUT]: /put
+{% endtabs %}
 
-[DELETE]: /delete
+### Responses
 
-[URI path]: /paths
+{% tab proto %}
 
-[long-running operation]: /long-running-operations
+{% sample '../example.proto', 'message Book' %}
 
-[idempotent]: /130#common-method-properties
+{% tab oas %}
 
-[Idempotency-Key]: /idempotency-key
+{% sample '../example.oas.yaml', '$.paths./publishers.post.responses.200' %}
 
-[Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
+{% endtabs %}
 
-[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
+### Errors
 
-[PUT concurrency]: /133#concurrency
+See [errors][], in particular [when to use PERMISSION_DENIED and NOT_FOUND
+errors][permission-denied].
 
-[RFC 6902]: https://datatracker.ietf.org/doc/html/rfc6902
+In addition, if the user does have proper permission, but the requested
+resource does not exist, the service **must** error with `NOT_FOUND` (HTTP 404)
+unless `allow_missing` is set to `true`.
 
-[RFC 7396]: https://datatracker.ietf.org/doc/html/rfc7396
+### Side effects
 
-[400 Bad Request]: /63#400-bad-request
+In general, update methods are intended to update the data within the resource.
+Update methods **should not** trigger other side effects. Instead, side effects
+**should** be triggered by custom methods.
 
-## Changelog
+In particular, this entails that [state fields][] **must not** be directly
+writable in update methods.
 
-* **2026-01-30**: Change `update_mask` to `updateMask` to match query param spec
-* **2026-01-21**: Standardize HTTP status code references.
-* **2025-12-09**: Initial creation
+### PATCH and PUT
+
+**TL;DR:** AEP-compliant APIs generally use the `PATCH` HTTP verb only, and do
+not support `PUT` requests.
+
+We standardize on `PATCH` because many organizations update stable APIs in
+place with backwards-compatible improvements. It is often necessary to add a
+new field to an existing resource, but this becomes a breaking change when
+using `PUT`.
+
+To illustrate this, consider a `PUT` request to a `Book` resource:
+
+```
+    PUT /v1/publishers/123/books/456
+
+    {"title": "Mary Poppins", "author": "P.L. Travers"}
+```
+
+Next consider that the resource is later augmented with a new field (here we
+add `rating`, and use a protobuf example without loss of generality):
+
+```proto
+message Book {
+  string title = 1;
+  string author = 2;
+
+  // Subsequently added to v1 in place...
+  int32 rating = 3;
+}
+```
+
+If a rating were set on a book and the existing `PUT` request were executed, it
+would wipe out the book's rating. In essence, a `PUT` request unintentionally
+would wipe out data because the previous version did not know about it.
+
+### FieldMasks in proto and json merge-patch in HTTP
+
+AEP recommends a specific diverence in behavior between the proto and the HTTP
+interfaces. Specifically:
+
+- The inclusion of the `update_mask` in the proto variant, requiring the user
+  to explicitly specify fields to be updated.
+- The usage of [IETF RFC 7396 - Json Merge Patch][IETF RFC 7396] for HTTP APIs.
+
+This divergence in behavior is intentional, and exists for the following
+reasons:
+
+1. The update mask is a proto-specific concept, due to the lack of ability
+   across all proto versions to differentiate if the user has explicitly
+   populated a field or not. JSON has the ability to express whether a field is
+   present (by omitting it from the JSON payload). Ultimately, this allows the
+   field mask + proto pair and json to be translatable.
+2. RFC 7396 is a popular and well-understood standard for HTTP. Introducing a
+   new standard for HTTP would have made the AEP HTTP variant less idiomatic.
+3. For HTTP-proto bindings, there is a way to generate the proto field mask
+   from the fields present in the JSON request. This is what is recommended in
+   the
+   [API Design Patterns book, section 8.2 ](https://www.oreilly.com/library/view/api-design-patterns/9781617295850/),
+   describing the Google AIPs from which AEP-134 is forked. Implementations of
+   gateway-grpc proto bindings such as
+   [gateway-grpc](https://grpc-ecosystem.github.io/grpc-gateway/docs/mapping/patch_feature/)
+   support this translation.
+
+Therefore, given the ability of these two different patch mechanisms to
+interoperate while maintaining idiomatic practices, this divergence was
+concluded to be the least worst option.
+
+### Etags and preconditions
+
+See [etags](/etags) for more information about adding headers and metadata such
+as `ETag` and `If-Match` for supporting resource freshness validation and other
+preconditions.
+
+## Interface Definitions
+
+{% tab proto %}
+
+{% sample '../example.proto', 'rpc UpdateBook' %}
+
+{% sample '../example.proto', 'message UpdateBookRequest' %}
+
+{% sample '../example.proto', 'message Book' %}
+
+{% tab oas %}
+
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.patch' %}
+
+{% endtabs %}
+
+<!-- prettier-ignore-start -->
+
+
+
+
+
+[create]: ./0133
+[errors]: ./0193
+[permission-denied]: ./0193.md#permission-denied
+[state fields]: ./0216
+[strong consistency]: ./0121.md#strong-consistency
+[required]: ./0203.md#required
+[optional]: ./0203.md#optional
+[IETF RFC 7396]: https://datatracker.ietf.org/doc/html/rfc7396
+<!-- prettier-ignore-end -->

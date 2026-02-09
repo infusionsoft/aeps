@@ -48,7 +48,7 @@ The most common HTTP methods used in REST APIs are:
 * `PATCH`
 * `DELETE`
 
-See AEP-130 for comprehensive guidance and information on HTTP methods, including safety and idempotency.
+See AEP-64 for comprehensive guidance and information on HTTP methods, including safety and idempotency.
 
 ### URL
 

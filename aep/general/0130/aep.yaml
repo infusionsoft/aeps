@@ -1,12 +1,9 @@
 ---
 id: 130
 state: approved
-created: 2025-11-11
-updated: 2026-01-21
-slug: http-methods
+created: 2026-02-09
+updated: 2026-02-09
+slug: actions
 placement:
-  category: standard-methods
+  category: actions
   order: 1
-redirect_from:
-  - /methods
-  - /standard-methods

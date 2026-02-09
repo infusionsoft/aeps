@@ -1,12 +1,9 @@
 ---
 id: 131
 state: approved
-slug: get
-created: 2025-11-12
-updated: 2026-01-21
+created: 2026-02-09
+updated: 2026-02-09
+slug: fetch
 placement:
-  category: standard-methods
+  category: actions
   order: 10
-redirect_from:
-  - /list
-  - /read

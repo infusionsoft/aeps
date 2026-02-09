@@ -12,8 +12,8 @@ categories:
     title: REST
   - code: resources
     title: Resources
-  - code: standard-methods
-    title: Standard Methods
+  - code: actions
+    title: Actions
   - code: fields
     title: Fields
   - code: design-patterns

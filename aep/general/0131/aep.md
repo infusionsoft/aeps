@@ -1,140 +1,141 @@
-# GET
+# Get
 
-In REST APIs, it is customary to make a `GET` request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) in order to retrieve that resource. `GET` requests are used to read either
-a single resource or a collection of resources. As defined in [RFC 9110 Section 9.3.1], `GET` is the primary mechanism
-for information retrieval in HTTP and should be [safe] and [idempotent].
+In REST APIs, it is customary to make a `GET` request to a resource's URI (for
+example, `/v1/publishers/{publisher_id}/books/{book_id}`) in order to retrieve
+that resource.
+
+Resource-oriented design AEP-121 honors this pattern through the `Get` method.
+These RPCs accept the URI representing that resource and return the resource.
 
 ## Guidance
 
-### When to use GET
+- APIs **must** provide a get method for resources. The purpose of the get
+  method is to return data from a single resource.
+- Some resources take longer to be retrieved than is reasonable for a regular
+  API request. In this situation, the API should use a
+  [long-running operation](/long-running-operations).
 
-Use `GET` for any operation that reads data without changing it. It is the default method for retrieving resources and
-collections.
+### Operation
 
-**Use `GET` when:**
+{% tab proto %}
 
-* Retrieving a specific resource by its ID (e.g., "Get user 123").
-* Listing resources in a collection (e.g., "List all books").
-* Searching or filtering data where the query parameters fit within the URL length limit.
-* The operation is read-only and safe to cache.
+{% sample '../example.proto', 'rpc GetBook' %}
 
-**Do NOT use `GET` when:**
+- The RPC's name **must** begin with the word `Get`. The remainder of the RPC
+  name **should** be the singular form of the resource's message name.
+- The request message **must** match the RPC name, with a `Request` suffix.
+- The response message **must** be the resource itself. (There is no
+  `GetBookResponse`.)
+- The HTTP verb **must** be `GET`.
+- The URI **should** contain a single variable field corresponding to the
+  resource path.
+    - This field **should** be called `path`.
+    - The URI **should** have a variable corresponding to this field.
+    - The `path` field **should** be the only variable in the URI path. All
+      remaining parameters **should** map to URI query parameters.
+- There **must not** be a `body` key in the `google.api.http` annotation.
+- There **should** be exactly one `google.api.method_signature` annotation,
+  with a value of `"path"`.
 
-* The operation modifies data (create, update, delete).
-* The operation triggers a process or action (e.g., "Send email", "Reboot server").
-* Sensitive data (like passwords or tokens) would be exposed in the URL query parameters.
-* The request parameters are too large for a URL (see [GET with body](#get-with-body)).
+{% tab oas %}
 
-### General requirements
+`Get` operations **must** be made by sending a `GET` request to the resource's
+URI:
 
-* `GET` **must** be used to retrieve a representation of a resource.
-* APIs **must** provide a `GET` method for resources unless there is a compelling reason not to do so. The purpose of
-  the `GET` method is to retrieve and return data about the resource.
-* `GET` requests **must not** have a request body payload.
-    * If a `GET` request contains a body, the body **must** be ignored, and **must not** cause an error.
-    * Be aware that some HTTP clients, proxies, and intermediaries may drop the request body or reject the request
-      entirely.
-    * If a request that meets the requirements to be a `GET` cannot be represented as a `GET`,
-      see [GET with body](#get-with-body).
-* `GET` requests **must** be [safe], meaning they **must not** modify server state or have side effects.
-* `GET` requests **must** be [idempotent], meaning multiple identical requests **must** produce the same result.
-* Some resources take longer to be retrieved than is reasonable for a regular API request. In this situation, the
-  API **should** use a [long-running operation].
+```http
+GET /v1/publishers/{publisher_id}/books/{book_id} HTTP/2
+Host: bookstore.example.com
+Accept: application/json
+```
 
-### Individual Resources
+- The URI **should** contain a variable for each resource in the resource
+  hierarchy.
+    - The path parameter for all resource IDs **must** be in the form
+      `{resource-singular}` (such as `book`).
 
-`GET` requests for individual resources:
+{% endtabs %}
 
-* **must** use the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** return a [200 OK] with the resource representation in the response body when the resource exists.
-* **must** return a [404 Not Found] if the resource does not exist.
-    * If the resource previously existed and has since been deleted (e.g., soft-deleted), the server **may** instead
-      respond with [410 Gone].
-* **may** support field masks or sparse fieldsets to allow clients to specify which fields they want returned, reducing
-  payload size and improving performance. See AEP-157 on partial responses for more details.
+### Requests
 
-### Collection Resources
+{% tab proto %}
 
-`GET` requests for collection resources:
+{% sample '../example.proto', 'message GetBookRequest' %}
 
-* **must** use the collection's [URI path] (e.g., `/publishers/{publisher_id}/books`).
-* **must** return a `[200 OK] when resources are successfully retrieved.
-    * The response body **must** be a wrapper object containing the list of resources, not a raw JSON array.
-    * These results **must** be [paginated].
-* **must** return a [200 OK] with an empty array (inside the wrapper object) if the collection exists but contains no
-  resources.
-* **should** return a [404 Not Found] if the parent resource does not exist (e.g., requesting
-  `/publishers/{invalid_id}/books` when the publisher doesn't exist).
-* **should** implement sorting and [filtering] mechanisms to allow clients to sort and narrow results.
-    * The filters **must** follow the guidelines on [query parameters].
-* **must** ensure a deterministic default sort order to guarantee stable [pagination].
+- A resource path field **must** be included. It **should** be called `path`.
+    - The field **should** be annotated as `REQUIRED`.
+    - The field **should** identify the [resource type][aep-4] that it
+      references.
+- The comment for the `path` field **should** document the resource pattern.
+- The request message **must not** contain any other required fields, and
+  **should not** contain other optional fields except those described in
+  another AEP.
 
-### Caching
+**Note:** The `path` field in the request object corresponds to the `path`
+variable in the `google.api.http` annotation on the RPC. This causes the `path`
+field in the request to be populated based on the value in the URL when the
+REST/JSON interface is used.
 
-* `GET` requests **should** support HTTP caching mechanisms to improve performance and reduce server load.
-* APIs **may** include appropriate cache control headers such as [Cache-Control], [ETag], and [Last-Modified].
-* APIs **may** support conditional requests using [If-None-Match] or [If-Modified-Since] headers,
-  returning [304 Not Modified] when appropriate.
+{% tab oas %}
 
-### GET with body
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.get.parameters' %}
 
-`GET` requests with request bodies violate HTTP semantics and **should** be avoided. If you encounter URI length
-restrictions or similar constraints, follow this decision tree:
+- The HTTP method **must** be `GET`.
+    - The request **must** be safe and **must not** have side effects.
+- There **must not** be a request body.
+    - If a `GET` request contains a body, the body **must** be ignored, and
+      **must not** cause an error.
+- The request **must not** require any fields in the query string. The request
+  **should not** include optional fields in the query string unless described
+  in another AEP.
 
-1. **Reconsider your design**: Can the request be redesigned to reduce URI length? Consider whether the query complexity
-   indicates a design issue.
-2. **Use URL-encoded query parameters**: Provide request information via multiple query parameters, or encode it as a
-   single structured query string parameter.
-3. **Use `POST` as a fallback**: When URL encoding is not possible, use a `POST` request with a body payload.
-    * This **must** be explicitly documented as a query operation, not a mutation.
+{% endtabs %}
 
-**Note:** When using `POST` for queries with extensive parameters, keep pagination parameters (e.g., `cursor`, `limit`)
-in the query string rather than the request body. This allows pagination links to contain only the `cursor`, which
-encodes page position and direction. The `cursor` may optionally include a hash of the applied filters to validate
-consistency across paginated requests.
+### Responses
 
-[RFC 9110 Section 9.3.1]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.1
+The response **should** usually include the fully-populated resource unless
+there is a reason to return a partial response (see AEP-157).
 
-[safe]: /130#common-method-properties
+{% tab proto %}
 
-[idempotent]: /130#common-method-properties
+{% sample '../example.proto', 'message Book' %}
 
-[long-running operation]: /long-running-operations
+{% tab oas %}
 
-[URI path]: /paths
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.get.responses.200.content' %}
 
-[paginated]: /pagination
+- The response content **must** be the resource itself. For example:
+  `#/components/schemas/Book`. The response **must** reference a schema with a
+  [`x-aep-resource` extension].
 
-[pagination]: /pagination
+[`x-aep-resource` extension]: ./0004.md#annotating-resource-types
 
-[query parameters]: /query-parameters
+{% endtabs %}
 
-[Cache-Control]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control
+### Errors
 
-[ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
+If the user does not have sufficient permission to know that the resource
+exists, the service **should** reply with an HTTP 404 error, regardless of
+whether or not the resource exists. Permission **must** be checked prior to
+checking if the resource exists.
 
-[Last-Modified]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Last-Modified
+If the user has sufficient permission to know that the resource exists, but is
+unable to access it, the service **should** reply with an HTTP 403 error.
 
-[If-None-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match
+If the user does have proper permission, but the requested resource does not
+exist, the service **must** reply with an HTTP 404 error.
 
-[If-Modified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since
+## Interface Definitions
 
-[304 Not Modified]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
+{% tab proto -%}
 
-[filtering]: /filtering
+{% sample '../example.proto', 'rpc GetBook' %}
 
-[200 OK]: /63#200-ok
+{% sample '../example.proto', 'message GetBookRequest' %}
 
-[404 Not Found]: /63#404-not-found
+{% sample '../example.proto', 'message Book' %}
 
-[410 Gone]: /63#410-gone
+{% tab oas %}
 
-## Changelog
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.get' %}
 
-* **2026-01-21**: Standardize HTTP status code references.
-* **2025-11-12**: Initial AEP-131 for Thryv, adapted from [Google AIP-131][] and aep.dev [AEP-131][].
-
-[Google AIP-131]: https://google.aip.dev/131
-
-[AEP-131]: https://aep.dev/131
+{% endtabs %}

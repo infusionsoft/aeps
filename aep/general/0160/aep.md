@@ -171,7 +171,7 @@ guidelines, see
 
 [search]: /searching
 
-[GET]: /get
+[GET]: /http-get
 
 ## Changelog
 

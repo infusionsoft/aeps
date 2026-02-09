@@ -77,13 +77,13 @@ paths:
 - Singleton resources **must** be singular.
     - Example: `users/1234/thing`
 - Singleton resources **may** parent other resources.
-- Singleton resources **must not** define the [`POST`][aep-132], [`PUT`][aep-133], or
-  [`DELETE`][aep-135] methods. The singleton is implicitly created or
+- Singleton resources **must not** define the [`POST`][aep-66], [`PUT`][aep-67], or
+  [`DELETE`][aep-69] methods. The singleton is implicitly created or
   deleted when its parent is created or deleted.
-- Singleton resources **should** define the [`GET`][aep-131] and
-  [`PATCH`][aep-134] methods, and **may** define [custom methods] as
+- Singleton resources **should** define the [`GET`][aep-65] and
+  [`PATCH`][aep-68] methods, and **may** define [custom methods] as
   appropriate.
-    - However, singleton resources **must not** define the [`PATCH`][aep-134]
+    - However, singleton resources **must not** define the [`PATCH`][aep-68]
       method if all fields on the resource are output only.
 - Singleton resources **may** be exposed as a collection to support [reading across collections]. See the example below.
     - The trailing segment in the path pattern that typically represents the

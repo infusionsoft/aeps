@@ -1,215 +1,203 @@
-# PUT
+# Create
 
-In REST APIs, it is customary to make a `PUT` request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) to replace that resource entirely with a new representation.
-`PUT` can also be used to create a resource at a specific URI when the client specifies the identifier. As defined in
-[RFC 9110 Section 9.3.4], `PUT` requests that the state of the target resource be created or replaced with the state
-defined by the representation enclosed in the request, and is [idempotent], but not [safe].
+In REST APIs, it is customary to make a `POST` request to a collection's URI
+(for example, `/v1/publishers/{publisher_id}/books`) in order to create a new
+resource within that collection.
+
+Resource-oriented design AEP-121 honors this pattern through the `Create`
+method. These RPCs accept the parent collection if one exists, and the resource
+to create (and potentially some other parameters), and return the created
+resource.
 
 ## Guidance
 
-### When to use PUT
+APIs **should** provide a create method for resources unless it is not valuable
+for users to do so. The purpose of the create method is to create a new
+resource in an already-existing collection.
 
-Use PUT for operations that completely replace a resource with a new representation or for creating a resource at a
-client-specified URI.
+### Operation
 
-**Use `PUT` when:**
+Create methods are specified using the following pattern:
 
-* Replacing an entire resource with a new representation (e.g., "Replace book 123 with this complete book object").
-* Creating a resource where the client specifies the full URI and identifier (e.g., "Create a book with ID 'isbn-123'").
-* You want to ensure the complete state of a resource matches the provided representation.
+- The HTTP verb **must** be `POST`.
+- Some resources take longer to be created than is reasonable for a regular API
+  request. In this situation, the API **should** use a
+  [long-running operation](/long-running-operations).
 
-**Do not use `PUT` when:**
+{% tab proto %}
 
-* Only partial updates are needed (use [PATCH] instead)
-* The server needs to generate or assign the resource identifier (use [POST] to a collection instead)
-* The operation has side effects that should not be repeated (use [POST] instead)
+{% sample '../example.proto', 'rpc CreateBook' %}
 
-A `PUT` request **must** include a complete representation of the resource in the request body.
+- The RPC's name **must** begin with the word `Create`. The remainder of the
+  RPC name **should** be the singular form of the resource being created.
+    - The request message **must** match the RPC name, with a `Request` suffix.
+- If the collection has a parent, the collection's parent resource **must** be
+  called `parent`, and **should** be the only variable in the URI path.
+    - The collection identifier (`books` in the above example) **must** be a
+      literal string.
+- There **must** be a `body` key in the `google.api.http` annotation, and it
+  **must** map to the resource field in the request message.
+    - All remaining fields **should** map to URI query parameters.
+- The operation **must** have [strong consistency][].
 
-### General requirements
+{% tab oas %}
 
-`PUT` requests:
-
-* **must** be used to replace the entire representation of a resource at a known URI.
-* **may** be used to create a resource when the client specifies the complete URI.
-* **must** include a complete representation of the resource in the request body.
-    * Omitted fields **must** be treated as explicitly set to their default or null values, effectively removing
-      previous values.
-* **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
-* **must** be [idempotent]. Repeating the same PUT request must produce the same result and leave the resource in the
-  same state.
-* **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
-  request, they should be ignored or validated for consistency.
-
-Some resources take longer to be updated than is reasonable for a regular API request. In this situation, the API should
-use a [long-running operation].
-
-### Replacing Resources
-
-`PUT` requests for replacing existing resources:
-
-* **must** be made to the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** return a [200 OK] with the updated resource representation in the response body.
-
-### Creating Resources
-
-`PUT` requests for creating resources:
-
-* **must** be made to the desired resource [URI path] with the client-specified identifier.
-* **must** return [201 Created] when a new resource is successfully created.
-* **may** include a [Location] header containing the URI of the newly created resource.
-* **should** include a representation of the created resource in the response body.
-* **should** only be supported when client-assigned identifiers are semantically appropriate (e.g., ISBNs, email
-  addresses, usernames).
-
-### Partial representations
-
-`PUT` requires a complete representation of the resource. If a field is omitted from the request, it should be treated
-as absent from the desired state. Depending on your API's semantics:
-
-* The field may be removed from the resource
-* The field may be set to a default or null value
-* The request may be rejected as invalid if required fields are missing ([400 Bad Request])
-
-Document clearly how your API handles omitted fields. If you need partial updates where omitted fields remain unchanged,
-use [PATCH] instead.
-
-**Warning:** This effectively deletes data. If a client performs a `GET`, modifies one field, and `PUT`s it back without
-including the other fields, those other fields will be erased.
-
-### Idempotency
-
-`PUT` is idempotent by definition. Making the same `PUT` request multiple times **must** result in the same resource
-state. This means:
-
-* The server replaces the entire resource with the provided representation on every request
-* If you need to track modification metadata, use conditional requests with [ETag] headers rather than modifying the
-  resource state
-
-### Concurrency
-
-For concurrent modification scenarios, APIs **may** implement optimistic concurrency control using [ETag]:
-
-* The server **may** include an [ETag] header in `GET` and `PUT` responses representing the resource version.
-* Clients **may** include an [If-Match] header with the [ETag] value when making `PUT` requests.
-* The server **must** return [412 Precondition Failed] if the [ETag] has changed, indicating another client has modified
-  the resource.
-* If no [If-Match] header is provided, the server **may** either accept the request (last-write-wins) or reject it with
-  [428 Precondition Required], depending on the API's concurrency policy.
-
-Example: Successful update with concurrency control
-
-```http request
-# Client retrieves the current resource
-GET /books/123
-ETag: "v1"
-
+```http
+POST /v1/publishers/{publisher_id}/books?id={book} HTTP/2
+Host: bookstore.example.com
+Accept: application/json
 {
-"id": "123",
-"title": "Original Title",
-"author": "Jane Doe"
-}
-
-# Client updates the resource with the ETag
-PUT /books/123
-If-Match: "v1"
-Content-Type: application/json
-
-{
-"id": "123",
-"title": "Updated Title",
-"author": "Jane Doe"
-}
-
-# Server accepts the update
-200 OK
-ETag: "v2"
-
-{
-"id": "123",
-"title": "Updated Title",
-"author": "Jane Doe"
+  "title": "Pride and Prejudice",
+  "author": "Jane Austen"
 }
 ```
 
-Example: Concurrent modification conflict
+{% endtabs %}
 
-```http request
-# Client A retrieves the resource
-GET /books/123
-ETag: "v1"
+### Requests
 
-# Client B also retrieves the resource
-GET /books/123
-ETag: "v1"
+Create methods implement a common request message pattern:
 
-# Client A successfully updates
-PUT /books/123
-If-Match: "v1"
-...
-200 OK
-ETag: "v2"
+- An `id` field **should** be supported.
+- The resource field **must** be included and **must** map to the POST body.
+- The request message **must not** contain any other required fields and
+  **should not** contain other optional fields except those described in this
+  or another AEP.
 
-# Client B attempts to update with stale ETag
-PUT /books/123
-If-Match: "v1"
-Content-Type: application/json
+{% tab proto %}
 
-{
-"id": "123",
-"title": "Different Title",
-"author": "Jane Doe"
-}
+{% sample '../example.proto', 'message CreateBookRequest' %}
 
-# Server rejects due to ETag mismatch
-412 Precondition Failed
+- A `parent` field **must** be included unless the resource being created is a
+  top-level resource. It **should** be called `parent`.
+    - The field **should** be [annotated as `REQUIRED`][aep-203].
+    - The field **must** identify the [resource type][aep-4] of the resource
+      being created.
 
-{
-"error": "Precondition Failed",
-"message": "The resource has been modified by another client. Please retrieve the latest version and retry."
-}
+{% tab oas %}
+
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.requestBody' %}
+
+- The request body **must** be the resource being created.
+
+{% endtabs %}
+
+### Responses
+
+{% tab proto %}
+
+{% sample '../example.proto', 'message Book' %}
+
+{% tab oas %}
+
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.responses.200' %}
+
+- The response **must** be the resource itself. There is no separate response
+  schema.
+    - The response **should** include the fully-populated resource, and **must**
+      include any fields that were provided unless they are input only (see
+      AEP-203).
+
+{% endtabs %}
+
+### Errors
+
+See [errors][], in particular [when to use PERMISSION_DENIED and NOT_FOUND
+errors][permission-denied].
+
+### User-specified IDs
+
+An API **should** allow a user to specify the ID component of a resource: not
+doing so introduces a non-idempotent request in the API, as sending the same
+payload results in creating a new resource each time.
+
+Exceptional cases should have the following behavior:
+
+- The resource allows identical records without a need to disambiguate between
+  the two (e.g. rows in a table with no primary key).
+- The resource will not be exposed in [Declarative clients][].
+
+An API **may** allow the `id` field to be optional, and give the resource a
+system-generated ID if one is not specified.
+
+For example:
+
+```
+// Using user-specified IDs.
+publishers/lacroix/books/les-miserables
+
+// Using system-generated IDs.
+publishers/012345678-abcd-cdef/books/12341234-5678-abcd
 ```
 
-[RFC 9110 Section 9.3.4]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.4
+- The `path` field on the resource **must** be ignored.
+- The documentation **should** explain what the acceptable format is, and the
+  format **should** follow the guidance for resource path formatting in
+  AEP-122.
+- If a user tries to create a resource with an ID that would result in a
+  duplicate resource path, the service **must** error with `ALREADY_EXISTS`.
+    - However, if the user making the call does not have permission to see the
+      duplicate resource, the service **must** error with `PERMISSION_DENIED`
+      instead.
 
-[safe]: /130#common-method-properties
+{% tab proto %}
 
-[idempotent]: /130#common-method-properties
+- There **should** be exactly one `google.api.method_signature` annotation,
+  with a comma-delimited list of values, including the field representing the
+  resource.
+    - If the collection has a parent, the list must include `parent`.
+    - If the resource supports user-settable ids, the list must include `id`.
+- The `id` field **must** exist on the request message, not the resource
+  itself.
+    - The field **may** be required or optional. If it is required, it **should**
+      include the corresponding annotation.
 
-[Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
+{% tab oas %}
 
-[location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.requestBody' %}
 
-[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
+- The `id` field **must** be a query parameter on the request.
 
-[If-Unmodified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Unmodified-Since
+{% endtabs %}
 
-[POST]: /post
+## Interface Definitions
 
-[PATCH]: /patch
+{% tab proto %}
 
-[URI path]: /paths
+{% sample '../example.proto', 'rpc CreateBook' %}
 
-[long-running operation]: /long-running-operations
+{% sample '../example.proto', 'message CreateBookRequest' %}
 
-[ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
+{% sample '../example.proto', 'message Book' %}
 
-[200 OK]: /63#200-ok
+{% tab oas %}
 
-[201 Created]: /63#201-created
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post' %}
 
-[400 Bad Request]: /63#400-bad-request
+{% endtabs %}
 
-[412 Precondition Failed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
+## Further reading
 
-[428 Precondition Required]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/428
+- For ensuring idempotency in `Create` methods, see AEP-155.
+- For naming resources involving Unicode, see AEP-210.
 
-## Changelog
+## Rationale
 
-* **2026-01-21**: Standardize HTTP status code references.
-* **2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].
+### Requiring user-specified ids
 
-[Google AIP-134]: https://google.aip.dev/134
+[Declarative clients][] use the resource ID as a way to identify a resource for
+applying updates and for conflict resolution. The lack of a user-specified ID
+means a client is unable to find the resource unless they store the identifier
+locally, and can result in re-creating the resource. This in turn has a
+downstream effect on all resources that reference it, forcing them to update to
+the ID of the newly-created resource.
 
-[AEP-134]: https://aep.dev/134
+Having a user-specified ID also means the client can precalculate the resource
+path and use it in references from other resources.
+
+[data plane]: ./0111.md#data-plane
+[errors]: ./0193
+[field_behavior]: ./0203
+[Declarative clients]: ./0003.md#declarative-clients
+[permission-denied]: ./0193.md#permission-denied
+[strong consistency]: ./0121.md#strong-consistency
