@@ -1,24 +1,22 @@
 # HTTP Methods
 
-This AEP establishes standards for how APIs use HTTP methods. Consistent and correct use of HTTP methods ensures
-that APIs are predictable, maintainable, and align with REST principles and HTTP standards defined in [RFC 9110].
-
 HTTP methods are standardized actions that indicate the desired operation to be performed on a resource. The method
 represents the _action_ (verb) being performed on the _resource_ (noun) identified by the URI path. The request method
 is the primary source of request semantics; it indicates the purpose for which the client has made the request and what
-the client expects as a successful result.
-
-This AEP provides general guidance applicable to all HTTP methods. Detailed requirements for individual methods are
-covered in separate AEPs (see Method Details table below).
+the client expects as a successful result. Consistent and correct use of HTTP methods ensures
+that APIs are predictable, maintainable, and align with REST principles and HTTP standards defined in [RFC 9110].
 
 ## Guidance
 
-### Choosing the Right Method
+HTTP methods are used to perform actions on resources. [Standard actions] like Fetch, List, Create, Update, Apply,
+and Delete map to specific HTTP methods. [Custom actions] that don't fit standard patterns typically use `POST`
+(although not always). For details on these actions and when to use them, see the [actions][standard actions] AEP.
 
 APIs **must** use HTTP methods in accordance with their standardized semantics as defined in [RFC 9110]. This means:
 
 * Methods **must** be used for their intended purpose
-* Methods **must** respect their safety, idempotency, and cacheability properties
+* Method implementations **must** fulfill the safety, idempotency, and cacheability requirements
+  (see [Common Method Properties](#common-method-properties))
 * Methods **must not** be repurposed for operations that conflict with their standard semantics
 
 The following table summarizes the most common HTTP methods and their proper use:
@@ -31,8 +29,38 @@ The following table summarizes the most common HTTP methods and their proper use
 | [PATCH]  | _Partially_ updates the specified resource                  | Modifying specific attributes of an existing resource      | `PATCH /books/123` updates only certain fields of book 123            |
 | [DELETE] | Deletes the specified resource                              | Removing a resource                                        | `DELETE /books/123` deletes book with ID 123                          |
 
-**Note:** When standard HTTP methods don't fit your use case, refer to the [custom methods] AEP for guidance on
-designing custom operations within RESTful constraints.
+### Common Method Properties
+
+Method implementations **must** fulfill the following properties, according to [RFC 9110 Section 9.2]:
+
+| Method   | Safe  | Idempotent | Cacheable |
+|----------|:-----:|:----------:|:---------:|
+| [GET]    | ✅ Yes |   ✅ Yes    |   ✅ Yes   |
+| [POST]   | ❌ No  |   ⚠️ No*   |   ❌ No    |
+| [PUT]    | ❌ No  |   ✅ Yes    |   ❌ No    |
+| [PATCH]  | ❌ No  |   ⚠️ No*   |   ❌ No    |
+| [DELETE] | ❌ No  |   ✅ Yes    |   ❌ No    |
+
+**Note:** \* `POST` and `PATCH` are not inherently idempotent, though specific implementations may be designed to be
+idempotent. See their respective AEPs for details.
+
+**Safe Methods**: Methods whose semantics are essentially read-only. The client does not request, and does not expect,
+any state change on the server as a result of applying a safe method to a target resource. Safe methods allow for
+prefetching, caching, and other optimizations without concern for side effects.
+
+**Idempotent Methods**: Methods where multiple identical requests have the same effect as a single request. Idempotency
+is critical for reliable operations over unreliable networks—clients can safely retry idempotent requests without fear
+of unintended side effects.
+
+**Cacheable Methods**: Methods whose responses may be stored for future reuse. Cacheability enables performance
+optimization and reduces server load. Generally, safe methods are cacheable, while methods that modify a resource state
+are not.
+
+### Choosing the Right Method
+
+**Note:** This diagram provides _general_ guidance for choosing HTTP methods for [standard actions]. When operations
+don't fit these patterns, refer to the [custom actions] AEP for guidance on designing custom operations within RESTful
+constraints.
 
 ```mermaid
 ---
@@ -67,33 +95,6 @@ flowchart TD
     replace ==>|Partial| patch
 ```
 
-### Common Method Properties
-
-Method implementations **must** fulfill the following properties, according to [RFC 9110 Section 9.2]:
-
-| Method   | Safe | Idempotent | Cacheable |
-|----------|------|------------|-----------|
-| [GET]    | Yes  | Yes        | Yes       |
-| [POST]   | No   | No*        | No        |
-| [PUT]    | No   | Yes        | No        |
-| [PATCH]  | No   | No*        | No        |
-| [DELETE] | No   | Yes        | No        |
-
-\* `POST` and `PATCH` are not inherently idempotent, though specific implementations may be designed to be idempotent.
-See their respective AEPs for details.
-
-**Safe Methods**: Methods whose semantics are essentially read-only. The client does not request, and does not expect,
-any state change on the server as a result of applying a safe method to a target resource. Safe methods allow for
-prefetching, caching, and other optimizations without concern for side effects.
-
-**Idempotent Methods**: Methods where multiple identical requests have the same effect as a single request. Idempotency
-is critical for reliable operations over unreliable networks—clients can safely retry idempotent requests without fear
-of unintended side effects.
-
-**Cacheable Methods**: Methods whose responses may be stored for future reuse. Cacheability enables performance
-optimization and reduces server load. Generally, safe methods are cacheable, while methods that modify a resource state
-are not.
-
 ### Responses
 
 The following requirements apply to all HTTP method implementations:
@@ -104,12 +105,6 @@ The following requirements apply to all HTTP method implementations:
   implementation details.
 
 For an overview on HTTP responses, see AEP-61.
-
-### Authorization checks
-
-The majority of operations require authorization. Services **must** check permissions before checking resource existence
-to avoid information disclosure. For detailed guidance on handling authorization vs. existence (e.g., returning
-`403 Forbidden` vs. `404 Not Found`), refer to AEP-211.
 
 ### Less common HTTP Methods
 
@@ -146,19 +141,23 @@ to CSRF attacks and unintended execution through prefetching or link sharing.
 Following standard method semantics makes it easier to evolve APIs over time, as clients and servers share a common
 understanding of behavior and expectations.
 
+## Further Reading
+
+- [API Actions](/actions)
+
 [RFC 9110]: https://datatracker.ietf.org/doc/html/rfc9110
 
 [RFC 9110 Section 9.2]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.2
 
-[GET]: /get
+[GET]: /http-get
 
-[POST]: /post
+[POST]: /http-post
 
-[PUT]: /put
+[PUT]: /http-put
 
-[PATCH]: /patch
+[PATCH]: /http-patch
 
-[DELETE]: /delete
+[DELETE]: /http-delete
 
 [HEAD]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/HEAD
 
@@ -168,11 +167,9 @@ understanding of behavior and expectations.
 
 [CONNECT]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Methods/CONNECT
 
-[Allow header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Allow
+[custom actions]: /custom-methods
 
-[Retry-After header]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Retry-After
-
-[custom methods]: /custom-methods
+[standard actions]: /actions
 
 [405 Method Not Allowed]: /63#405-method-not-allowed
 
@@ -180,6 +177,7 @@ understanding of behavior and expectations.
 
 ## Changelog
 
+* **2026-02-09**: Move from AEP-130 to AEP-64. Refactor to tie in new AEP-130 on Actions.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-02**: Updated method tables to include all HTTP methods and separated them into 2 sections.
 * **2025-11-11**: Initial AEP-130 for Thryv, adapted from [Google AIP-130][] and aep.dev [AEP-130][].
