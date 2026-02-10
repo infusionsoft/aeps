@@ -1,7 +1,6 @@
 # GET
 
-In REST APIs, it is customary to make a `GET` request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) in order to retrieve that resource. `GET` requests are used to read either
+In REST APIs, it is customary to make a `GET` request to fetch data. `GET` requests are used to read either
 a single resource or a collection of resources. As defined in [RFC 9110 Section 9.3.1], `GET` is the primary mechanism
 for information retrieval in HTTP and should be [safe] and [idempotent].
 
@@ -14,7 +13,7 @@ collections.
 
 **Use `GET` when:**
 
-* Retrieving a specific resource by its ID (e.g., "Get user 123").
+* Retrieving a specific resource by its ID (e.g., "Fetch user 123").
 * Listing resources in a collection (e.g., "List all books").
 * Searching or filtering data where the query parameters fit within the URL length limit.
 * The operation is read-only and safe to cache.
@@ -28,9 +27,7 @@ collections.
 
 ### General requirements
 
-* `GET` **must** be used to retrieve a representation of a resource.
-* APIs **must** provide a `GET` method for resources unless there is a compelling reason not to do so. The purpose of
-  the `GET` method is to retrieve and return data about the resource.
+* `GET` **must** be used to retrieve a representation of a resource or collection.
 * `GET` requests **must not** have a request body payload.
     * If a `GET` request contains a body, the body **must** be ignored, and **must not** cause an error.
     * Be aware that some HTTP clients, proxies, and intermediaries may drop the request body or reject the request
@@ -39,20 +36,6 @@ collections.
       see [GET with body](#get-with-body).
 * `GET` requests **must** be [safe], meaning they **must not** modify server state or have side effects.
 * `GET` requests **must** be [idempotent], meaning multiple identical requests **must** produce the same result.
-* Some resources take longer to be retrieved than is reasonable for a regular API request. In this situation, the
-  API **should** use a [long-running operation].
-
-### Individual Resources
-
-`GET` requests for individual resources:
-
-* **must** use the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** return a [200 OK] with the resource representation in the response body when the resource exists.
-* **must** return a [404 Not Found] if the resource does not exist.
-    * If the resource previously existed and has since been deleted (e.g., soft-deleted), the server **may** instead
-      respond with [410 Gone].
-* **may** support field masks or sparse fieldsets to allow clients to specify which fields they want returned, reducing
-  payload size and improving performance. See AEP-157 on partial responses for more details.
 
 ### Collection Resources
 
@@ -96,11 +79,9 @@ consistency across paginated requests.
 
 [RFC 9110 Section 9.3.1]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.1
 
-[safe]: /130#common-method-properties
+[safe]: /64#common-method-properties
 
-[idempotent]: /130#common-method-properties
-
-[long-running operation]: /long-running-operations
+[idempotent]: /64#common-method-properties
 
 [URI path]: /paths
 
@@ -128,10 +109,10 @@ consistency across paginated requests.
 
 [404 Not Found]: /63#404-not-found
 
-[410 Gone]: /63#410-gone
-
 ## Changelog
 
+* **2026-02-09**: Move this from AEP-131 to AEP-65. Extract `Individual Resources` section to `Fetch` action (new
+  AEP-131).
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-11-12**: Initial AEP-131 for Thryv, adapted from [Google AIP-131][] and aep.dev [AEP-131][].
 
