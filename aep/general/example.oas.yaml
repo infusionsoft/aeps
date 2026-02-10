@@ -7,10 +7,8 @@ components:
             properties:
               familyName:
                 type: string
-                x-aep-field-number: 2
               givenName:
                 type: string
-                x-aep-field-number: 1
             type: object
           type: array
         edition:
@@ -36,13 +34,6 @@ components:
         - price
         - published
       type: object
-      x-aep-resource:
-        parents:
-          - publisher
-        patterns:
-          - publishers/{publisher_id}/books/{book_id}
-        plural: books
-        singular: book
     book-edition:
       properties:
         displayName:
@@ -55,13 +46,6 @@ components:
       required:
         - displayName
       type: object
-      x-aep-resource:
-        parents:
-          - book
-        patterns:
-          - publishers/{publisher_id}/books/{book_id}/editions/{book_edition_id}
-        plural: book-editions
-        singular: book-edition
     isbn:
       properties:
         path:
@@ -70,11 +54,6 @@ components:
             the service.
           type: string
       type: object
-      x-aep-resource:
-        patterns:
-          - isbns/{isbn_id}
-        plural: isbns
-        singular: isbn
     item:
       properties:
         book:
@@ -94,13 +73,6 @@ components:
         - condition
         - price
       type: object
-      x-aep-resource:
-        parents:
-          - store
-        patterns:
-          - stores/{store_id}/items/{item_id}
-        plural: items
-        singular: item
     publisher:
       properties:
         description:
@@ -111,11 +83,6 @@ components:
             the service.
           type: string
       type: object
-      x-aep-resource:
-        patterns:
-          - publishers/{publisher_id}
-        plural: publishers
-        singular: publisher
     store:
       properties:
         description:
@@ -130,11 +97,6 @@ components:
       required:
         - name
       type: object
-      x-aep-resource:
-        patterns:
-          - stores/{store_id}
-        plural: stores
-        singular: store
 info:
   contact:
     email: aepsupport@aep.dev
@@ -283,7 +245,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: {}
+              schema: { }
           description: Successful response
     get:
       description: Get method for publisher
@@ -430,7 +392,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: {}
+              schema: { }
           description: Successful response
     get:
       description: Get method for book
@@ -599,7 +561,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: {}
+              schema: { }
           description: Successful response
     get:
       description: Get method for book-edition
@@ -655,13 +617,6 @@ paths:
               schema:
                 $ref: https://aep.dev/json-schema/type/operation.json
           description: Long-running operation response
-      x-aep-long-running-operation:
-        response:
-          schema:
-            properties:
-              success:
-                type: boolean
-            type: object
   /stores:
     get:
       description: List method for store
@@ -736,7 +691,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: {}
+              schema: { }
           description: Successful response
     get:
       description: Get method for store
@@ -861,7 +816,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: {}
+              schema: { }
           description: Successful response
     get:
       description: Get method for item
@@ -942,9 +897,5 @@ paths:
               schema:
                 $ref: https://aep.dev/json-schema/type/operation.json
           description: Long-running operation response
-      x-aep-long-running-operation:
-        response:
-          schema:
-            type: object
 servers:
   - url: http://localhost:8081
