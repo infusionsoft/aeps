@@ -7,9 +7,9 @@ category, or timestamps.
 Filtering applies deterministic, field-aware constraints that are index-friendly and predictable. Filtering is distinct
 from:
 
-* Sorting (ordering results)
+* [Sorting] (ordering results)
 * [Pagination] (windowing results)
-* [Searching] (partial text matching, fuzzy queries, complex boolean logic)
+* [Searching][search] (partial text matching, fuzzy queries, complex boolean logic)
 
 **Note:** Because filters are intended for a potentially non-technical audience, they sometimes borrow from patterns of
 colloquial speech rather than common patterns found in code.
@@ -163,11 +163,9 @@ defeat standardization benefits. For an in-depth analysis of filtering strategie
 guidelines, see
 [ADR-001: REST API Filtering and Searching Strategy](https://github.com/infusionsoft/aeps/blob/main/docs/arch/adr-001.md).
 
-[query parameters]: /query-parameters
+[Sorting]: /132#ordering
 
 [Pagination]: /pagination
-
-[Searching]: /searching
 
 [search]: /searching
 

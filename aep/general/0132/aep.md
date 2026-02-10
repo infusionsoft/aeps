@@ -1,92 +1,46 @@
 # List
 
-In REST APIs, it is customary to make a `GET` request to a resource
+In REST APIs, it is customary to make a [GET] request to a resource
 collection's URI (for example, `/publishers/{publisher_id}/books`) in order to
-retrieve a list of the resources within that collection.
-
-Resource-oriented design AEP-121 honors this pattern through the `List` method.
-These RPCs accept a parent collection (if one exists), and return a list of
-responses matching that input.
+retrieve a list of the resources within that collection. Resource-oriented design AEP-121 honors this pattern through
+the `List` action.
 
 ## Guidance
 
-APIs **should** provide a `List` method for resource collections.The purpose of
-the `List` method is to return data from a finite collection (generally
+APIs **should** provide a `List` action for resource collections. The purpose of
+the `List` action is to return data from a finite collection (generally
 singular unless the operation supports [reading across collections][]).
 
-When the `GET` method is used on a URI ending in a resource collection, the
+When the [GET] HTTP method is used on a URI ending in a resource collection, the
 result **must** be a list of resources.
 
 ### Operation
 
-{% tab proto %}
-
-{% sample '../example.proto', 'rpc ListBooks' %}
-
-- The RPC's name **must** begin with the word `List`. The remainder of the RPC
-  name **should** be the plural form of the resource's message name.
-- The request message **must** match the RPC name, with a `-Request` suffix.
-- The response message **must** match the RPC name, with a `-Response` suffix.
-    - The response **should** include fully-populated resources unless there is a
-      reason to return a partial response (see AEP-157).
-- The HTTP verb **must** be `GET`.
-- If the collection has a parent resource, The URI **must** contain a field
-  corresponding to the collection parent's name.
-    - This field **must** be called `parent`.
-    - The URI **must** have a variable corresponding to this field.
-    - The `parent` field **must** be the only variable in the URI path. All
-      remaining parameters **must** map to URI query parameters.
-- There **must not** be a `body` key in the `google.api.http` annotation.
-- There **should** be exactly one `google.api.method_signature` annotation with
-  a value of `"parent"` if a parent exists, and an empty string otherwise.
-
-{% tab oas %}
+`List` operations **must** be made by sending a [GET] request to the resource
+collection's [URI path]:
 
 ```http
-GET /v1/publishers/{publisher_id}/books HTTP/2
-Host: bookstore.example.com
-Accept: application/json
+GET /v1/publishers/{publisher_id}/books
 ```
 
-`List` operations **must** be made by sending a `GET` request to the resource
-collection's URI:
-
-- The HTTP method **must** be `GET`.
-    - The request **must** be safe and **must not** have side effects.
-- There **must not** be a request body.
-    - If a `GET` request contains a body, the body **must** be ignored, and
-      **must not** cause an error.
-- The request **must not** require any fields in the query string.
-    - The query string **may** include fields for common design patterns relevant
-      to list methods, such as `string filter` and `string orderBy`.
 - The URI **should** contain a variable for each individual ID in the resource
   hierarchy.
     - The path parameter for all resource IDs **must** be in the form
       `{resourceName}_id` (such as `book_id`), and path parameters representing
-      the ID of parent resources **must** end with `Id`.
-
-{% endtabs %}
+      the ID of parent resources **must** end with `id`.
+- `List` actions **should** implement sorting and [filtering] mechanisms to allow clients to sort and narrow results.
 
 ### Requests
 
+- The HTTP method **must** be [GET], and **must** follow the `GET` method guidelines in AEP-65.
+    - The request **must** be [safe] and **must not** have side effects.
+- There **must not** be a request body.
+    - If a `GET` request contains a body, the body **must** be ignored, and
+      **must not** cause an error.
+- The request **must not** _require_ any query parameters.
+    - Optional query parameters **may** be included (e.g., for [pagination] or [filtering])
+
 {% tab proto %}
-
-{% sample '../example.proto', 'message ListBooksRequest' %}
-
-- A `parent` field **must** be included unless the resource being listed is a
-  top-level resource. It **should** be called `parent`.
-    - The field **must** be [annotated as required][aep-203].
-    - The field **must** identify the [resource type][] of the resource being
-      listed with a `aepi.api.field_info.resource_reference` annotation.
-    - The field **must** accept the parent [path, _not_ the id](./0122)
-- The `max_page_size` and `page_token` fields, which support pagination,
-  **must** be specified on all list request messages. For more information, see
-  AEP-158.
-
-**Note:** The `parent` field in the request object corresponds to the `parent`
-variable in the `google.api.http` annotation on the RPC. This causes the
-`parent` field in the request to be populated based on the value in the URL
-when the REST/JSON interface is used.
 
 {% tab oas %}
 
@@ -96,96 +50,72 @@ when the REST/JSON interface is used.
 
 ### Responses
 
-`List` operations **must** return a page of results, with each individual
-result being a resource.
+A `List` action **must** return [200 OK] when resources are successfully retrieved.
 
-- The array of resources **must** be named `results` and contain resources with
-  no additional wrapping.
-- The `string nextPageToken` field **must** be included in the list response
-  schema. It **must** be set if there are subsequent pages, and **must not** be
-  set if the response represents the final page. For more information, see
-  AEP-158.
-- The response struct **may** include a `int32 total_size` (or
-  `int64 total_size`) field with the number of items in the collection.
-    - The value **may** be an estimate (the field **should** clearly document
-      this if so).
-    - If filtering is used, the `total_size` field **should** reflect the size of
-      the collection _after_ the filter is applied.
-- The response message **must** include a field corresponding to the resources
-  being returned, named for the English plural term for the resource, and
-  **should not** include any other repeated fields.
-- Fields providing metadata about the list request (such as
-  `string next_page_token` or `int32 total_size`) **must** be included on the
-  response (not as part of the resource itself).
+The response **must** be [paginated][pagination] and follow these requirements:
+
+* The field `results` **must** be an array of resources, with the schema as a reference to the resource (e.g.,
+  `#/components/schemas/Book`).
+* Fields providing metadata about the `List` request (such as page tokens) **must** be included in the response wrapper
+  object, not as part of the resource itself.
+* The response **must** ensure a deterministic default sort order to guarantee stable pagination.
+
+If the collection exists but contains no resources, the response **must** return a [200 OK] with an empty `results`
+array.
 
 {% tab proto %}
 
-{% sample '../example.proto', 'message ListBooksResponse' %}
-
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.responses.200' %}
-
-- The field "results" **must** be an array of resources, with the schema as a
-  reference to the resource (e.g. `#/components/schemas/Book`).
-- The field "nextPageToken" **must** be a string that contains the token to
-  retrieve the next page. This **must not** be set if the response represents
-  the final page.
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.responses.200.content' %}
 
 {% endtabs %}
 
-**Note:** List methods **may** return the complete collection to any user with
-permission to make a successful List request on the collection, _or_ **may**
-return a collection only containing resources for which the user has read
-permission. This behavior **should** be clearly documented either for each List
-method or as a standard convention in service-level documentation. Permission
-checks on individual resources may have a negative performance impact so should
-be used only where absolutely necessary.
-
 ### Errors
 
-If the user does not have sufficient permission to know that the collection
-exists, the service **should** reply with an HTTP 404 error, regardless of
-whether or not the collection exists. Permission **must** be checked prior to
-checking whether the collection exists.
+A List action **must** return appropriate error responses. For additional guidance, see [Errors]
+and [HTTP status codes].
 
-If the user does have proper permission, but the requested collection does not
-exist (generally because the parent does not exist), the service **must** reply
-with an HTTP 404 error.
+Most common error scenarios:
 
-**Note:** An empty collection which the user has permission to access **must**
-return `200 OK` with an empty results array, and not `404 Not Found`.
+* Return [404 Not Found] if the parent resource does not exist (e.g., requesting `/publishers/{invalid_id}/books` when
+  the publisher doesn't exist).
+* See [authorization checks](/authorization) for details on responses based on permissions.
+
+**Note:** `List` actions **may** return the complete collection to any user with
+permission to make a successful `List` request on the collection, _or_ **may**
+return a collection only containing resources for which the user has read
+permission. This behavior **should** be clearly documented either for each `List`
+action or as a standard convention in service-level documentation. Permission
+checks on individual resources may have a negative performance impact so should
+be used only where necessary.
 
 ### Advanced operations
 
-`List` methods **may** allow an extended set of functionality to allow a user
+`List` actions **may** allow an extended set of functionality to allow a user
 to specify the resources that are returned in a response.
 
 The following table summarizes the applicable AEPs, ordered by the precedence
 of the operation on the results.
 
-| Operation                      | AEP                                |
-| ------------------------------ | ---------------------------------- |
-| filter                         | [AEP-160](/0160)                   |
-| ordering (`order_by`)          | [AEP-132](#ordering)               |
-| pagination (`next_page_token`) | [AEP-158](/0158)                   |
-| skip                           | [AEP-158](/0158/#skipping-results) |
+| Operation  | AEP                  |
+|------------|----------------------|
+| filtering  | [AEP-160](/160)      |
+| ordering   | [AEP-132](#ordering) |
+| pagination | [AEP-158](/158)      |
 
-For example, if both the `filter` and `skip` fields are specified, then the
-filter would be applied first, then the resulting set would be the results that
-skip N entries of the filtered result.
+For example, if both a filter and pagination fields are specified, then the
+filter would be applied first, then the resulting set would be paginated.
 
 ### Ordering
 
-`List` methods **may** allow clients to specify sorting order; if they do, the
-request message **should** contain a `string order_by` field.
+`List` actions **may** allow clients to specify sorting order; if they do, the
+order **must** bew specified in a query parameter which **must** be a `string` named `orderBy`.
 
-- Values **should** be a comma separated list of fields. For example:
-  `"foo,bar"`.
+- Values **should** be a comma-separated list of fields. For example:
+  `foo,bar`.
 - The default sorting order is ascending. To specify descending order for a
-  field, users append a `-` prefix; for example: `"foo,-bar"`, `"-foo,bar"`.
-- Redundant space characters in the syntax are insignificant. `"foo, -bar"`,
-  `" foo , -bar "`, and `"foo,-bar"` are all equivalent.
+  field, users append a `-` prefix; for example: `foo,-bar`, `-foo,bar`.
 - Subfields are specified with a `.` character, such as `foo.bar` or
   `address.street`.
 
@@ -198,19 +128,13 @@ Some APIs need to "[soft-delete][]" resources, marking them as deleted or
 pending deletion (and optionally purging them later).
 
 APIs that do this **should not** include deleted resources by default in list
-requests. APIs with soft deletion of a resource **should** include a
-`bool show_deleted` field in the list request that, if set, will cause
-soft-deleted resources to be included.
+requests. APIs with soft deletion of a resource **may** include a `boolean` field named
+`showDeleted` in the list request that, if set, will cause soft-deleted resources to be included.
+For more information, see AEP-164.
 
 ## Interface Definitions
 
 {% tab proto -%}
-
-{% sample '../example.proto', 'rpc ListBooks' %}
-
-{% sample '../example.proto', 'message ListBooksRequest' %}
-
-{% sample '../example.proto', 'message ListBooksResponse' %}
 
 {% tab oas %}
 
@@ -218,10 +142,32 @@ soft-deleted resources to be included.
 
 {% endtabs %}
 
-<!-- prettier-ignore-start -->
+## Changelog
+
+* **2026-02-09**: Initial creation, adapted from [Google AIP-132][] and aep.dev [AEP-132][].
+
+[Google AIP-132]: https://google.aip.dev/131
+
+[AEP-132]: https://aep.dev/131
+
 [reading across collections]: ./0159
+
 [soft-delete]: ./0164
-[resource type]: ./0004
 
+[GET]: /http-get
 
-<!-- prettier-ignore-end -->
+[URI path]: /paths
+
+[safe]: /64#common-method-properties
+
+[pagination]: /pagination
+
+[filtering]: /filtering
+
+[errors]: /errors
+
+[HTTP status codes]: /status-codes
+
+[200 OK]: /63#200-ok
+
+[404 Not Found]: /63#404-not-found

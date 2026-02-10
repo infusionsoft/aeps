@@ -133,7 +133,7 @@ Common uses for query parameters in APIs include:
 
 * Filtering: `?status=active&type=premium`
 * Pagination: `?page=2&limit=50`
-* Sorting: `?sort=created_time&order=desc`
+* Sorting: `?orderBy=createdTime`
 
 Query parameter keys are typically **case-sensitive**, though this behavior can vary by server implementation. To avoid
 ambiguity, assume parameter keys are case-sensitive unless explicitly documented otherwise. Also, maintain consistent

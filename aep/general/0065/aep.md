@@ -37,22 +37,6 @@ collections.
 * `GET` requests **must** be [safe], meaning they **must not** modify server state or have side effects.
 * `GET` requests **must** be [idempotent], meaning multiple identical requests **must** produce the same result.
 
-### Collection Resources
-
-`GET` requests for collection resources:
-
-* **must** use the collection's [URI path] (e.g., `/publishers/{publisher_id}/books`).
-* **must** return a `[200 OK] when resources are successfully retrieved.
-    * The response body **must** be a wrapper object containing the list of resources, not a raw JSON array.
-    * These results **must** be [paginated].
-* **must** return a [200 OK] with an empty array (inside the wrapper object) if the collection exists but contains no
-  resources.
-* **should** return a [404 Not Found] if the parent resource does not exist (e.g., requesting
-  `/publishers/{invalid_id}/books` when the publisher doesn't exist).
-* **should** implement sorting and [filtering] mechanisms to allow clients to sort and narrow results.
-    * The filters **must** follow the guidelines on [query parameters].
-* **must** ensure a deterministic default sort order to guarantee stable [pagination].
-
 ### Caching
 
 * `GET` requests **should** support HTTP caching mechanisms to improve performance and reduce server load.
@@ -77,19 +61,16 @@ in the query string rather than the request body. This allows pagination links t
 encodes page position and direction. The `cursor` may optionally include a hash of the applied filters to validate
 consistency across paginated requests.
 
+## Further Reading
+
+- [Standard Action: Fetch](/fetch)
+- [Standard Action: List](/list)
+
 [RFC 9110 Section 9.3.1]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.1
 
 [safe]: /64#common-method-properties
 
 [idempotent]: /64#common-method-properties
-
-[URI path]: /paths
-
-[paginated]: /pagination
-
-[pagination]: /pagination
-
-[query parameters]: /query-parameters
 
 [Cache-Control]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control
 
@@ -103,16 +84,10 @@ consistency across paginated requests.
 
 [304 Not Modified]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
 
-[filtering]: /filtering
-
-[200 OK]: /63#200-ok
-
-[404 Not Found]: /63#404-not-found
-
 ## Changelog
 
 * **2026-02-09**: Move this from AEP-131 to AEP-65. Extract `Individual Resources` section to `Fetch` action (new
-  AEP-131).
+  AEP-131).Extract `Collection Resources` section to `List` action (new AEP-132).
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-11-12**: Initial AEP-131 for Thryv, adapted from [Google AIP-131][] and aep.dev [AEP-131][].
 

@@ -13,6 +13,8 @@ be paginated.
     * If using offset-based pagination, _new_ APIs **must**
       implement [token-based offset pagination](#token-based-offset-pagination).
 * Query parameters for pagination **must** follow the guidelines in AEP-106.
+* The array of resources **must** be named `results` and contain resources with
+  no additional wrapping.
 
 ### Cursor-based pagination
 
@@ -55,7 +57,7 @@ responds with:
 
 ```json
 {
-  "books": [
+  "results": [
     {
       "id": "456",
       "title": "Les Misérables",
