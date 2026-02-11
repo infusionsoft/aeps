@@ -26,38 +26,6 @@ steady-state and reading resource state returns a consistent `404 Not found`
 
 Delete methods are specified using the following pattern:
 
-{% tab proto %}
-
-{% sample '../example.proto', 'message DeleteBookRequest' %}
-
-- The method's name **must** begin with the word `Delete`. The remainder of the
-  method name **should** be the singular form of the resource's name.
-- The request schema name **must** exactly match the method name, with a
-  `Request` suffix.
-- The request message field receiving the resource path **should** map to the
-  URI path.
-    - This field **should** be called `path`.
-    - The `path` field **should** be the only variable in the URI path. All
-      remaining parameters **should** map to URI query parameters.
-- There **must not** be a `body` key in the `google.api.http` annotation.
-- There **should** be exactly one `google.api.method_signature` annotation,
-  with a value of `"path"`. If an etag or force field are used, they **may** be
-  included in the signature.
-
-{% tab oas %}
-
-```http
-DELETE /v1/publishers/{publisher_id}/books/{book_id} HTTP/2
-Host: bookstore.example.com
-Accept: application/json
-```
-
-- The response body **should** be omitted.
-- The HTTP response code **should** be `204 No Content` if the delete was
-  successful.
-
-{% endtabs %}
-
 ### Requests
 
 Delete methods implement a common request pattern:
@@ -68,38 +36,6 @@ Delete methods implement a common request pattern:
 - The request **must not** require any fields in the query string. The request
   **should not** include optional fields in the query string unless described
   in another AEP.
-
-{% tab proto %}
-
-{% sample '../example.proto', 'message DeleteBookRequest' %}
-
-- A `path` field **must** be included. It **should** be called `path`.
-    - The field **should** be [annotated as required][aep-203].
-    - The field **must** identify the [resource type][aep-4] that it references.
-- The comment for the field **should** document the resource pattern.
-- The request message **must not** contain any other required fields, and
-  **should not** contain other optional fields except those described in this
-  or another AEP.
-
-{% tab oas %}
-
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete.parameters' %}
-
-{% endtabs %}
-
-### Responses
-
-{% tab proto %}
-
-- The response message **should** be `google.protobuf.Empty`.
-
-{% tab oas %}
-
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete.responses.204' %}
-
-- Delete methods **should** return `204 No Content` with no response body.
-
-{% endtabs %}
 
 ### Errors
 
@@ -126,48 +62,6 @@ reconstructing wiped-out child resources may be quite difficult.
 If an API allows deletion of a resource that may have child resources, the API
 **must** provide a `bool force` field on the request, which the user sets to
 explicitly opt in to a cascading delete.
-
-{% tab proto -%}
-
-```proto
-message DeletePublisherRequest {
-  // The path of the publisher to delete.
-  // Format: publishers/{publisher_id}
-  string path = 1 [
-    (aep.api.field_info) = { resource_reference: [ "library.example.com/publisher" ], field_behavior: [ FIELD_BEHAVIOR_REQUIRED ] }
-  ];
-
-  // If set to true, any books from this publisher will also be deleted.
-  // (Otherwise, the request will only work if the publisher has no books.)
-  bool force = 2;
-}
-```
-
-The API **must** fail with a `FAILED_PRECONDITION` error if the `force` field
-is `false` (or unset) and child resources are present.
-
-{% tab oas -%}
-
-{% sample 'cascading_delete.oas.yaml', '$.paths' %}
-
-The API **must** fail with a `409 Conflict` error if the `force` field is
-`false` (or unset) and child resources are present.
-
-{% endtabs %}
-
-## Interface Definitions
-
-{% tab proto %}
-
-{% sample '../example.proto', 'rpc DeleteBook' %}
-
-{% sample '../example.proto', 'message DeleteBookRequest' %}
-
-{% tab oas %}
-
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete' %}
-
-{% endtabs %}
 
 ## Further reading
 
