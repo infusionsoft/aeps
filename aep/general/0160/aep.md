@@ -32,7 +32,7 @@ Examples:
 
 ```http request
 ### Get all books created after 2025-01-01
-GET /books?created_after=2025-01-01T00:00:00Z
+GET /books?createdTimeAfter=2025-01-01T00:00:00Z
 
 ### Get all published books
 GET /books?state=published
@@ -42,7 +42,8 @@ GET /books?state=published
 
 Different APIs have different resource models and user needs, so the set of filterable fields and supported operators
 will vary. These guidelines ensure consistency in _how_ filters are named and composed, while allowing each API to
-decide _which_ filters to offer based on real use cases.
+decide _which_ filters to offer based on real use cases. Just because an operator is listed here doesn't mean it needs
+to be implemented. Instead, this is saying "if you need to implement this parameter, name it this".
 
 Filtering parameter names **must** be stable (do not rename lightly), specific, and self-explanatory.
 
@@ -51,18 +52,21 @@ APIs **must** use the direct field name for exact matches (e.g. `state=active`, 
 APIs **should** use the following prefix/suffix modifiers for common comparisons. Use consistent prefixes/suffixes and
 only introduce them when there is more than one plausible comparison. APIs **should** use a subset as appropriate.
 
-| Operator  | Meaning                                                 | Example                     |
-|-----------|---------------------------------------------------------|-----------------------------|
-|           | Equals (direct field name)                              | `status=active`             |
-| `_ne`     | Not equals                                              | `status_ne=cancelled`       |
-| `_lt`,    | Less than                                               | `price_lt=100`              |
-| `_lte`    | Less than or equal                                      | `price_lte=100`             |
-| `_gt`,    | Greater than                                            | `price_gt=0`                |
-| `_gte`    | Greater than or equal                                   | `price_gte=50`              |
-| `_before` | Timestamp-specific `<`                                  | `created_before=2025-01-01` |
-| `_after`  | Timestamp-specific `>`                                  | `created_after=2025-01-01`  |
-| `is_`     | Boolean checks                                          | `is_active=true`            |
-| `has_`    | [Nullability and existence](#nullability-and-existence) | `has_phone_number=true`     |
+| Operator             | Meaning                                                 | Example                          |
+|----------------------|---------------------------------------------------------|----------------------------------|
+| (none)               | Equals (direct field name)                              | `status=ACTIVE`                  |
+| `NotEqual`           | Not equals                                              | `statusNotEqual=CANCELLED`       |
+| `LessThan`           | Strictly less than `<`                                  | `priceLessThan=100`              |
+| `LessThanOrEqual`    | Less than or equal `< =`                                | `priceLessThanOrEqual=100`       |
+| `GreaterThan`        | Strictly greater than `>`                               | `priceGreaterThan=100`           |
+| `GreaterThanOrEqual` | Greater than or equal `> =`                             | `priceGreaterThanOrEqual=100`    |
+| `Maximum`            | Upper bound (inclusive) `< =`                           | `capacityMaximum=500`            |
+| `Minimum`            | Lower bound (inclusive) `> =`                           | `capacityMinimum=50`             |
+| `Before`             | Timestamp strictly before `<`                           | `createdTimeBefore=2025-01-01`   |
+| `Latest`             | Timestamp at or before `< =`                            | `createdTimeLatest=2025-01-01`   |
+| `After`              | Timestamp strictly after `>`                            | `createdTimeAfter=2025-01-01`    |
+| `Earliest`           | Timestamp at or after `> =`                             | `createdTimeEarliest=2025-01-01` |
+| `has` (prefix)       | [Nullability and existence](#nullability-and-existence) | `hasPhoneNumber=true`            |
 
 ### Combining filters (`AND`)
 
@@ -106,12 +110,12 @@ If a real use case requires it, APIs **should** implement a specialized [search]
 
 Query parameters do not naturally express "field is missing" vs. "field is present but empty". APIs **should**
 avoid exposing "missing vs present" semantics unless necessary. If existence filtering is required, APIs **may** add
-explicit parameters such as `has_{field}=true|false`
+explicit parameters such as `has{field}=true|false`
 
 Example:
 
 ``` http request
-GET /users?has_phone_number=true
+GET /users?hasPhoneNumber=true
 ```
 
 APIs **must** document exactly what "has" means for each field (non-null, non-empty string, non-empty array, etc.). The
@@ -173,6 +177,8 @@ guidelines, see
 
 ## Changelog
 
+* **2026-02-18**: Change format from underscore (`_`) to `camelCase`. Add to naming conventions table. Use full words
+  instead of abbreviations.
 * **2026-01-27**: Removed search guidance, it will be a separate AEP. Align guidance with [ADR-001].
 * **2025-12-11**: Initial creation, adapted from [Google AIP-160][] and aep.dev [AEP-160][].
 
