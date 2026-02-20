@@ -1,4 +1,10 @@
 components:
+  headers:
+    LocationHeader:
+      description: URI of the newly created resource
+      schema:
+        type: string
+        format: uri
   schemas:
     book:
       properties:
@@ -136,11 +142,6 @@ paths:
     post:
       description: Create method for isbn
       operationId: createIsbn
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -148,7 +149,10 @@ paths:
               $ref: '#/components/schemas/isbn'
         required: true
       responses:
-        '200':
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
           content:
             application/json:
               schema:
@@ -209,11 +213,6 @@ paths:
     post:
       description: Create method for publisher
       operationId: createPublisher
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -221,7 +220,10 @@ paths:
               $ref: '#/components/schemas/publisher'
         required: true
       responses:
-        '200':
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
           content:
             application/json:
               schema:
@@ -352,10 +354,6 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: id
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -363,7 +361,10 @@ paths:
               $ref: '#/components/schemas/book'
         required: true
       responses:
-        '200':
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
           content:
             application/json:
               schema:
@@ -520,10 +521,6 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: id
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -531,7 +528,10 @@ paths:
               $ref: '#/components/schemas/book-edition'
         required: true
       responses:
-        '200':
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
           content:
             application/json:
               schema:
@@ -655,11 +655,6 @@ paths:
     post:
       description: Create method for store
       operationId: createStore
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -667,7 +662,10 @@ paths:
               $ref: '#/components/schemas/store'
         required: true
       responses:
-        '200':
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
           content:
             application/json:
               schema:
@@ -780,10 +778,6 @@ paths:
           required: true
           schema:
             type: string
-        - in: query
-          name: id
-          schema:
-            type: string
       requestBody:
         content:
           application/json:
@@ -791,7 +785,10 @@ paths:
               $ref: '#/components/schemas/item'
         required: true
       responses:
-        '200':
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
           content:
             application/json:
               schema:

@@ -16,25 +16,24 @@ that do not align with the semantics of other HTTP methods.
 
 **Use `POST` when:**
 
-* Creating a new resource where the server generates the ID (e.g., "Create a new book").
+* Creating a new resource with a server-generated ID (e.g., "Create a new book").
 * Triggering an action or operation on a resource (e.g., "Send email", "Reset password").
-* Performing complex queries that cannot be expressed via `GET` due to URL length or complexity constraints (
-  see [GET with body]).
+* Performing complex queries that cannot be expressed via `GET` due to URL length or complexity constraints
+  (see [GET with body]).
 * Executing batch operations or operations with side effects that do not map to resource creation, replacement, or
   deletion.
 
 **Do NOT use `POST` when:**
 
 * The operation is purely read-only without side effects; use [GET] instead.
-* You are replacing an entire resource at a known URI; use [PUT] instead.
+* You are creating a new resource at a known URI (client-generated ID); use [PUT] instead.
 * You are partially updating a resource; use [PATCH] instead.
 * You are deleting a resource; use [DELETE] instead.
 
 ### General requirements
 
-POST requests:
+`POST` requests:
 
-* **must** be used to create a new resource when the server assigns the resource identifier.
 * **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
 * **must** include a request body unless the operation explicitly requires no input data.
 * **must not** be _assumed_ to be [idempotent].
@@ -46,53 +45,6 @@ POST requests:
 APIs **must** use more specific HTTP methods when appropriate ([PUT] for full replacement, [PATCH] for partial
 updates, [DELETE] for removal) rather than overloading `POST`.
 
-Some resources take longer to be created than is reasonable for a regular API request. See [long-running operations].
-
-### Creating resources
-
-When using `POST` to create new resources:
-
-* The request **must** be sent to the collection URI (e.g., `/publishers/{publisher_id}/books`).
-* The request body **must** contain the resource representation to be created.
-* On successful creation, the response **must** return [201 Created].
-* A [404 Not Found] **should** be returned when the parent resource does not exist (e.g., creating a book under a
-  non-existent publisher)
-* The response **may** include a [Location] header containing the URI of the newly created resource.
-* The response body **should** include the complete representation of the created resource, including any
-  server-generated fields (e.g., `id`, `createdTime`, `updatedTime`).
-    * For bulk creation operations, APIs **may** return a summary or list of IDs/Status objects instead of full
-      resources to improve performance.
-
-For example, this request:
-
-```http request
-POST /v1/publishers/123/books
-Content-Type: application/json
-
-{
-    "title": "Les Misérables",
-    "author": "Victor Hugo",
-    "isbn": "9780451419439"
-}
-```
-
-Will return:
-
-```http request
-201 Created
-Location: /v1/publishers/123/books/456
-Content-Type: application/json
-
-{
-    "id": "456",
-    "title": "Les Misérables",
-    "author": "Victor Hugo",
-    "isbn": "9780451419439",
-    "createdTime": "2025-11-12T10:30:00Z",
-    "updatedTime": "2025-11-12T10:30:00Z"
-}
-```
-
 ### Custom methods
 
 `POST` is the primary method used for "reifying" concepts; converting a process, verb, or relationship into a distinct
@@ -102,9 +54,6 @@ resource. For best practices around this, refer to AEP-121.
 covered in detail in AEP-136.
 
 ### Error handling
-
-When a `POST` request fails during resource creation, the server **must not** create the resource. The operation
-**must** be atomic from the client's perspective.
 
 If a `POST` operation is partially completed before encountering an error, the service **should** roll back changes when
 possible. If rollback is not possible, the service **must** clearly document the potential for partial state changes.
@@ -116,34 +65,28 @@ APIs **should** support an [Idempotency-Key] to allow safe retries.
 
 [RFC 9110 Section 9.3.3]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.3
 
-[safe]: /130#common-method-properties
+[safe]: /64#common-method-properties
 
-[idempotent]: /130#common-method-properties
+[idempotent]: /64#common-method-properties
 
 [GET with body]: /131#get-with-body
 
-[GET]: /get
+[GET]: /http-get
 
-[PUT]: /put
+[PUT]: /http-put
 
-[PATCH]: /patch
+[PATCH]: /http-patch
 
-[DELETE]: /delete
-
-[location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
-
-[long-running operations]: /long-running-operations
+[DELETE]: /http-delete
 
 [Idempotency-Key]: /idempotency-key
 
 [Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 
-[201 Created]: /63#201-created
-
-[404 Not Found]: /63#404-not-found
-
 ## Changelog
 
+* **2026-02-19**: Move this from AEP-132 to AEP-66. Separate out guidelines for `Create`s in new AEP-133; this AEP will
+  focus on general `POST` requests.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-09**: Point to resource-oriented design (AEP-121) instead of re-iterating the same concepts in it
 * **2025-12-02**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].

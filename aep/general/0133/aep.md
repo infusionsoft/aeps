@@ -5,170 +5,126 @@ In REST APIs, it is customary to make a `POST` request to a collection's URI
 resource within that collection.
 
 Resource-oriented design AEP-121 honors this pattern through the `Create`
-method. These RPCs accept the parent collection if one exists, and the resource
-to create (and potentially some other parameters), and return the created
-resource.
+action.
+
+Also see the [apply](/apply) action, with guidance on how to implement creation with client assigned IDs.
 
 ## Guidance
 
-APIs **should** provide a create method for resources unless it is not valuable
-for users to do so. The purpose of the create method is to create a new
+APIs **should** provide a create action for resources unless it is not valuable
+for users to do so. The purpose of the create action is to create a new
 resource in an already-existing collection.
 
 ### Operation
 
-Create methods are specified using the following pattern:
+`Create` operations are specified using the following pattern:
 
-- The HTTP verb **must** be `POST`.
+- The HTTP method **must** be `POST`, unless the resource being created has a client specified id,
+  see [User-specified IDs](#user-specified-ids).
+    - `POST` **must** follow the guidelines in AEP-66.
 - Some resources take longer to be created than is reasonable for a regular API
   request. In this situation, the API **should** use a
   [long-running operation](/long-running-operations).
 
-{% tab proto %}
-
-{% sample '../example.proto', 'rpc CreateBook' %}
-
-- The RPC's name **must** begin with the word `Create`. The remainder of the
-  RPC name **should** be the singular form of the resource being created.
-    - The request message **must** match the RPC name, with a `Request` suffix.
-- If the collection has a parent, the collection's parent resource **must** be
-  called `parent`, and **should** be the only variable in the URI path.
-    - The collection identifier (`books` in the above example) **must** be a
-      literal string.
-- There **must** be a `body` key in the `google.api.http` annotation, and it
-  **must** map to the resource field in the request message.
-    - All remaining fields **should** map to URI query parameters.
-- The operation **must** have [strong consistency][].
-
-{% tab oas %}
+`Create` operations are made by sending a [POST] request to the _collection_ URI:
 
 ```http
-POST /v1/publishers/{publisher_id}/books?id={book} HTTP/2
-Host: bookstore.example.com
-Accept: application/json
-{
-  "title": "Pride and Prejudice",
-  "author": "Jane Austen"
-}
+POST /v1/publishers/{publisher_id}/books
 ```
-
-{% endtabs %}
 
 ### Requests
 
-Create methods implement a common request message pattern:
+- The request body **must** be the resource being created.
+- The request **must** be sent to the _collection_ URI.
+- When a request fails during creation, the server **must not** create the resource. The operation **must** be
+  atomic from the client's perspective.
+- If read-only fields (e.g., `createdTime`) are included in the request, they **should** be ignored or
+  return [400 Bad Request], depending on your API's semantics.
+- Unrecognized fields **may** be ignored or **may** cause a [400 Bad Request], depending on the API's semantics.
+    - This **must** be documented.
 
-- An `id` field **should** be supported.
-- The resource field **must** be included and **must** map to the POST body.
-- The request message **must not** contain any other required fields and
-  **should not** contain other optional fields except those described in this
-  or another AEP.
+```http request
+POST /v1/publishers/123/books
+Content-Type: application/json
+
+{
+    "title": "Les Misérables",
+    "author": "Victor Hugo",
+    "isbn": "9780451419439"
+}
+```
 
 {% tab proto %}
-
-{% sample '../example.proto', 'message CreateBookRequest' %}
-
-- A `parent` field **must** be included unless the resource being created is a
-  top-level resource. It **should** be called `parent`.
-    - The field **should** be [annotated as `REQUIRED`][aep-203].
-    - The field **must** identify the [resource type][aep-4] of the resource
-      being created.
 
 {% tab oas %}
 
 {% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.requestBody' %}
-
-- The request body **must** be the resource being created.
 
 {% endtabs %}
 
 ### Responses
 
-{% tab proto %}
+On successful creation, the response **must** return [201 Created]. The response **may** include a [Location] header
+containing the URI of the newly created resource.
 
-{% sample '../example.proto', 'message Book' %}
+The response body:
+
+* **must** be the resource itself. There is no separate response schema.
+* **should** include the complete representation of the created resource.
+* **must** include any fields that were provided unless they are input only.
+* **must** include any server-generated fields (e.g., `id`, `createdTime`, `updatedTime`).
+* For bulk creation operations, APIs **may** return a summary or list of IDs/Status objects instead of full
+  resources to improve performance.
+
+```http
+201 Created
+Location: /v1/publishers/123/books/456
+Content-Type: application/json
+
+{
+    "id": "456",
+    "title": "Les Misérables",
+    "author": "Victor Hugo",
+    "isbn": "9780451419439",
+    "createdTime": "2025-11-12T10:30:00Z",
+    "updatedTime": "2025-11-12T10:30:00Z"
+}
+```
+
+{% tab proto %}
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.responses.200' %}
-
-- The response **must** be the resource itself. There is no separate response
-  schema.
-    - The response **should** include the fully-populated resource, and **must**
-      include any fields that were provided unless they are input only (see
-      AEP-203).
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.responses.201' %}
 
 {% endtabs %}
 
 ### Errors
 
-See [errors][], in particular [when to use PERMISSION_DENIED and NOT_FOUND
-errors][permission-denied].
+A `Create` action **must** return appropriate error responses. For additional guidance, see [Errors]
+and [HTTP status codes].
+
+Most common error scenarios:
+
+* [400 Bad Request] **should** be returned if the request body is malformed or missing required fields.
+* [404 Not Found] **should** be returned if the parent resource does not exist (e.g., creating a book under a
+  non-existent publisher).
+* [409 Conflict] **should** be returned if a resource with the same identifier already exists.
+* See [authorization checks](/authorization) for details on responses based on permissions.
 
 ### User-specified IDs
 
-An API **should** allow a user to specify the ID component of a resource: not
-doing so introduces a non-idempotent request in the API, as sending the same
-payload results in creating a new resource each time.
+An API **may** allow the client to specify resource IDs. In general, this should only be supported when client-assigned
+identifiers are semantically appropriate (e.g., ISBNs, email addresses, usernames). For resource creation with a client
+specified ID, see [Apply].
 
-Exceptional cases should have the following behavior:
-
-- The resource allows identical records without a need to disambiguate between
-  the two (e.g. rows in a table with no primary key).
-- The resource will not be exposed in [Declarative clients][].
-
-An API **may** allow the `id` field to be optional, and give the resource a
-system-generated ID if one is not specified.
-
-For example:
-
-```
-// Using user-specified IDs.
-publishers/lacroix/books/les-miserables
-
-// Using system-generated IDs.
-publishers/012345678-abcd-cdef/books/12341234-5678-abcd
-```
-
-- The `path` field on the resource **must** be ignored.
-- The documentation **should** explain what the acceptable format is, and the
-  format **should** follow the guidance for resource path formatting in
-  AEP-122.
-- If a user tries to create a resource with an ID that would result in a
-  duplicate resource path, the service **must** error with `ALREADY_EXISTS`.
-    - However, if the user making the call does not have permission to see the
-      duplicate resource, the service **must** error with `PERMISSION_DENIED`
-      instead.
-
-{% tab proto %}
-
-- There **should** be exactly one `google.api.method_signature` annotation,
-  with a comma-delimited list of values, including the field representing the
-  resource.
-    - If the collection has a parent, the list must include `parent`.
-    - If the resource supports user-settable ids, the list must include `id`.
-- The `id` field **must** exist on the request message, not the resource
-  itself.
-    - The field **may** be required or optional. If it is required, it **should**
-      include the corresponding annotation.
-
-{% tab oas %}
-
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.requestBody' %}
-
-- The `id` field **must** be a query parameter on the request.
-
-{% endtabs %}
+**Note:** APIs **should** prefer `POST` for resource creation. It is good practice to keep resource ID management
+under the control of the server rather than the client. However, when the client must control the resource identifier
+(e.g., natural keys, external system integration, idempotent creation requirements), use [Apply] instead of `Create`.
 
 ## Interface Definitions
 
 {% tab proto %}
-
-{% sample '../example.proto', 'rpc CreateBook' %}
-
-{% sample '../example.proto', 'message CreateBookRequest' %}
-
-{% sample '../example.proto', 'message Book' %}
 
 {% tab oas %}
 
@@ -178,26 +134,31 @@ publishers/012345678-abcd-cdef/books/12341234-5678-abcd
 
 ## Further reading
 
-- For ensuring idempotency in `Create` methods, see AEP-155.
+- For ensuring idempotency in `Create` actions, see AEP-155.
 - For naming resources involving Unicode, see AEP-210.
 
-## Rationale
+## Changelog
 
-### Requiring user-specified ids
+* **2026-02-19**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
 
-[Declarative clients][] use the resource ID as a way to identify a resource for
-applying updates and for conflict resolution. The lack of a user-specified ID
-means a client is unable to find the resource unless they store the identifier
-locally, and can result in re-creating the resource. This in turn has a
-downstream effect on all resources that reference it, forcing them to update to
-the ID of the newly-created resource.
+[Google AIP-133]: https://google.aip.dev/133
 
-Having a user-specified ID also means the client can precalculate the resource
-path and use it in references from other resources.
+[AEP-133]: https://aep.dev/133
 
-[data plane]: ./0111.md#data-plane
-[errors]: ./0193
-[field_behavior]: ./0203
-[Declarative clients]: ./0003.md#declarative-clients
-[permission-denied]: ./0193.md#permission-denied
-[strong consistency]: ./0121.md#strong-consistency
+[errors]: /errors
+
+[POST]: /http-post
+
+[Apply]: /apply
+
+[location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
+
+[HTTP status codes]: /status-codes
+
+[201 Created]: /63#201-created
+
+[400 Bad Request]: /63#400-bad-request
+
+[404 Not Found]: /63#404-not-found
+
+[409 Conflict]: /63#409-conflict

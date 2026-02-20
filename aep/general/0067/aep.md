@@ -31,8 +31,6 @@ A `PUT` request **must** include a complete representation of the resource in th
 
 `PUT` requests:
 
-* **must** be used to replace the entire representation of a resource at a known URI.
-* **may** be used to create a resource when the client specifies the complete URI.
 * **must** include a complete representation of the resource in the request body.
     * Omitted fields **must** be treated as explicitly set to their default or null values, effectively removing
       previous values.
@@ -40,7 +38,7 @@ A `PUT` request **must** include a complete representation of the resource in th
 * **must** be [idempotent]. Repeating the same PUT request must produce the same result and leave the resource in the
   same state.
 * **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
-  request, they should be ignored or validated for consistency.
+  request, they **should** be ignored or validated for consistency.
 
 Some resources take longer to be updated than is reasonable for a regular API request. In this situation, the API should
 use a [long-running operation].
@@ -51,17 +49,6 @@ use a [long-running operation].
 
 * **must** be made to the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
 * **must** return a [200 OK] with the updated resource representation in the response body.
-
-### Creating Resources
-
-`PUT` requests for creating resources:
-
-* **must** be made to the desired resource [URI path] with the client-specified identifier.
-* **must** return [201 Created] when a new resource is successfully created.
-* **may** include a [Location] header containing the URI of the newly created resource.
-* **should** include a representation of the created resource in the response body.
-* **should** only be supported when client-assigned identifiers are semantically appropriate (e.g., ISBNs, email
-  addresses, usernames).
 
 ### Partial representations
 
@@ -173,9 +160,9 @@ Content-Type: application/json
 
 [RFC 9110 Section 9.3.4]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.4
 
-[safe]: /130#common-method-properties
+[safe]: /64#common-method-properties
 
-[idempotent]: /130#common-method-properties
+[idempotent]: /64#common-method-properties
 
 [Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 
@@ -185,9 +172,9 @@ Content-Type: application/json
 
 [If-Unmodified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Unmodified-Since
 
-[POST]: /post
+[POST]: /http-post
 
-[PATCH]: /patch
+[PATCH]: /http-patch
 
 [URI path]: /paths
 
@@ -207,6 +194,8 @@ Content-Type: application/json
 
 ## Changelog
 
+* **2026-02-19**: Move this from AEP-133 to AEP-67. Separate out guidelines for `Create`s in new AEP-133, and guidelines
+  for `Apply` in new AEP-137. This AEP will focus on general `PUT` requests.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].
 
