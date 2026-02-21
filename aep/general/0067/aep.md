@@ -10,7 +10,7 @@ defined by the representation enclosed in the request, and is [idempotent], but 
 
 ### When to use PUT
 
-Use PUT for operations that completely replace a resource with a new representation or for creating a resource at a
+Use `PUT` for operations that completely replace a resource with a new representation or for creating a resource at a
 client-specified URI.
 
 **Use `PUT` when:**
@@ -21,49 +21,17 @@ client-specified URI.
 
 **Do not use `PUT` when:**
 
-* Only partial updates are needed (use [PATCH] instead)
+* Updating a resource (use [PATCH] instead)
 * The server needs to generate or assign the resource identifier (use [POST] to a collection instead)
 * The operation has side effects that should not be repeated (use [POST] instead)
-
-A `PUT` request **must** include a complete representation of the resource in the request body.
 
 ### General requirements
 
 `PUT` requests:
 
-* **must** include a complete representation of the resource in the request body.
-    * Omitted fields **must** be treated as explicitly set to their default or null values, effectively removing
-      previous values.
 * **must** have the [Content-Type] header set appropriately to indicate the format of the request body.
-* **must** be [idempotent]. Repeating the same PUT request must produce the same result and leave the resource in the
+* **must** be [idempotent]. Repeating the same `PUT` request must produce the same result and leave the resource in the
   same state.
-* **must not** modify read-only or server-managed fields (e.g., `createdTime`, `id`). If such fields are included in the
-  request, they **should** be ignored or validated for consistency.
-
-Some resources take longer to be updated than is reasonable for a regular API request. In this situation, the API should
-use a [long-running operation].
-
-### Replacing Resources
-
-`PUT` requests for replacing existing resources:
-
-* **must** be made to the resource's canonical [URI path] (e.g., `/publishers/{publisher_id}/books/{book_id}`).
-* **must** return a [200 OK] with the updated resource representation in the response body.
-
-### Partial representations
-
-`PUT` requires a complete representation of the resource. If a field is omitted from the request, it should be treated
-as absent from the desired state. Depending on your API's semantics:
-
-* The field may be removed from the resource
-* The field may be set to a default or null value
-* The request may be rejected as invalid if required fields are missing ([400 Bad Request])
-
-Document clearly how your API handles omitted fields. If you need partial updates where omitted fields remain unchanged,
-use [PATCH] instead.
-
-**Warning:** This effectively deletes data. If a client performs a `GET`, modifies one field, and `PUT`s it back without
-including the other fields, those other fields will be erased.
 
 ### Idempotency
 
@@ -73,6 +41,18 @@ state. This means:
 * The server replaces the entire resource with the provided representation on every request
 * If you need to track modification metadata, use conditional requests with [ETag] headers rather than modifying the
   resource state
+
+### PATCH and PUT
+
+**`PUT` is not an update.** `PUT` means complete replacement: "delete everything at this location and put _THIS_ exact
+representation in its place." Any fields omitted from a `PUT` request will be lost or reset to default values.
+
+[PATCH] is designed for updates. `PATCH` requests only modify the fields explicitly included in the request, preserving
+all other fields. This makes `PATCH` forward-compatible with schema evolution. If new fields are added to a resource,
+existing `PATCH` operations will not inadvertently remove them.
+
+APIs **must not** use `PUT` for updates. Use [PATCH] for updates and reserve `PUT` for the [Apply] action (complete
+replacement or creation with client-specified IDs).
 
 ### Concurrency
 
@@ -168,34 +148,25 @@ Content-Type: application/json
 
 [location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
 
-[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
-
-[If-Unmodified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Unmodified-Since
-
 [POST]: /http-post
 
 [PATCH]: /http-patch
 
-[URI path]: /paths
+[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
 
-[long-running operation]: /long-running-operations
+[If-Unmodified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Unmodified-Since
 
 [ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
-
-[200 OK]: /63#200-ok
-
-[201 Created]: /63#201-created
-
-[400 Bad Request]: /63#400-bad-request
 
 [412 Precondition Failed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
 
 [428 Precondition Required]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/428
 
+[apply]: /apply
+
 ## Changelog
 
-* **2026-02-19**: Move this from AEP-133 to AEP-67. Separate out guidelines for `Create`s in new AEP-133, and guidelines
-  for `Apply` in new AEP-137. This AEP will focus on general `PUT` requests.
+* **2026-02-20**: Move this from AEP-133 to AEP-67. Separate out guidelines for `Apply` in new AEP-137.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].
 

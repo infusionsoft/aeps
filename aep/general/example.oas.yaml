@@ -308,7 +308,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/publisher'
-          description: Successful response
+          description: Successful replace
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+          description: Successful creation
   /publishers/{publisher_id}/books:
     get:
       description: List method for book
@@ -469,7 +478,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/book'
-          description: Successful response
+          description: Successful replace
+        '201':
+          headers:
+            Location:
+              $ref: '#/components/headers/LocationHeader'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/book'
+          description: Successful creation
   /publishers/{publisher_id}/books/{book_id}/editions:
     get:
       description: List method for book-edition
