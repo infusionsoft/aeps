@@ -11,7 +11,7 @@ strict hierarchical access patterns while still allowing cross-collection querie
 ## Guidance
 
 APIs **may** support reading resources across multiple collections by allowing users to specify a `-` (the hyphen or
-dash character) as a wildcard character in a standard [GET]:
+dash character) as a wildcard character in a standard [List](./list) action:
 
 ```http
 GET /v1/publishers/-/books?filter=...
@@ -33,11 +33,51 @@ possibility of partial failures due to unreachable parents (such as when
 listing across locations), the method **must** indicate this following the
 guidance in [unreachable resources].
 
+- The OpenAPI path pattern **must** include a parameter for the collection
+  identifier, rather than hard-coding the `-` character. This allows clients to
+  use either a specific collection ID or the wildcard `-`.
+- The path parameter **should** allow the `-` character as a valid value.
+
+**Note:** When using wildcard collection lookup, the response **must** return
+resources with their canonical paths containing actual parent collection
+identifiers, not the wildcard character.
+
+**Example:** List books across all publishers:
+
+{% tab proto %}
+
+{% tab oas %}
+
+```yaml
+paths:
+  /v1/publishers/{publisher_id}/books:
+    get:
+      operationId: listBooks
+      description: >-
+        Lists books for a specific publisher. Supports wildcard collection
+        lookup: use `-` as the publisher_id to list books across all
+        publishers. When using the wildcard, books from all publishers are
+        returned with their canonical resource paths (e.g.,
+        publishers/123/books/456, not publishers/-/books/456).
+      parameters:
+        - in: path
+          name: publisher_id
+          required: true
+          schema:
+            type: string
+          description: >-
+            The publisher ID. Use `-` to list books across all publishers.
+```
+
+{% endtabs %}
+
 ### Unique resource lookup
 
-Sometimes, a resource within a subcollection has an identifier that is unique across parent collections. In this case,
-it may be useful to allow retrieval of that resource without knowing which parent collection contains it. In such cases,
-APIs **may** allow users to specify the wildcard collection ID `-` (the hyphen or dash character) to represent any
+Sometimes, a resource within a sub-collection has an identifier that is unique
+across parent collections. In this case, it may be useful to allow a
+[Get](./get) action to retrieve that resource without knowing which parent
+collection contains it. In such cases, APIs **may** allow users to specify the
+wildcard collection ID `-` (the hyphen or dash character) to represent any
 parent collection:
 
 ```http
@@ -56,6 +96,42 @@ GET /v1/publishers/-/books/{book_id}
   `publishers/123/books/456`, _not_ `publishers/-/books/456`.
 - The resource ID **must** be unique within parent collections.
 
+### Reading across collections with different path patterns
+
+Sometimes, a resource may have multiple possible path patterns. This typically
+happens when a resource, or one of its ancestors, may have more than one
+possible parent resource (including having no parent).
+
+For example, `Book` might have the following path patterns:
+
+- `/publishers/{publisher_id}/books/{book_id}` for books with a publisher
+- `/books/{book_id}` for self-published books
+
+In this case, APIs **may** allow users to read across _all_ collections of
+books by using the `--` global wildcard sequence:
+
+```http
+GET /v1/--/books
+```
+
+Here, `--` is not a wildcard for a resource ID within a specific collection.
+Rather, it is a wildcard for the entire path pattern. This allows users to
+retrieve a book regardless of its resource ancestry.
+
+This pattern may also be used to search all subcollections of a specific
+collection. For example, a `Playlist` resource might have the following path
+patterns:
+
+- `games/{game}/users/{user}/playlists/{playlist}` for playlists created by a
+  user within a game
+- `games/{game}/zones/{zone}/playlists/{playlist}` for playlists specific to a
+  game zone
+
+A client could read across all collections of both zone and user playlists
+_within_ game `123` with:
+
+`GET /v1/games/123/--/playlists`
+
 ## Further reading
 
 - For partial failures due to unreachable resources, see [unreachable resources].
@@ -68,6 +144,7 @@ GET /v1/publishers/-/books/{book_id}
 
 ## Changelog
 
+* **2026-02-11**: Add details for OpenAPI and reading across collections with different path patterns
 * **2026-01-30**: Change `order_by` to `orderBy` to match query param spec
 * **2025-12-10**: Initial creation, adapted from [Google AIP-159][] and aep.dev [AEP-159][].
 
