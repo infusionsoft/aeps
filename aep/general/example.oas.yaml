@@ -44,6 +44,8 @@ components:
       type: object
     publisher:
       properties:
+        name:
+          type: string
         description:
           type: string
       type: object
@@ -155,6 +157,20 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: updateMask
+          required: true
+          description: >
+            Comma-separated list of field names to update.
+            Only the fields listed here will be modified.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - name
+                - description
+          style: form
       requestBody:
         content:
           application/merge-patch+json:
@@ -164,7 +180,7 @@ paths:
       responses:
         '200':
           content:
-            application/merge-patch+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/publisher'
           description: Successful response
@@ -320,6 +336,24 @@ paths:
           required: true
           schema:
             type: string
+        - in: query
+          name: updateMask
+          required: true
+          description: >
+            Comma-separated list of field names to update.
+            Only the fields listed here will be modified.
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - author.familyName
+                - author.givenName
+                - edition
+                - isbn
+                - price
+                - published
+          style: form
       requestBody:
         content:
           application/merge-patch+json:
@@ -329,7 +363,7 @@ paths:
       responses:
         '200':
           content:
-            application/merge-patch+json:
+            application/json:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful response
