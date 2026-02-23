@@ -150,6 +150,12 @@ guidance.
 
 **Must** be a string. Field(s) to sort results by. See [Filtering] for complete guidance.
 
+#### `cascade`
+
+**Must** be a boolean. Used in [Delete] operations to indicate whether child resources should be deleted along with the
+parent resource. When `cascade` is `true`, the API deletes the specified resource and all its child resources. When
+`cascade` is unset, it **must** default to `false`.
+
 #### `tenant`
 
 **Must** be a string. The tenant identifier. The `X-Tenant` header **must** be the source of truth for tenant scope;
@@ -194,8 +200,11 @@ experience across the platform.
 
 [Query Parameters]: /query-parameters
 
+[delete]: /delete
+
 ## Changelog
 
+* **2026-02-20**: Add `cascade`
 * **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
 * **2026-01-21**: Add new terms `purgeTime` and `show_deleted`.
 * **2026-01-20**: Add rationale for `createdTime` over `createdAt`.
