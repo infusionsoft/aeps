@@ -5,8 +5,8 @@ following high-level design principles:
 
 - The fundamental building blocks of an API are individually named _resources_
   (nouns) and the relationships and hierarchy that exist between them.
-- A small number of standard _methods_ (verbs) provide the semantics for most
-  common operations. When the standard methods do not fit, custom methods may
+- A small number of standard _actions_ (verbs) provide the semantics for most
+  common operations. When the standard actions do not fit, custom actions may
   be introduced.
 
 These principles align with core [REST] concepts such as resources, uniform
@@ -20,7 +20,7 @@ When designing a REST API, consider the following:
 - The resources (nouns) the API will expose.
 - The relationships and hierarchies between those resources.
 - The schema (representation) of each resource.
-- The methods (HTTP verbs) each resource supports, relying as much as possible
+- The actions (HTTP verbs) each resource supports, relying as much as possible
   on the standard verbs.
 
 ### Resources
@@ -42,24 +42,24 @@ resources as entities or objects that can be manipulated, not as procedures to b
 
 **Important:** While there is some conceptual alignment between storage systems and
 APIs, a service with a resource-oriented API is not necessarily a database and
-has enormous flexibility in how it interprets resources and methods. API
+has enormous flexibility in how it interprets resources and actions. API
 designers **should not** expect that their API will be reflective of their
 database schema. In fact, having an API that is identical to the underlying
 database schema is actually an antipattern, as it tightly couples the surface
 to the underlying system.
 
-### Methods
+### Actions
 
-Resource-oriented REST APIs emphasize resources (data model) over the methods
+Resource-oriented REST APIs emphasize resources (data model) over the actions
 performed on those resources (functionality). A typical REST API exposes a large
-number of resources with a small number of methods on each resource. The
-methods can be either the [standard methods] or carefully designed [custom methods].
+number of resources with a small number of actions on each resource. The
+actions can be either the [standard actions] or carefully designed [custom actions].
 
-If the request to, or the response from, a standard method (or a custom method in
+If the request to, or the response from, a standard action (or a custom action in
 the same _service_) **is** the resource or **contains** the resource, the
-resource schema for that resource across all methods **must** be the same.
+resource schema for that resource across all actions **must** be the same.
 
-A resource **must** support at minimum [GET][]: clients must be able to
+A resource **must** support at minimum [fetch][]: clients must be able to
 validate the state of resources after performing a mutation such as creation,
 updates, or deletes.
 
@@ -67,23 +67,23 @@ APIs **must** also support listing collections of resources, except for [singlet
 where more than one resource is not possible.
 
 In REST, APIs **must not** invent new HTTP methods. When operations do not cleanly map to these standard verbs applied
-to resources, APIs **may** use custom methods, but APIs **should** strongly prefer standard methods and reified
-resources over custom methods. For detailed guidance on designing custom methods, see AEP-136.
+to resources, APIs **may** use custom actions, but APIs **should** strongly prefer standard actions and reified
+resources over custom actions. For detailed guidance on designing custom actions, see AEP-136.
 
 ### Reification
 
 When an operation feels like a verb (e.g., "calculating," "importing," "deploying"), APIs **should** model the process
-or result of that action as a resource rather than using a custom method. This technique, known as [reification], allows
+or result of that action as a resource rather than using a custom action. This technique, known as [reification], allows
 standard CRUD patterns to be applied to complex operations.
 
-For example, instead of an RPC-style endpoint like `POST /run-import` or a custom method like `POST /data:import`, model
+For example, instead of an RPC-style endpoint like `POST /run-import` or a custom action like `POST /data:import`, model
 the import as a resource: `POST /imports`. This approach provides several benefits:
 
 * State tracking: Clients can use `GET /imports/{id}` to monitor progress or retrieve errors.
 * Audit trail: Clients can use `GET /imports` to view a history of past operations.
 * Standard semantics: The operation follows predictable REST patterns that clients already understand.
 * Queryability: Clients can filter, sort, and paginate through operations using standard list operations.
-* Consistency: The API surface remains uniform rather than accumulating dozens of custom methods with unique behaviors.
+* Consistency: The API surface remains uniform rather than accumulating dozens of custom actions with unique behaviors.
 
 Common examples of reified resources include `/imports`, `/exports`, `/shipments`, `/deployments`, `/calculations`, and
 `/scans`.
@@ -93,10 +93,10 @@ simple state change and a tracked process. For something like "canceling an orde
 
 * Resource approach: `POST /orders/{id}/cancellations`. This is useful when tracking _who_ canceled the order, _why_ it
   was canceled, or when the cancellation requires an approval workflow.
-* Custom method approach: `POST /orders/{id}:cancel`. This is appropriate when the action is a simple state transition
+* Custom action approach: `POST /orders/{id}:cancel`. This is appropriate when the action is a simple state transition
   with no additional data or history requirements.
 
-If an operation is instantaneous, has no state, and leaves no trace, a custom method **may** be appropriate. However, if
+If an operation is instantaneous, has no state, and leaves no trace, a custom action **may** be appropriate. However, if
 tracking _who_ performed the action, _when_ it happened, or its _status_ is necessary, the operation **should** be
 reified as a resource.
 
@@ -104,8 +104,9 @@ reified as a resource.
 
 Changes **should** be visible immediately after an operation completes.
 
-A method is strongly consistent if changes are immediately visible after an operation completes. When you create,
-update, or delete a resource, any subsequent GET request **should** reflect that change until another modification is
+An action is strongly consistent if changes are immediately visible after an operation completes. When you [create],
+[update], or [apply] a resource, any subsequent [fetch] requests **should** reflect that change until another
+modification is
 made.
 
 User-settable fields (fields that clients provide) **must** return the same value on all subsequent requests after an
@@ -119,12 +120,12 @@ consistent values after an operation completes.
 
 Examples of strong consistency include:
 
-- Following a successful create that is the latest mutation on a resource, a `GET` request for a resource **must**
+- Following a successful [create] that is the latest mutation on a resource, a [fetch] request for a resource **must**
   return the resource.
-- Following a successful update that is the latest mutation on a resource, a `GET` request for a resource **must**
+- Following a successful [update] that is the latest mutation on a resource, a [fetch] request for a resource **must**
   return the final values from the update request.
-- Following a successful delete that is the latest mutation on a resource, a `GET` request for a resource **must**
-  return `NOT_FOUND` (or the resource with the `DELETED` state value in the case of soft delete, if applicable)
+- Following a successful [delete] that is the latest mutation on a resource, a [fetch] request for a resource **must**
+  return `NOT_FOUND` (or the resource with the `DELETED` state value in the case of [soft delete], if applicable)
 
 **Why strong consistency matters**:
 
@@ -164,9 +165,9 @@ deletion.
 
 ## Rationale
 
-**Why reification over custom methods?**
+**Why reification over custom actions?**
 
-The guidance to prefer reified resources over custom methods stems from the observation that most "actions" in a system
+The guidance to prefer reified resources over custom actions stems from the observation that most "actions" in a system
 have state, history, or metadata that is valuable to track. By modeling these as resources:
 
 * Clients gain visibility into the operation's lifecycle.
@@ -174,17 +175,27 @@ have state, history, or metadata that is valuable to track. By modeling these as
 * Operations become queryable and manageable using standard patterns.
 * The API remains consistent and predictable.
 
-Custom methods should be reserved for truly stateless, instantaneous operations where no tracking is needed.
+Custom actions should be reserved for truly stateless, instantaneous operations where no tracking is needed.
 
-APIs that overuse custom methods become increasingly difficult to work with. A well-designed REST API should have far
-more resources than custom methods. If your API has dozens of custom methods, it's likely straying from
+APIs that overuse custom actions become increasingly difficult to work with. A well-designed REST API should have far
+more resources than custom actions. If your API has dozens of custom actions, it's likely straying from
 resource-oriented principles and becoming an RPC API disguised as REST.
 
-[create]: ./0133
+[create]: /create
 
-[standard methods]: ./0130
+[update]: /update
 
-[custom methods]: ./0136
+[apply]: /apply
+
+[fetch]: /fetch
+
+[delete]: /delete
+
+[soft delete]: /soft-delete
+
+[standard actions]: ./0130
+
+[custom actions]: ./0136
 
 [singleton resources]: /singletons
 
@@ -198,6 +209,7 @@ resource-oriented principles and becoming an RPC API disguised as REST.
 
 ## Changelog
 
+- **2026-02-20**: Change verbiage from `method` to `action`.
 - **2025-12-09**: Initial creation, adapted from [Google AIP-121][] and aep.dev [AEP-121][].
 
 [Google AIP-121]: https://google.aip.dev/121
