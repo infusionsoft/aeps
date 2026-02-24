@@ -10,11 +10,40 @@ be paginated.
 * Endpoints returning collections of data **must** be paginated.
 * APIs **should** prefer [cursor-based pagination](#cursor-based-pagination)
   to [offset-based pagination](#token-based-offset-pagination).
-    * If using offset-based pagination, _new_ APIs **must**
-      implement [token-based offset pagination](#token-based-offset-pagination).
+  See [Choosing a pagination strategy](#choosing-a-pagination-strategy).
 * Query parameters for pagination **must** follow the guidelines in AEP-106.
 * The array of resources **must** be named `results` and contain resources with
   no additional wrapping.
+
+### Choosing a pagination strategy
+
+**Note:** Many technical constraints trace back to database design decisions made long before an API is built. A schema
+that lacks stable sort keys, proper indexing, or a well-chosen primary key will make cursor pagination difficult and
+offset pagination unreliable. How you design your database is important. A well-designed schema keeps both pagination
+strategies on the table, while a poor one may take options off the table permanently.
+
+This decision is not purely a UX decision, nor is it purely a technical one. UX requirements are a valid and important
+input, but **must** be weighed against dataset characteristics and performance rather than treated as the deciding
+factor in isolation. A great UX with offset pagination is of no use if the underlying dataset cannot support it
+reliably. Before choosing offset, teams **must** evaluate both user experience _and_ technical limitations.
+
+Use cursor-based pagination when:
+
+- The dataset is large, unbounded, or expected to grow significantly over time.
+- The underlying database is NoSQL or sharded, where offset scanning is expensive or unreliable.
+- The data changes frequently, as offset pagination may produce duplicates or skip items between page requests.
+- Sequential traversal (next/previous) is enough for the use case.
+
+Use offset-based pagination when:
+
+- The dataset is small, bounded, and unlikely to grow significantly.
+- The underlying database is relational and the paginated query can be efficiently indexed.
+- The data is stable and unlikely to change between page requests.
+- Users must be able to jump to an arbitrary page, this is a validated user need and not just an assumed one.
+- UX requirements genuinely call for it, and the above technical factors do not contradict it.
+
+**Note:** Cursor is also the safer default: switching from cursor to offset later is straightforward, but the reverse
+will ruin your week.
 
 ### Cursor-based pagination
 
@@ -69,21 +98,6 @@ responds with:
 }
 ```
 
-### Token-based offset pagination
-
-APIs that have a legitimate need for offset-based pagination **should** use token-based offset pagination. This approach
-encodes the offset, limit, and any filters into an opaque token.
-
-When implementing token-based offset pagination:
-
-* The API **must** use the same request/response structure as [cursor-based pagination](#cursor-based-pagination) (
-  `pageSize`, `pageToken` and `nextPageToken`)
-* The page token **must** internally encode the offset, limit, and query parameters
-* The implementation details **must** be hidden from the client
-
-From the client's perspective, this is identical to cursor-based pagination. The difference is only in the server-side
-implementation.
-
 ### Page Token Opacity
 
 Page tokens provided by APIs **must** be opaque (but URL-safe) strings, and **must not** be user-parseable. This is
@@ -109,26 +123,9 @@ used. It is not necessary to document this behavior.
 **Note:** While a reasonable time may vary between APIs, a good rule of thumb
 is three days.
 
-### Small collections
+### Offset-based pagination
 
-All collections **must** return a paginated response structure, regardless of size.
-
-For collections that are known to be small (subject to interpretation, but typically fewer than 1000 items), endpoints *
-*should** implement true pagination. That way, if the collection grows beyond the expected size in the future,
-pagination is already in place.
-
-However, if the collection is small enough that it doesn't benefit from true pagination, endpoints **may** return all
-results in a single page with an empty `nextPageToken`, without implementing actual pagination logic.
-
-### Traditional offset-based pagination
-
-**Important:** _New_ APIs **must not** use traditional offset-based pagination. If offset-based pagination is required,
-_new_ APIs **must** use [token-based offset pagination](#token-based-offset-pagination) instead.
-
-This section documents traditional offset-based pagination for backwards compatibility with existing APIs. Migration to
-a different pagination strategy is highly encouraged, although not required (_yet_).
-
-When implementing traditional offset-based pagination (existing APIs only):
+When implementing traditional offset-based pagination:
 
 * Request schemas for collections **must** define an integer `offset` query parameter, allowing users to specify the
   number of results to skip before returning results.
@@ -142,9 +139,23 @@ When implementing traditional offset-based pagination (existing APIs only):
 * The API **may** return fewer results than the number requested (including zero results), even if not at the end of the
   collection.
 
+### Small Collections
+
+All collections **must** return a paginated response structure, regardless of
+size. For collections that will never meaningfully benefit from pagination,
+endpoints **may** satisfy this requirement by returning all results in a single
+response with an empty or absent `nextPageToken`, without implementing actual
+pagination logic. In other words, just wrap the results in the pagination envelope
+without actually implementing pagination.
+
+However, if there is any reasonable chance the collection grows beyond a small
+size (typically a few hundred to low thousands of items), endpoints **should**
+implement true pagination from the start. Retrofitting pagination onto a
+collection that clients already consume as a single page is a breaking change.
+
 ## Rationale
 
-### Cursor-based pagination
+### Preferring cursor over offset
 
 Cursor-based pagination is generally better and more efficient than offset-based pagination. Cursor-based pagination
 maintains consistent performance regardless of dataset size, while offset-based pagination degrades as offsets increase.
@@ -153,26 +164,13 @@ even when data changes between requests, preventing items from being skipped or 
 collections that are frequently updated. These advantages make cursor-based pagination the preferred approach for _most_
 use cases.
 
-### Token offset vs offset pagination
-
-Using tokens makes the API flexible for the future. It allows switching to cursor-based pagination internally without
-breaking the API contract. All paginated endpoints (cursor and offset) work the same way from the client's perspective.
-Tokenizing offset pagination prevents users from manipulating offsets arbitrarily to access data in unintended ways. And
-it also prevents users from changing filters/sorts mid-pagination, which can cause inconsistent results. These benefits
-make token-based offset pagination better than traditional offset-based pagination.
-
-### Avoid traditional offset-based pagination
-
-Traditional offset-based pagination has several significant limitations. Performance degrades with large offsets, as the
-database must skip many rows before returning results. Results can be inconsistent if data changes between requests;
-items may be skipped or duplicated as users page through results. It is not suitable for real-time data or frequently
-updated collections. Also, users can manipulate offsets arbitrarily to access data in potentially unintended ways. These
-limitations are why new APIs must use either cursor-based pagination or token-based offset pagination instead.
-
 ## Changelog
 
+* **2026-02-23**: Change guidance to allow both offset and cursor. Remove the token offset option. Add guidance on when
+  to choose each method.
 * **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
-* **2025-12-15**: Added guidance on token-based offset pagination for new APIs, small collection handling, and clarified that new APIs must use cursor-based or token-based offset pagination only.
+* **2025-12-15**: Added guidance on token-based offset pagination for new APIs, small collection handling, and clarified
+  that new APIs must use cursor-based or token-based offset pagination only.
 * **2025-12-10**: Initial creation, adapted from [Google AIP-158][] and aep.dev [AEP-158][].
 
 [Google AIP-158]: https://google.aip.dev/158
