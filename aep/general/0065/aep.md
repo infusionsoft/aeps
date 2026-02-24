@@ -42,7 +42,7 @@ collections.
 * `GET` requests **should** support HTTP caching mechanisms to improve performance and reduce server load.
 * APIs **may** include appropriate cache control headers such as [Cache-Control], [ETag], and [Last-Modified].
 * APIs **may** support conditional requests using [If-None-Match] or [If-Modified-Since] headers,
-  returning [304 Not Modified] when appropriate.
+  returning [304 Not Modified] when appropriate. See AEP-154 for more details.
 
 ### GET with body
 
@@ -65,6 +65,7 @@ consistency across paginated requests.
 
 - [Standard Action: Fetch](/fetch)
 - [Standard Action: List](/list)
+- [AEP-154: Preconditions](/154) - Guidance on using ETags and conditional headers for concurrency control.
 
 [RFC 9110 Section 9.3.1]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.1
 

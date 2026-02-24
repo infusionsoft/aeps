@@ -40,10 +40,9 @@ idempotent (applying the same patch multiple times produces the same result); ho
 is idempotent unless it is clearly documented. APIs **must** clearly document if a `PATCH` endpoint is idempotent.
 `PATCH` operations that require idempotency **should** support an [Idempotency-Key].
 
-### Concurrency
+## Further Reading
 
-`PATCH` operations **may** implement optimistic concurrency control using ETags in the same manner as `PUT` requests.
-See the [PUT concurrency] section for detailed guidance and examples.
+- [AEP-154: Preconditions](/154) - Guidance on using ETags and conditional headers for concurrency control.
 
 [RFC 5789]: https://datatracker.ietf.org/doc/html/rfc5789
 

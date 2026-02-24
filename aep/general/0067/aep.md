@@ -40,7 +40,7 @@ state. This means:
 
 * The server replaces the entire resource with the provided representation on every request
 * If you need to track modification metadata, use conditional requests with [ETag] headers rather than modifying the
-  resource state
+  resource state. See AEP-154 for more details.
 
 ### PATCH and PUT
 
@@ -54,89 +54,9 @@ existing `PATCH` operations will not inadvertently remove them.
 APIs **must not** use `PUT` for updates. Use [PATCH] for updates and reserve `PUT` for the [Apply] action (complete
 replacement or creation with client-specified IDs).
 
-### Concurrency
+## Further Reading
 
-For concurrent modification scenarios, APIs **may** implement optimistic concurrency control using [ETag]:
-
-* The server **may** include an [ETag] header in `GET` and `PUT` responses representing the resource version.
-* Clients **may** include an [If-Match] header with the [ETag] value when making `PUT` requests.
-* The server **must** return [412 Precondition Failed] if the [ETag] has changed, indicating another client has modified
-  the resource.
-* If no [If-Match] header is provided, the server **may** either accept the request (last-write-wins) or reject it with
-  [428 Precondition Required], depending on the API's concurrency policy.
-
-Example: Successful update with concurrency control
-
-```http request
-# Client retrieves the current resource
-GET /books/123
-ETag: "v1"
-
-{
-"id": "123",
-"title": "Original Title",
-"author": "Jane Doe"
-}
-
-# Client updates the resource with the ETag
-PUT /books/123
-If-Match: "v1"
-Content-Type: application/json
-
-{
-"id": "123",
-"title": "Updated Title",
-"author": "Jane Doe"
-}
-
-# Server accepts the update
-200 OK
-ETag: "v2"
-
-{
-"id": "123",
-"title": "Updated Title",
-"author": "Jane Doe"
-}
-```
-
-Example: Concurrent modification conflict
-
-```http request
-# Client A retrieves the resource
-GET /books/123
-ETag: "v1"
-
-# Client B also retrieves the resource
-GET /books/123
-ETag: "v1"
-
-# Client A successfully updates
-PUT /books/123
-If-Match: "v1"
-...
-200 OK
-ETag: "v2"
-
-# Client B attempts to update with stale ETag
-PUT /books/123
-If-Match: "v1"
-Content-Type: application/json
-
-{
-"id": "123",
-"title": "Different Title",
-"author": "Jane Doe"
-}
-
-# Server rejects due to ETag mismatch
-412 Precondition Failed
-
-{
-"error": "Precondition Failed",
-"message": "The resource has been modified by another client. Please retrieve the latest version and retry."
-}
-```
+- [AEP-154: Preconditions](/154) - Guidance on using ETags and conditional headers for concurrency control.
 
 [RFC 9110 Section 9.3.4]: https://datatracker.ietf.org/doc/html/rfc9110#section-9.3.4
 
@@ -152,20 +72,13 @@ Content-Type: application/json
 
 [PATCH]: /http-patch
 
-[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
-
-[If-Unmodified-Since]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Unmodified-Since
-
 [ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
-
-[412 Precondition Failed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
-
-[428 Precondition Required]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/428
 
 [apply]: /apply
 
 ## Changelog
 
+* **2026-02-24**: Move concurrency to AEP-154.
 * **2026-02-20**: Move this from AEP-133 to AEP-67. Separate out guidelines for `Apply` in new AEP-137.
 * **2026-01-21**: Standardize HTTP status code references.
 * **2025-12-02**: Initial creation, adapted from [Google AIP-134][] and aep.dev [AEP-134][].

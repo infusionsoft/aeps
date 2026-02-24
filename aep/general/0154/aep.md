@@ -1,6 +1,6 @@
 # Preconditions
 
-Preconditions refers to the concept of a set of conditions that must be met
+Preconditions refer to the concept of a set of conditions that must be met
 before a particular operation (generally update of a resource) is performed.
 
 For example, APIs often need to validate that a client and server agree on the
@@ -18,13 +18,15 @@ the checksums match before acting on the request.
 When adding precondition checking to an API ([ETag], [If-Match], and
 [If-None-Match] headers), the behavior **must** match
 [preconditions](https://datatracker.ietf.org/doc/html/rfc9110.html#name-preconditions)
-as documented in [RFC 9110][].
+what is documented in [RFC 9110][].
 
 If a server receives a conditional header it does not support, the service
 **should** return a [400 Bad Request] response. A server **should**
 support _all_ preconditions or _none_ of them.
 
-### Etags
+### ETags
+
+[ETag] (entity tag) is a _response_ header.
 
 A resource **may** provide an `ETag` header when retrieving a single resource
 when it is important to ensure that the client has an up-to-date resource
@@ -49,10 +51,12 @@ guarantees it will change if the resource changes.
 
 ### If-Match / If-None-Match
 
+[If-Match] and [If-None-Match] are a _request_ headers.
+
 Services that provide ETags **should** support the `If-Match` and
 `If-None-Match` headers.
 
-An example of using `If-Match`:
+An example of using `If-Match` (the `ETag` returned from the request before is in the `If-Match` header):
 
 ```http request
 GET /v1/publishers/{publisher_id}/books/{book_id}
@@ -67,8 +71,8 @@ service **must** reply with [412 Precondition Failed].
 
 If the user omits the `If-Match` header, the service **should** permit the
 request. However, services with [strong consistency](./0121#strong-consistency)
-or parallelism requirements **may** require users to send ETags all the time
-and reject the request with a [400 Bad Request] error if it does not contain an `ETag`.
+or parallelism requirements **may** require clients to send precondition headers all the time
+and reject the request with a [428 Precondition Required] error if it does not contain an `If-Match` header.
 
 If any conditional headers are supported for any operation within a service,
 the same conditional headers **must** be supported for all mutation methods
@@ -116,7 +120,7 @@ ETag: W/"55cc0347-66fc-46c3-a26f-98a9a7d61d0e"
 [`If-match`](https://datatracker.ietf.org/doc/html/rfc9110.html#name-if-match), while
 the weak match **must** be used when evaluating the
 [`If-None-Match`](https://datatracker.ietf.org/doc/html/rfc9110.html#name-if-none-match)
-as stated in [RFC-9110][].
+as stated in [RFC 9110][].
 
 Strong ETags **must**, and weak ETags **should**, be guaranteed to change if any
 properties on the resource change that are directly mutable by the client.
@@ -124,8 +128,117 @@ Additionally, strong ETags **should** be guaranteed to change if the resource's
 representation changes in a meaningful way (meaning the new representation is
 not equivalent to the old one).
 
+### Concurrency control
+
+Preconditions enable optimistic concurrency control, allowing multiple clients to work with the same resource without
+explicit locking.
+
+When a service provides ETags, clients **should** use the `If-Match` header to prevent concurrent modification
+conflicts. The typical flow is:
+
+1. The client retrieves the resource and receives an `ETag`.
+2. The client includes the `ETag` value in the `If-Match` header when making a mutation request.
+3. The server validates that the `ETag` matches the current resource state.
+4. If the `ETag` has changed, the server **must** return [412 Precondition Failed], indicating another client has
+   modified the resource.
+5. The client retrieves the updated resource, merges changes if needed, and retries the operation with the new `ETag`.
+
+If no `If-Match` header is provided, the service **should** permit the request using last-write-wins semantics. However,
+services with strong consistency or parallelism requirements **may** require clients to always send ETags and reject
+requests without them using [400 Bad Request].
+
+### Examples
+
+**Note:** These examples have simplified ETags to better communicate the concept. When implementing ETags, follow the
+opaque checksum or hash guidance described in [Etags](#etags) above.
+
+**Example**: Successful update with concurrency control
+
+```http
+### Client retrieves the current resource
+GET /books/123
+ETag: "v1"
+
+{
+  "id": "123",
+  "title": "Original Title",
+  "author": "Jane Doe"
+}
+
+
+### Client updates the resource with the ETag
+PUT /books/123
+If-Match: "v1"
+Content-Type: application/json
+
+{
+  "id": "123",
+  "title": "Updated Title",
+  "author": "Jane Doe"
+}
+
+
+### Server accepts the update
+200 OK
+ETag: "v2"
+
+{
+  "id": "123",
+  "title": "Updated Title",
+  "author": "Jane Doe"
+}
+```
+
+**Example**: Concurrent modification conflict
+
+```http
+### Client A retrieves the resource
+GET /books/123
+ETag: "v1"
+
+
+### Client B also retrieves the resource
+GET /books/123
+ETag: "v1"
+
+
+### Client A successfully updates
+PUT /books/123
+If-Match: "v1"
+...
+200 OK
+ETag: "v2"
+
+
+### Client B attempts to update with stale ETag
+PUT /books/123
+If-Match: "v1"
+Content-Type: application/json
+
+{
+  "id": "123",
+  "title": "Different Title",
+  "author": "Jane Doe"
+}
+
+### Server rejects due to ETag mismatch
+412 Precondition Failed
+
+{
+  "message": "The resource has been modified by another client. Please retrieve the latest version and retry."
+  // ...rest of error...
+}
+```
+
+## Further Reading
+
+- [HTTP Conditional Requests](https://developer.mozilla.org/en-US/docs/Web/HTTP/Conditional_requests) - Covers
+  date-based conditional headers like `If-Modified-Since` and `If-Unmodified-Since`, which provide timestamp-based
+  caching mechanisms complementary to ETag-based preconditions
+
 ## Changelog
 
+- **2026-02-24**: Move concurrency to here from AEP-67.
 - **2026-01-22**: Initial creation, adapted from [Google AIP-154][] and aep.dev [AEP-154][].
 
 [Google AIP-154]: https://google.aip.dev/154
@@ -134,4 +247,16 @@ not equivalent to the old one).
 
 [RFC 9110]: https://datatracker.ietf.org/doc/html/rfc9110.html#section-8.8.3
 
+[304 Not Modified]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/304
+
+[400 Bad Request]: /63#400-bad-request
+
 [412 Precondition Failed]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/412
+
+[428 Precondition Required]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status/428
+
+[If-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Match
+
+[If-None-Match]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-None-Match
+
+[ETag]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/ETag
