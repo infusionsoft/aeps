@@ -131,16 +131,13 @@ guidance.
 
 #### `pageSize`
 
-**Must** be an integer. Maximum number of results to return. Token-based pagination. See [Pagination] for complete
+**Must** be an integer. Maximum number of results to return. Token and Offset-based pagination. See [Pagination] for
+complete guidance.
+
+#### `pageNumber`
+
+**Must** be an integer. Which page of results to return for offset-based pagination. See [Pagination] for complete
 guidance.
-
-#### `offset`
-
-**Must** be an integer. Starting position. Offset-based pagination. See [Pagination] for complete guidance.
-
-#### `limit`
-
-**Must** be an integer. Maximum number of results. Offset-based pagination. See [Pagination] for complete guidance.
 
 #### `q`
 

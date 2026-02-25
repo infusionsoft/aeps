@@ -125,19 +125,41 @@ is three days.
 
 ### Offset-based pagination
 
-When implementing traditional offset-based pagination:
+When implementing offset-based pagination:
 
-* Request schemas for collections **must** define an integer `offset` query parameter, allowing users to specify the
-  number of results to skip before returning results.
-    * The `offset` field **must not** be required and **must** default to `0`.
-* Request schemas for collections **must** define an integer `limit` query parameter, allowing users to specify the
+* Request schemas for collections **must** define an integer `pageNumber` query parameter, allowing users to specify
+  which page of results to return.
+    * The `pageNumber` field **must not** be required and **must** default to `1`.
+* Request schemas for collections **must** define an integer `pageSize` query parameter, allowing users to specify the
   maximum number of results to return.
-    * The `limit` field **must not** be required.
-    * If the request does not specify `limit`, the API **must** choose an appropriate default.
+    * The `pageSize` field **must not** be required.
+    * If the request does not specify `pageSize`, the API **must** choose an appropriate default.
 * Response messages **may** include a `total` field indicating the total number of results available, though this
   **should** be avoided if the calculation is expensive.
 * The API **may** return fewer results than the number requested (including zero results), even if not at the end of the
   collection.
+
+Example:
+
+```http request
+GET /v1/publishers/123/books?pageSize=50&pageNumber=2
+```
+
+responds with:
+
+```json
+{
+  "results": [
+    {
+      "id": "456",
+      "title": "Les Misérables",
+      "author": "Victor Hugo"
+    }
+    // ... 49 more books
+  ],
+  "total": 342
+}
+```
 
 ### Small Collections
 
@@ -152,6 +174,28 @@ However, if there is any reasonable chance the collection grows beyond a small
 size (typically a few hundred to low thousands of items), endpoints **should**
 implement true pagination from the start. Retrofitting pagination onto a
 collection that clients already consume as a single page is a breaking change.
+
+## Interface Definitions
+
+### Cursor Pagination
+
+{% tab proto %}
+
+{% tab oas %}
+
+{% sample 'cursor.oas.yaml', '$.paths./publishers/{publisher_id}/books.get' %}
+
+{% endtabs %}
+
+### Offset Pagination
+
+{% tab proto %}
+
+{% tab oas %}
+
+{% sample 'offset.oas.yaml', '$.paths./publishers/{publisher_id}/books.get' %}
+
+{% endtabs %}
 
 ## Rationale
 
