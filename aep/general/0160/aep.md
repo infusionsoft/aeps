@@ -52,21 +52,19 @@ APIs **must** use the direct field name for exact matches (e.g. `state=active`, 
 APIs **should** use the following prefix/suffix modifiers for common comparisons. Use consistent prefixes/suffixes and
 only introduce them when there is more than one plausible comparison. APIs **should** use a subset as appropriate.
 
-| Operator             | Meaning                                                 | Example                            |
-|----------------------|---------------------------------------------------------|------------------------------------|
-| (none)               | Equals (direct field name)                              | `status=ACTIVE`                    |
-| `NotEqual`           | Not equals                                              | `statusNotEqual=CANCELLED`         |
-| `LessThan`           | Strictly less than `<`                                  | `priceLessThan=100`                |
-| `LessThanOrEqual`    | Less than or equal `< =`                                | `priceLessThanOrEqual=100`         |
-| `GreaterThan`        | Strictly greater than `>`                               | `priceGreaterThan=100`             |
-| `GreaterThanOrEqual` | Greater than or equal `> =`                             | `priceGreaterThanOrEqual=100`      |
-| `Maximum`            | Upper bound (inclusive) `< =`                           | `capacityMaximum=500`              |
-| `Minimum`            | Lower bound (inclusive) `> =`                           | `capacityMinimum=50`               |
-| `Before`             | Timestamp strictly before `<`                           | `publishedTimeBefore=2025-01-01`   |
-| `Latest`             | Timestamp at or before `< =`                            | `publishedTimeLatest=2025-01-01`   |
-| `After`              | Timestamp strictly after `>`                            | `publishedTimeAfter=2025-01-01`    |
-| `Earliest`           | Timestamp at or after `> =`                             | `publishedTimeEarliest=2025-01-01` |
-| `has` (prefix)       | [Nullability and existence](#nullability-and-existence) | `hasPhoneNumber=true`              |
+| Filtering operation                                     | Pattern                                                           | Example                                                                     |
+|---------------------------------------------------------|-------------------------------------------------------------------|-----------------------------------------------------------------------------|
+| Equals                                                  | `{field}`                                                         | `status=ACTIVE`                                                             |
+| Not equals                                              | `{field}NotEqual`                                                 | `statusNotEqual=CANCELLED`                                                  |
+| Lower bound<br/>(exclusive) `>`                         | `{field}GreaterThan`                                              | `priceGreaterThan=100`                                                      |
+| Upper bound<br/>(exclusive) `<`                         | `{field}LessThan`                                                 | `priceLessThan=100`                                                         |
+| Lower bound<br/>(inclusive) `≥`                         | `{field}GreaterThanOrEqual`<br/>`min{Field}`<br/>`minimum{Field}` | `priceGreaterThanOrEqual=100`<br/>`minCapacity=50`<br/>`minimumCapacity=50` |
+| Upper bound<br/>(inclusive) `≤`                         | `{field}LessThanOrEqual`<br/>`max{Field}`<br/>`maximum{Field}`    | `priceLessThanOrEqual=100`<br/>`maxCapacity=500`<br/>`maximumCapacity=500`  |
+| Timestamp lower<br/>bound (exclusive) `>`               | `{field}After`                                                    | `publishedTimeAfter=2025-01-01`                                             |
+| Timestamp upper<br/>bound (exclusive) `<`               | `{field}Before`                                                   | `publishedTimeBefore=2025-01-01`                                            |
+| Timestamp lower<br/>bound (inclusive) `≥`               | `earliest{Field}`                                                 | `earliestPublishedTime=2025-01-01`                                          |
+| Timestamp upper<br/>bound (inclusive) `≤`               | `latest{Field}`                                                   | `latestPublishedTime=2025-01-01`                                            |
+| [Nullability and existence](#nullability-and-existence) | `has{Field}`                                                      | `hasPhoneNumber=true`                                                       |
 
 ### Combining filters (`AND`)
 
