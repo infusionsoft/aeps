@@ -1,0 +1,80 @@
+openapi: 3.1.0
+info:
+  title: Books API
+  version: 1.0.0
+paths:
+  /publishers/{publisher_id}/books:
+    get:
+      summary: List books for a publisher
+      operationId: listBooks
+      parameters:
+        - name: publisher_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: pageSize
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 20
+            example: 50
+          description: >
+            The maximum number of results to return. The API will choose an
+            appropriate default if not specified. The API may return fewer
+            results than requested, even if not at the end of the collection.
+        - name: pageToken
+          in: query
+          required: false
+          schema:
+            type: string
+            example: abc123xyz
+          description: >
+            An opaque, URL-safe token used to advance to the next page of
+            results. This value is obtained from the `nextPageToken` field of
+            a previous response. Must not be inspected or constructed by
+            clients.
+      responses:
+        '200':
+          description: A paginated list of books.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Book'
+                    description: >
+                      The list of books for the current page.
+                  nextPageToken:
+                    type: string
+                    description: >
+                      An opaque token used to retrieve the next page of results. If
+                      absent or empty, the end of the collection has been reached. Pass
+                      this value as the `pageToken` query parameter in a subsequent
+                      request to retrieve the next page.
+components:
+  schemas:
+    Book:
+      description: A representation of a single book.
+      properties:
+        name:
+          type: string
+          description: |
+            The name of the book.
+            Format: publishers/{publisher_id}/books/{book_id}
+        isbn:
+          type: string
+          description: |
+            The ISBN (International Standard Book Number) for this book.
+        title:
+          type: string
+          description: The title of the book.
+        authors:
+          type: array
+          items:
+            type: string
+          description: The author or authors of the book.
