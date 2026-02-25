@@ -31,8 +31,8 @@ APIs **may** support filtering on collection endpoints. If supported:
 Examples:
 
 ```http request
-### Get all books created after 2025-01-01
-GET /books?createdTimeAfter=2025-01-01T00:00:00Z
+### Get all books published after 2025-01-01
+GET /books?publishedTimeAfter=2025-01-01T00:00:00Z
 
 ### Get all published books
 GET /books?state=published
@@ -52,21 +52,21 @@ APIs **must** use the direct field name for exact matches (e.g. `state=active`, 
 APIs **should** use the following prefix/suffix modifiers for common comparisons. Use consistent prefixes/suffixes and
 only introduce them when there is more than one plausible comparison. APIs **should** use a subset as appropriate.
 
-| Operator             | Meaning                                                 | Example                          |
-|----------------------|---------------------------------------------------------|----------------------------------|
-| (none)               | Equals (direct field name)                              | `status=ACTIVE`                  |
-| `NotEqual`           | Not equals                                              | `statusNotEqual=CANCELLED`       |
-| `LessThan`           | Strictly less than `<`                                  | `priceLessThan=100`              |
-| `LessThanOrEqual`    | Less than or equal `< =`                                | `priceLessThanOrEqual=100`       |
-| `GreaterThan`        | Strictly greater than `>`                               | `priceGreaterThan=100`           |
-| `GreaterThanOrEqual` | Greater than or equal `> =`                             | `priceGreaterThanOrEqual=100`    |
-| `Maximum`            | Upper bound (inclusive) `< =`                           | `capacityMaximum=500`            |
-| `Minimum`            | Lower bound (inclusive) `> =`                           | `capacityMinimum=50`             |
-| `Before`             | Timestamp strictly before `<`                           | `createdTimeBefore=2025-01-01`   |
-| `Latest`             | Timestamp at or before `< =`                            | `createdTimeLatest=2025-01-01`   |
-| `After`              | Timestamp strictly after `>`                            | `createdTimeAfter=2025-01-01`    |
-| `Earliest`           | Timestamp at or after `> =`                             | `createdTimeEarliest=2025-01-01` |
-| `has` (prefix)       | [Nullability and existence](#nullability-and-existence) | `hasPhoneNumber=true`            |
+| Operator             | Meaning                                                 | Example                            |
+|----------------------|---------------------------------------------------------|------------------------------------|
+| (none)               | Equals (direct field name)                              | `status=ACTIVE`                    |
+| `NotEqual`           | Not equals                                              | `statusNotEqual=CANCELLED`         |
+| `LessThan`           | Strictly less than `<`                                  | `priceLessThan=100`                |
+| `LessThanOrEqual`    | Less than or equal `< =`                                | `priceLessThanOrEqual=100`         |
+| `GreaterThan`        | Strictly greater than `>`                               | `priceGreaterThan=100`             |
+| `GreaterThanOrEqual` | Greater than or equal `> =`                             | `priceGreaterThanOrEqual=100`      |
+| `Maximum`            | Upper bound (inclusive) `< =`                           | `capacityMaximum=500`              |
+| `Minimum`            | Lower bound (inclusive) `> =`                           | `capacityMinimum=50`               |
+| `Before`             | Timestamp strictly before `<`                           | `publishedTimeBefore=2025-01-01`   |
+| `Latest`             | Timestamp at or before `< =`                            | `publishedTimeLatest=2025-01-01`   |
+| `After`              | Timestamp strictly after `>`                            | `publishedTimeAfter=2025-01-01`    |
+| `Earliest`           | Timestamp at or after `> =`                             | `publishedTimeEarliest=2025-01-01` |
+| `has` (prefix)       | [Nullability and existence](#nullability-and-existence) | `hasPhoneNumber=true`              |
 
 ### Combining filters (`AND`)
 
