@@ -30,7 +30,9 @@ reliably. Before choosing offset, teams **must** evaluate both user experience _
 Use cursor-based pagination when:
 
 - The dataset is large, unbounded, or expected to grow significantly over time.
-- The underlying database is NoSQL or sharded, where offset scanning is expensive or unreliable.
+- The underlying database is NoSQL or sharded. These databases are often designed around
+  cursor-style access and may not support offset scanning at all or do so at significant
+  performance cost.
 - The data changes frequently, as offset pagination may produce duplicates or skip items between page requests.
 - Sequential traversal (next/previous) is enough for the use case.
 
