@@ -43,7 +43,7 @@ Content-Type: application/json
 
 ### Querying an operation
 
-The service **must** provide a `GET /operations/{operation_id}` endpoint to query the status of the operation. This
+The service **must** provide a `GET /operations/{operationId}` endpoint to query the status of the operation. This
 endpoint:
 
 * **must** return `200 OK` with an `Operation` object (see [Interface Definitions](#interface-definitions)) when the
@@ -69,7 +69,7 @@ APIs **may** include additional state values if needed, but **must** document th
 
 APIs **may** support cancelling long-running operations when feasible. Cancellation:
 
-* **must** be implemented via `POST /operations/{operation_id}:cancel`.
+* **must** be implemented via `POST /operations/{operationId}:cancel`.
 * **must** return `200 OK` with the updated `Operation` object if the operation was successfully canceled.
 * **must** return `404 Not Found` if the operation does not exist.
 * may not take effect immediately; the operation `state` **should** transition to canceled once cancellation is

@@ -1,7 +1,7 @@
 # DELETE
 
 In REST APIs, it is customary to make a DELETE request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) to remove that resource. As defined in
+`/publishers/{publisherId}/books/{bookId}`) to remove that resource. As defined in
 [RFC 9110 Section 9.3.5], `DELETE` requests that the origin server remove the association between the target resource
 and its current functionality. In effect, this method is similar to the `rm` command in UNIX: it expresses a deletion
 operation on the URI mapping of the origin server rather than an expectation that the previously associated information
@@ -44,7 +44,7 @@ Use `DELETE` for operations that remove a resource from the system.
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete.parameters' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.delete.parameters' %}
 
 {% endtabs %}
 

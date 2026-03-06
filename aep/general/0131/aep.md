@@ -1,7 +1,7 @@
 # Fetch
 
 In REST APIs, it is customary to make a [GET] request to a resource's URI (for
-example, `/v1/publishers/{publisher_id}/books/{book_id}`) in order to retrieve
+example, `/v1/publishers/{publisherId}/books/{bookId}`) in order to retrieve
 that resource. Resource-oriented design AEP-121 honors this pattern through the `Fetch` action.
 
 ## Guidance
@@ -17,14 +17,14 @@ that resource. Resource-oriented design AEP-121 honors this pattern through the 
 `Fetch` operations **must** be made by sending a [GET] request to the resource's canonical [URI path]:
 
 ```http
-GET /v1/publishers/{publisher_id}/books/{book_id}
+GET /v1/publishers/{publisherId}/books/{bookId}
 ```
 
 - The URI **should** contain a variable for each resource in the resource
   hierarchy.
     - The path parameter for all resource IDs **must** be in the form
-      `{resourceName}_id` (such as `book_id`), and path parameters representing
-      the ID of parent resources **must** end with `id`.
+      `{resourceName}Id` (such as `bookId`), and path parameters representing
+      the ID of parent resources **must** end with `Id`.
 
 ### Requests
 
@@ -40,7 +40,7 @@ GET /v1/publishers/{publisher_id}/books/{book_id}
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.get.parameters' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.get.parameters' %}
 
 {% endtabs %}
 
@@ -56,7 +56,7 @@ the fully populated resource unless there is a reason to return a partial respon
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.get.responses.200.content' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.get.responses.200.content' %}
 
 {% endtabs %}
 
@@ -78,7 +78,7 @@ Most common error scenarios:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.get' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.get' %}
 
 {% endtabs %}
 

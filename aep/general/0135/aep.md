@@ -1,7 +1,7 @@
 # Delete
 
 In REST APIs, it is customary to make a [DELETE] request to a resource's URI
-(for example, `/v1/publishers/{publisher_id}/books/{book_id}`) in order to
+(for example, `/v1/publishers/{publisherId}/books/{bookId}`) in order to
 delete that resource.
 
 Resource-oriented design (AEP-121) honors this pattern through the `Delete`
@@ -33,7 +33,7 @@ Delete actions are specified using the following pattern:
 `Delete` operations **must** be made by sending a [DELETE] request to the resource's canonical [URI path]:
 
 ```http
-DELETE /v1/publishers/{publisher_id}/books/{book_id}
+DELETE /v1/publishers/{publisherId}/books/{bookId}
 ```
 
 ### Requests
@@ -51,7 +51,7 @@ Delete actions implement a common request pattern:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete.parameters' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.delete.parameters' %}
 
 {% endtabs %}
 
@@ -65,7 +65,7 @@ Delete actions implement a common request pattern:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete.responses.204' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.delete.responses.204' %}
 
 {% endtabs %}
 
@@ -159,7 +159,7 @@ This approach is useful when:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.delete' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.delete' %}
 
 {% endtabs %}
 

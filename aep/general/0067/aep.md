@@ -1,7 +1,7 @@
 # PUT
 
 In REST APIs, it is customary to make a `PUT` request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) to replace that resource entirely with a new representation.
+`/publishers/{publisherId}/books/{bookId}`) to replace that resource entirely with a new representation.
 `PUT` can also be used to create a resource at a specific URI when the client specifies the identifier. As defined in
 [RFC 9110 Section 9.3.4], `PUT` requests that the state of the target resource be created or replaced with the state
 defined by the representation enclosed in the request, and is [idempotent], but not [safe].
