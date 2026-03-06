@@ -110,7 +110,7 @@ filter would be applied first, then the resulting set would be paginated.
 ### Ordering
 
 `List` actions **may** allow clients to specify sorting order; if they do, the
-order **must** bew specified in a query parameter which **must** be a `string` named `orderBy`.
+order **must** be specified in a query parameter which **must** be a `string` named `orderBy`.
 
 - Values **should** be a comma-separated list of fields. For example:
   `foo,bar`.
@@ -146,9 +146,9 @@ For more information, see AEP-164.
 
 * **2026-02-09**: Initial creation, adapted from [Google AIP-132][] and aep.dev [AEP-132][].
 
-[Google AIP-132]: https://google.aip.dev/131
+[Google AIP-132]: https://google.aip.dev/132
 
-[AEP-132]: https://aep.dev/131
+[AEP-132]: https://aep.dev/132
 
 [reading across collections]: ./0159
 

@@ -75,7 +75,7 @@ requirements.
 
 #### `purgeTime`
 
-**Must** be a timestamp. Read-only. The time when a soft deleted resource will be purged from the system (see AIP-164).
+**Must** be a timestamp. Read-only. The time when a soft deleted resource will be purged from the system (see AEP-164).
 Resources that support soft delete **should** include this field.
 
 Services **may** provide a `purgeTime` value that is inexact, but the resource **must not** be purged from the system
