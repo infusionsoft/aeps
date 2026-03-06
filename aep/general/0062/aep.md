@@ -109,7 +109,7 @@ path represents the thing (noun) that the HTTP method (verb) acts upon. It appea
 starting with a forward slash (`/`).
 
 Unlike the earlier parts of the URL, paths _are **case-sensitive**_, so `/v1/users` and `/v1/Users` are considered
-different. Therefore, it's important to maintain consistant naming convents throughout our APIs.
+different. Therefore, it's important to maintain consistent naming convents throughout our APIs.
 
 Paths in APIs are typically hierarchical, using forward slashes to separate segments that represent resources and their
 relationships. For example:

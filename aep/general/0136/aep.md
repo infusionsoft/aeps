@@ -110,7 +110,7 @@ around state management to determine when the custom method should be invoked.
 
 [HTTP methods]: /http-methods
 
-[idempotent, safe, and cacheable]: /130#common-method-properties
+[idempotent, safe, and cacheable]: /64#common-method-properties
 
 [GET]: /http-get
 
