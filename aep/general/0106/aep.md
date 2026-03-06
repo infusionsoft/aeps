@@ -93,6 +93,8 @@ including Google, Microsoft, and Stripe.
 
 [Pagination]: /pagination
 
+[Standard Names]: /standard-names
+
 ## Changelog
 
 * **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters

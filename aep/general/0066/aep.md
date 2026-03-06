@@ -69,7 +69,7 @@ APIs **should** support an [Idempotency-Key] to allow safe retries.
 
 [idempotent]: /64#common-method-properties
 
-[GET with body]: /131#get-with-body
+[GET with body]: /65#get-with-body
 
 [GET]: /http-get
 

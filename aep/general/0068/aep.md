@@ -58,8 +58,6 @@ is idempotent unless it is clearly documented. APIs **must** clearly document if
 
 [Content-Type]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Content-Type
 
-[PUT concurrency]: /133#concurrency
-
 ## Changelog
 
 * **2026-02-20**: Move this from AEP-134 to AEP-68. Separate out guidelines for `Update` in new AEP-134.

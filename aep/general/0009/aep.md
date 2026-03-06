@@ -175,7 +175,7 @@ A schema describes the structure of the request or response of an
 ### User
 
 A human being which is using an API directly. This term is
-defined to differentiate usage in the AIPs between a human _user_ and a
+defined to differentiate usage in the AEPs between a human _user_ and a
 programmatic _client_. A user does not always solely refer to a customer of Thryv (public APIs); users can also be
 internal, like employees and fellow developers.
 
