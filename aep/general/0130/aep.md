@@ -13,14 +13,14 @@ REST APIs **should** use standard actions on resources and collections where app
 every action; API authors **should** implement only the actions that make sense for their specific resource. The
 following table defines the standard actions and their corresponding HTTP methods:
 
-| Action | HTTP Method  | Applied To          | Purpose                                       |
-|--------|--------------|---------------------|-----------------------------------------------|
-| Fetch  | [GET]        | Resource            | Retrieve a single resource by its identifier  |
-| List   | [GET]        | Collection          | Retrieve multiple resources from a collection |
-| Create | [POST]/[PUT] | Collection/Resource | Create a new resource                         |
-| Update | [PATCH]      | Resource            | Modify an existing resource                   |
-| Apply  | [PUT]        | Resource            | Completely replace (or create) a resource     |
-| Delete | [DELETE]     | Resource            | Remove a resource                             |
+| Action            | HTTP Method            | Applied To | Purpose                                       |
+|-------------------|------------------------|------------|-----------------------------------------------|
+| [Fetch](/fetch)   | [GET](/http-get)       | Resource   | Retrieve a single resource by its identifier  |
+| [List](/list)     | [GET](/http-get)       | Collection | Retrieve multiple resources from a collection |
+| [Create](/create) | [POST](/http-post)     | Collection | Create a new resource                         |
+| [Update](/update) | [PATCH](/http-patch)   | Resource   | Modify an existing resource                   |
+| [Apply](/apply)   | [PUT](/http-put)       | Resource   | Completely replace (or create) a resource     |
+| [Delete](/delete) | [DELETE](/http-delete) | Resource   | Remove a resource                             |
 
 ### Custom Actions
 
@@ -47,24 +47,6 @@ Standard actions provide the most consistency across APIs and are the most famil
 custom action endpoint like `/orders/123:cancel`, create a cancellations resource at `/orders/123/cancellations`. This
 maintains the [resource-oriented] model and allows the full power of standard actions to be applied to these reified
 resources. See AEP-121 for more information.
-
-### Bulk Actions
-
-Bulk operations that _modify_ multiple resources **may** be implemented as custom actions, as they cannot use the same
-endpoint as single-resource operations without causing conflicts.
-
-For example, bulk create operations might use:
-
-```
-POST /books:batch
-```
-
-However, API authors **should** first consider whether reifying the bulk operation as a resource would be more
-appropriate:
-
-```
-POST /books/imports
-```
 
 ### OperationIDs
 
@@ -121,20 +103,11 @@ whereas a cancel action endpoint is a one-way operation.
 - [OpenAPI operationId specification](https://swagger.io/docs/specification/v3_0/paths-and-operations/#operationid)
 - [Resource Oriented Design][resource-oriented]
 
-[GET]: /http-get
-
-[POST]: /http-post
-
-[PUT]: /http-put
-
-[PATCH]: /http-patch
-
-[DELETE]: /http-delete
-
 [resource-oriented]: /resource-oriented-design
 
 ## Changelog
 
+- **2026-03-06**: Add links to action AEPs. Move bulk operations section to AEP-136.
 - **2026-02-09**: Initial creation, adapted from [Google AIP-130][] and aep.dev [AEP-130][].
 
 [Google AIP-130]: https://google.aip.dev/130
