@@ -94,8 +94,9 @@ If a custom media type is truly necessary, it **should** follow the format `appl
 * Document the custom media type thoroughly in the API specification
 * Ensure the custom media type provides clear value over standard `application/json`
 
-An example of an appropriate custom media type is the standardized error response `application/vnd.error+json` (
-see [Errors](./errors)).
+Examples of appropriate custom media types are the standardized error response `application/problem+json`
+(see [Errors](./errors)), and the standardized JSON Merge Patch request `application/merge-patch+json`
+(see [Update](/update)).
 
 **Note:** Simply wanting to indicate a version number or resource type is **not** a sufficient reason for a custom media
 type. Use standard `application/json` with appropriate URL versioning or content structure instead.
