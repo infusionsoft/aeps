@@ -34,7 +34,7 @@ parameters:
     schema:
       type: string
     description: >-
-      A comma-separated list of fields to include in the response. If not
+      The fields to include in the response. If not
       provided, all fields are returned. Nested fields can be specified using
       dot notation. For example: `title,author.name`.
 ```

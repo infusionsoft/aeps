@@ -12,7 +12,7 @@ vocabulary to adhere to user intent.
     * If the operation results in _any_ change in server state, it **must** use [POST].
     * Only actions which are [idempotent, safe, and cacheable] may use [GET].
 * The HTTP URI **must** use a `:` character followed by the custom verb (e.g. `:cancel`).
-    * If word separation is required, `kebab-case` **must** be used.
+    * If word separation is required, `camelCase` **must** be used.
     * The custom verb must be placed after the resource identifier (e.g., `/orders/123:cancel`).
 * The custom verb **must** be an action verb describing what it does.
     * It **must not** contain nouns or noun phrases.
@@ -20,7 +20,8 @@ vocabulary to adhere to user intent.
     * It **should** be concise and clearly convey the operation's intent.
 * Custom actions **must** operate on a specific resource or collection.
     * They **must not** be standalone endpoints unrelated to resources.
-* Avoid redundancy with the resource name (e.g., `:cancel` not `:cancel-order` when the resource is already an order)
+* Custom actions **should** avoid redundancy with the resource name (e.g., `:cancel` not `:cancelOrder` when the
+  resource is already an order)
 
 APIs **must** clearly document each custom action, including:
 
@@ -47,8 +48,6 @@ and [reified][reification] resources; prefer those over custom actions due to th
 **Do NOT use custom actions when:**
 
 * Standard actions can naturally express the operation.
-* The operation is filtering; use [fetch] with query parameters instead.
-* The operation is a bulk list (`batch-fetch`); use a regular [list] action.
 * The operation has state that should be tracked, monitored, or queried; use [reification] to model it as a resource
   instead (e.g., `/imports`, `/deployments`, `/calculations`).
 * You're simply trying to avoid thinking about resource modeling; take time to consider if a resource-oriented approach
@@ -62,16 +61,14 @@ Custom actions using [POST] are not inherently idempotent. If a custom action is
 documented. Custom actions that require idempotency (such as payment operations or order submissions) **should**
 support an [Idempotency-Key].
 
-### Bulk operations
+### Bulk Actions
 
-Custom actions **may** be used for bulk [create] and [update] operations (not [fetch]) when it would otherwise be
-ambiguous or conflict with single-resource operations.
-
-Since `POST /books` is used for creating a single book, to avoid conflicting URIs, bulk creation **may** use a custom
-action:
+Custom actions **may** be used for bulk operations. This is especially useful when it would otherwise be
+ambiguous or conflict with single-resource operations. For example, `POST /books` is used for creating a single book, to
+avoid conflicting URIs, bulk creation **may** use a custom action:
 
 ```http request
-POST /books:batch-create
+POST /books:batchCreate
 Content-Type: application/json
 
 {
@@ -84,7 +81,12 @@ Content-Type: application/json
 
 Similarly, bulk updates **may** use a custom action when updating multiple resources at once.
 
-However, bulk read operations **must not** use custom methods. Instead, use standard [list] requests.
+However, API authors **should** first consider whether [reifying][reification] the bulk operation as a resource would be
+more appropriate. For example:
+
+- `POST /books/imports`
+- `POST /books/batches`
+- `POST /books/uploads`
 
 ### Stateless methods
 
@@ -132,6 +134,7 @@ around state management to determine when the custom method should be invoked.
 
 ## Changelog
 
+* **2026-03-06**: Change word separation from kebab to camel case. Import bulk operations section from AEP-130.
 * **2026-02-20:** Change verbiage from `method` to `action`. Remove filtering. Add Declarative clients and stateless
   methods.
 * **2024-12-10:** Initial creation, adapted from [Google AIP-136][] and aep.dev [AEP-136][].
