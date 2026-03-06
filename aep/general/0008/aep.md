@@ -59,8 +59,32 @@ printed pages.
 
 ### File structure
 
-AEPs **must** be written in Markdown, and **must** be named using their
-four-digit number (example: `0008.md`).
+AEPs **must** be organized as follows:
+
+```
+general/
+  0001/
+    aep.md
+    aep.yaml
+  0002/
+    aep.md
+    aep.yaml
+    aep-2-supporting-file.ext
+  ...
+  global-supporting-file-1.ext
+```
+
+Each AEP **must** reside in a folder named after its AEP number, zero-padded to four digits (e.g., AEP-8 belongs in
+`0008/`).
+
+Within that folder:
+
+- The AEP content **must** be in a file named `aep.md`.
+- The AEP front matter **must** be in a file named `aep.yaml`, and **must** be valid YAML.
+- Any AEP-specific supporting files (such as images or examples) **must** be placed in the same folder as the AEP.
+
+Supporting files that apply globally across multiple AEPs **must** be placed directly in the `general/` folder. Adding
+supporting files is optional.
 
 AEPs **must** have appropriate front matter.
 
