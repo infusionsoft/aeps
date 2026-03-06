@@ -112,8 +112,7 @@ filter would be applied first, then the resulting set would be paginated.
 `List` actions **may** allow clients to specify sorting order; if they do, the
 order **must** bew specified in a query parameter which **must** be a `string` named `orderBy`.
 
-- Values **should** be a comma-separated list of fields. For example:
-  `foo,bar`.
+- Values **must** be the fields to sort by. For example: `foo,bar`.
 - The default sorting order is ascending. To specify descending order for a
   field, users append a `-` prefix; for example: `foo,-bar`, `-foo,bar`.
 - Subfields are specified with a `.` character, such as `foo.bar` or

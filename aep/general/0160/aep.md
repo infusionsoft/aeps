@@ -83,18 +83,8 @@ When the same filter parameter appears multiple times, or has a comma-separated 
 an `OR` for that field, and combine it with other filter parameters using `AND` (
 see [Combining filters](#combining-filters-and)).
 
-Example (both of these requests are equivalent):
-
-```http
-GET /products?category=books&category=electronics
-GET /products?category=books,electronics
-```
-
-In both cases, this means products with either the category "books" OR "electronics".
-
-APIs **must not** require clients to rely on ambiguous separators without documentation (for example, silently treating
-commas as special). APIs **should** support both formats (repeated parameters and comma-separated values) to maximize
-client flexibility. If supporting only one format, APIs **must** clearly document which format is accepted.
+See [Repeated and list query parameters](/106#repeated-and-list-query-parameters) for more details on repeated
+parameters and comma-separated lists.
 
 ### `OR` across different fields
 
@@ -175,6 +165,7 @@ guidelines, see
 
 ## Changelog
 
+* **2026-03-06**: Move guidance on repeated parameters to AEP-106.
 * **2026-02-18**: Change format from underscore (`_`) to `camelCase`. Add to naming conventions table. Use full words
   instead of abbreviations.
 * **2026-01-27**: Removed search guidance, it will be a separate AEP. Align guidance with [ADR-001].

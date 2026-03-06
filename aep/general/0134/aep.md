@@ -57,8 +57,8 @@ APIs **must** use the [RFC 7396] JSON Merge Patch with field masking approach fo
 uses a simple partial JSON object with an explicit field mask parameter to indicate which fields to update.
 
 * The MIME Type of the request **must** be `application/merge-patch+json`.
-* The field mask **must** be provided as a query parameter named `updateMask`.
-* The field mask **must** be a comma-separated list of fields (e.g., `updateMask=field1,field2,nested.field`)
+* The field mask **must** be provided as a query parameter named `updateMask`, containing all fields to be updated (
+  e.g., `updateMask=field1,field2,nested.field`).
 * If no `updateMask` is provided, the request **should** return [400 Bad Request] to ensure explicit intent.
 * Only fields listed in the `updateMask` **must** be updated on the resource.
 * Fields present in the request body but not in the `updateMask` **must** be ignored.
