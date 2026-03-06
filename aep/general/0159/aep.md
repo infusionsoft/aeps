@@ -50,18 +50,18 @@ identifiers, not the wildcard character.
 
 ```yaml
 paths:
-  /v1/publishers/{publisher_id}/books:
+  /v1/publishers/{publisherId}/books:
     get:
       operationId: listBooks
       description: >-
         Lists books for a specific publisher. Supports wildcard collection
-        lookup: use `-` as the publisher_id to list books across all
+        lookup: use `-` as the publisherId to list books across all
         publishers. When using the wildcard, books from all publishers are
         returned with their canonical resource paths (e.g.,
         publishers/123/books/456, not publishers/-/books/456).
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -81,7 +81,7 @@ wildcard collection ID `-` (the hyphen or dash character) to represent any
 parent collection:
 
 ```http
-GET /v1/publishers/-/books/{book_id}
+GET /v1/publishers/-/books/{bookId}
 ```
 
 - The URI pattern **should** still be specified with a variable and permit the
@@ -104,8 +104,8 @@ possible parent resource (including having no parent).
 
 For example, `Book` might have the following path patterns:
 
-- `/publishers/{publisher_id}/books/{book_id}` for books with a publisher
-- `/books/{book_id}` for self-published books
+- `/publishers/{publisherId}/books/{bookId}` for books with a publisher
+- `/books/{bookId}` for self-published books
 
 In this case, APIs **may** allow users to read across _all_ collections of
 books by using the `--` global wildcard sequence:

@@ -20,7 +20,7 @@ a field to indicate this:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.responses.200.content.application/json' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.get.responses.200.content.application/json' %}
 
 {% endtabs %}
 

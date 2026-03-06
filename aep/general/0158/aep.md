@@ -185,7 +185,7 @@ collection that clients already consume as a single page is a breaking change.
 
 {% tab oas %}
 
-{% sample 'cursor.oas.yaml', '$.paths./publishers/{publisher_id}/books.get' %}
+{% sample 'cursor.oas.yaml', '$.paths./publishers/{publisherId}/books.get' %}
 
 {% endtabs %}
 
@@ -195,7 +195,7 @@ collection that clients already consume as a single page is a breaking change.
 
 {% tab oas %}
 
-{% sample 'offset.oas.yaml', '$.paths./publishers/{publisher_id}/books.get' %}
+{% sample 'offset.oas.yaml', '$.paths./publishers/{publisherId}/books.get' %}
 
 {% endtabs %}
 

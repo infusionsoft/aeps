@@ -3,12 +3,12 @@ info:
   title: Books API
   version: 1.0.0
 paths:
-  /publishers/{publisher_id}/books:
+  /publishers/{publisherId}/books:
     get:
       summary: List books for a publisher
       operationId: listBooks
       parameters:
-        - name: publisher_id
+        - name: publisherId
           in: path
           required: true
           schema:
@@ -65,7 +65,7 @@ components:
           type: string
           description: |
             The name of the book.
-            Format: publishers/{publisher_id}/books/{book_id}
+            Format: publishers/{publisherId}/books/{bookId}
         isbn:
           type: string
           description: |

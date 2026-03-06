@@ -78,12 +78,12 @@ transition custom methods:
 
 - The HTTP method **must** be `POST`.
 - The custom method **must** use an action verb (e.g., `:publish`), without any nouns (e.g., `:publish-book`).
-- The resource path parameters (e.g., `publisher_id`, `book_id`) **should** be the only path variables in the URI. All
+- The resource path parameters (e.g., `publisherId`, `bookId`) **should** be the only path variables in the URI. All
   other parameters **should** be in the request body.
 - The request body **may** contain operational parameters that affect how the transition executes, but **should not**
   contain metadata worth tracking or auditing.
     - Examples of appropriate parameters: `force: true`, `skipValidation: true`, `dryRun: true`
-    - Examples of inappropriate parameters: `reason`, `published_by`, `notes` (these indicate the transition should be
+    - Examples of inappropriate parameters: `reason`, `publishedBy`, `notes` (these indicate the transition should be
       modeled as a [transition resource](#state-transition-resources))
     - If no parameters are needed, an empty object `{}` **should** be sent.
 - The response **should** be the resource itself (e.g., the `Book` object).
