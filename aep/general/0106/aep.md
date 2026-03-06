@@ -47,6 +47,19 @@ experience by making simple use cases work without requiring extensive parameter
 
 Default values **must** be documented in the API specification.
 
+### Repeated and list query parameters
+
+There are two common ways for clients to pass multiple values for a single query parameter:
+
+- Repeated parameters: `GET /products?category=books&category=electronics`
+- Comma-separated values: `GET /products?category=books,electronics`
+
+Both forms are equivalent and APIs **should** support both to maximize client flexibility. If there is a strong
+technical reason to support only one format, the API **must** document this explicitly.
+
+APIs **must not** treat separator characters (such as commas, pipes, or spaces) as special without documenting
+this behavior. Silent parsing of delimiters leads to subtle client bugs.
+
 ### Standard query parameters
 
 To ensure consistency across the API ecosystem, APIs **should** use the query parameters defined in [Standard Names]
@@ -97,6 +110,7 @@ including Google, Microsoft, and Stripe.
 
 ## Changelog
 
+* **2026-03-06**: Add section on repeated and list query parameters.
 * **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
 * **2025-12-16**: Clarify query parameters are non-actionable, instead of read-only
 * **2025-12-15**: Remove section on list values, since that is mostly a client side thing
