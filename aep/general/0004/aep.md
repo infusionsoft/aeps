@@ -8,17 +8,18 @@ uniform practices across all services
 
 ### Global API Versioning
 
-APIs **must** use [Semantic Versioning].
-
 All APIs **must** use global versioning. The version identifier applies to the entire API surface of a microservice and
 is exposed as a path prefix.
 
 **URI Format**
 
 * The version **must** appear at the start of the path.
-* APIs **must** use only the major version component (e.g., `v1`, `v5`). Minor and patch versions **must not** be
-  exposed in the URI.
+* The version **must** be a whole number major version only (e.g., `v1`, `v5`). Minor and patch versions **must not**
+  be exposed in the URI.
 * Format: `/v{major}/...`
+
+The major version **must** be incremented when a breaking change is introduced to the API contract.
+See [When to Version](#when-to-version) for details on what constitutes a breaking change.
 
 Examples:
 
