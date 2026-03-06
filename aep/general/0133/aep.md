@@ -115,12 +115,26 @@ Most common error scenarios:
 ### User-specified IDs
 
 An API **may** allow the client to specify resource IDs. In general, this should only be supported when client-assigned
-identifiers are semantically appropriate (e.g., ISBNs, email addresses, usernames). For resource creation with a client
-specified ID, see [Apply].
+identifiers are semantically appropriate (e.g., ISBNs, email addresses, usernames).
 
-**Note:** APIs **should** prefer `POST` for resource creation. It is good practice to keep resource ID management
-under the control of the server rather than the client. However, when the client must control the resource identifier
-(e.g., natural keys, external system integration, idempotent creation requirements), use [Apply] instead of `Create`.
+**Note:** APIs **should** prefer server-generated IDs for resource creation. It is good practice to keep resource ID
+management under the control of the server rather than the client.
+
+When client-specified IDs are necessary, there are two approaches:
+
+- **ID in request body**: Include the ID in the request body when posting to the collection URI. This returns
+  [201 Created] on success and [409 Conflict] if the ID already exists. Use this approach when:
+  - You want to prevent accidental overwrites of existing resources
+  - Creating duplicate resources should be treated as an error
+  - The ID should be validated, but resource replacement is not desired
+- **ID in path ([Apply])**: Use the [Apply] action with the ID as a path parameter. This returns [201 Created] on the
+  first creation and [200 OK] when replacing an existing resource. Use this approach when:
+  - Idempotent creation is required (e.g., retry safety, external system integration)
+  - The client needs to ensure a resource exists with specific content
+  - Complete resource replacement is acceptable behavior
+  - Building declarative clients that manage resource state
+
+See [Apply] for complete guidance on its usage.
 
 ## Interface Definitions
 
@@ -139,6 +153,7 @@ under the control of the server rather than the client. However, when the client
 
 ## Changelog
 
+* **2026-03-06**: Added guidance on ID in request body vs. ID in path (Apply) for user-specified IDs.
 * **2026-02-19**: Initial creation, adapted from [Google AIP-133][] and aep.dev [AEP-133][].
 
 [Google AIP-133]: https://google.aip.dev/133
@@ -154,6 +169,8 @@ under the control of the server rather than the client. However, when the client
 [location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
 
 [HTTP status codes]: /status-codes
+
+[200 OK]: /63#200-ok
 
 [201 Created]: /63#201-created
 
