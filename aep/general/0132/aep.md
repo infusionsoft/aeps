@@ -1,7 +1,7 @@
 # List
 
 In REST APIs, it is customary to make a [GET] request to a resource
-collection's URI (for example, `/publishers/{publisher_id}/books`) in order to
+collection's URI (for example, `/publishers/{publisherId}/books`) in order to
 retrieve a list of the resources within that collection. Resource-oriented design AEP-121 honors this pattern through
 the `List` action.
 
@@ -20,14 +20,14 @@ result **must** be a list of resources.
 collection's [URI path]:
 
 ```http
-GET /v1/publishers/{publisher_id}/books
+GET /v1/publishers/{publisherId}/books
 ```
 
 - The URI **should** contain a variable for each individual ID in the resource
   hierarchy.
     - The path parameter for all resource IDs **must** be in the form
-      `{resourceName}_id` (such as `book_id`), and path parameters representing
-      the ID of parent resources **must** end with `id`.
+      `{resourceName}Id` (such as `bookId`), and path parameters representing
+      the ID of parent resources **must** end with `Id`.
 - `List` actions **should** implement sorting and [filtering] mechanisms to allow clients to sort and narrow results.
 
 ### Requests
@@ -44,7 +44,7 @@ GET /v1/publishers/{publisher_id}/books
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.parameters' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.get.parameters' %}
 
 {% endtabs %}
 
@@ -67,7 +67,7 @@ array.
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.responses.200.content' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.get.responses.200.content' %}
 
 {% endtabs %}
 
@@ -78,7 +78,7 @@ and [HTTP status codes].
 
 Most common error scenarios:
 
-* Return [404 Not Found] if the parent resource does not exist (e.g., requesting `/publishers/{invalid_id}/books` when
+* Return [404 Not Found] if the parent resource does not exist (e.g., requesting `/publishers/{invalidId}/books` when
   the publisher doesn't exist).
 * See [authorization checks](/authorization) for details on responses based on permissions.
 
@@ -138,7 +138,7 @@ For more information, see AEP-164.
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.get' %}
 
 {% endtabs %}
 

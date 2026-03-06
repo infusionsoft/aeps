@@ -112,13 +112,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/publisher'
           description: Successful response
-  /publishers/{publisher_id}:
+  /publishers/{publisherId}:
     delete:
       description: Delete method for publisher
       operationId: deletePublisher
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -137,7 +137,7 @@ paths:
       operationId: getPublisher
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -153,7 +153,7 @@ paths:
       operationId: updatePublisher
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -189,7 +189,7 @@ paths:
       operationId: applyPublisher
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -215,13 +215,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful creation
-  /publishers/{publisher_id}/books:
+  /publishers/{publisherId}/books:
     get:
       description: List method for book
       operationId: listBooks
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -256,7 +256,7 @@ paths:
       operationId: createBook
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
@@ -276,18 +276,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful response
-  /publishers/{publisher_id}/books/{book_id}:
+  /publishers/{publisherId}/books/{bookId}:
     delete:
       description: Delete method for book
       operationId: deleteBook
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
@@ -306,12 +306,12 @@ paths:
       operationId: getBook
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
@@ -327,12 +327,12 @@ paths:
       operationId: updateBook
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
@@ -372,12 +372,12 @@ paths:
       operationId: applyBook
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
@@ -403,18 +403,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/book'
           description: Successful creation
-  /publishers/{publisher_id}/books/{book_id}/editions:
+  /publishers/{publisherId}/books/{bookId}/editions:
     get:
       description: List method for book-edition
       operationId: listBookEditions
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
@@ -445,12 +445,12 @@ paths:
       operationId: createBookEdition
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
@@ -470,23 +470,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/book-edition'
           description: Successful response
-  /publishers/{publisher_id}/books/{book_id}/editions/{book_edition_id}:
+  /publishers/{publisherId}/books/{bookId}/editions/{bookEditionId}:
     delete:
       description: Delete method for book-edition
       operationId: deleteBookEdition
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
         - in: path
-          name: book_edition_id
+          name: bookEditionId
           required: true
           schema:
             type: string
@@ -501,17 +501,17 @@ paths:
       operationId: getBookEdition
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string
         - in: path
-          name: book_edition_id
+          name: bookEditionId
           required: true
           schema:
             type: string
@@ -522,18 +522,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/book-edition'
           description: Successful response
-  /publishers/{publisher_id}/books/{book_id}:archive:
+  /publishers/{publisherId}/books/{bookId}:archive:
     post:
       description: Custom method archive for book
       operationId: archiveBook
       parameters:
         - in: path
-          name: publisher_id
+          name: publisherId
           required: true
           schema:
             type: string
         - in: path
-          name: book_id
+          name: bookId
           required: true
           schema:
             type: string

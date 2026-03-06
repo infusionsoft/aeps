@@ -1,7 +1,7 @@
 # PATCH
 
 In REST APIs, it is customary to make a PATCH request to a resource's URI (for example,
-`/publishers/{publisher_id}/books/{book_id}`) to partially update that resource. Unlike [PUT], which replaces the entire
+`/publishers/{publisherId}/books/{bookId}`) to partially update that resource. Unlike [PUT], which replaces the entire
 resource, `PATCH` applies a set of changes to modify only specific fields. As defined in [RFC 5789], `PATCH` requests
 that a set of changes described in the request be applied to the resource identified by the request URI.
 
