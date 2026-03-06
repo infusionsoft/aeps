@@ -19,13 +19,13 @@ paths:
                   items:
                     type: string
                   description: The contents of the input, as a string.
-                source_language_code:
+                sourceLanguageCode:
                   type: string
                   description: |
                     The BCP-47 language code of the input text (e.g. "en-US").
                     If the source language is not specified, the service will
                     attempt to infer it.
-                target_language_code:
+                targetLanguageCode:
                   type: string
                   description: |
                     The BCP-47 language code of the output text (e.g. "en-US").
@@ -38,11 +38,11 @@ paths:
                 description: |
                   Response structure for the translate operation.
                 properties:
-                  translated_text:
+                  translatedText:
                     type: string
                     description: |
                       Text translated into the target language.
-                  detected_language_code:
+                  detectedLanguageCode:
                     type: string
                     description: |
                       The BCP-47 language code of source text in the initial

@@ -1,7 +1,7 @@
 # Update
 
 In REST APIs, it is customary to make a [PATCH] request to a
-resource's URI (for example, `/v1/publishers/{publisher_id}/books/{book_id}`)
+resource's URI (for example, `/v1/publishers/{publisherId}/books/{bookId}`)
 in order to update that resource.
 
 Resource-oriented design AEP-121 honors this pattern through the `Update`
@@ -31,7 +31,7 @@ changes to the resources without causing side effects.
 `Update` operations **must** be made by sending a [PATCH] request to the resource's canonical [URI path]:
 
 ```http
-PATCH /v1/publishers/{publisher_id}/books/{book_id}
+PATCH /v1/publishers/{publisherId}/books/{bookId}
 ```
 
 ### Requests
@@ -111,7 +111,7 @@ The response body:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.patch.responses.200' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.patch.responses.200' %}
 
 {% endtabs %}
 
@@ -168,7 +168,7 @@ new URI.
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.patch' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.patch' %}
 
 {% endtabs %}
 

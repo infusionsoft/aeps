@@ -59,7 +59,7 @@ Services that provide ETags **should** support the `If-Match` and
 An example of using `If-Match` (the `ETag` returned from the request before is in the `If-Match` header):
 
 ```http request
-GET /v1/publishers/{publisher_id}/books/{book_id}
+GET /v1/publishers/{publisherId}/books/{bookId}
 Accept: application/json
 If-Match: "55cc0347-66fc-46c3-a26f-98a9a7d61d0e"
 ```

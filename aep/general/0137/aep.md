@@ -1,7 +1,7 @@
 # Apply
 
 In REST APIs, it is customary to make a `PUT` request to a resource's URI (for
-example, `/v1/publishers/{publisher_id}/books/{book_id}`) in order to create or
+example, `/v1/publishers/{publisherId}/books/{bookId}`) in order to create or
 replace a resource.
 
 [Resource-oriented design](/resources) honors this pattern through the `Apply`
@@ -58,7 +58,7 @@ unchanged, see [Update].
 `Apply` operations **must** be made by sending a [PUT] request to the resource's canonical [URI path]:
 
 ```http
-PUT /v1/publishers/{publisher_id}/books/{book_id}
+PUT /v1/publishers/{publisherId}/books/{bookId}
 ```
 
 ### Requests
@@ -86,7 +86,7 @@ Content-Type: application/json
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.put.requestBody' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.put.requestBody' %}
 
 {% endtabs %}
 
@@ -107,7 +107,7 @@ The response body:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.put.responses' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.put.responses' %}
 
 {% endtabs %}
 
@@ -134,7 +134,7 @@ the [PATCH and PUT](/67#patch-and-put) section of AEP-67 for more information.
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books/{book_id}.put' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books/{bookId}.put' %}
 
 {% endtabs %}
 

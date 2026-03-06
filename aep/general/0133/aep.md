@@ -1,7 +1,7 @@
 # Create
 
 In REST APIs, it is customary to make a `POST` request to a collection's URI
-(for example, `/v1/publishers/{publisher_id}/books`) in order to create a new
+(for example, `/v1/publishers/{publisherId}/books`) in order to create a new
 resource within that collection.
 
 Resource-oriented design AEP-121 honors this pattern through the `Create`
@@ -29,7 +29,7 @@ resource in an already-existing collection.
 `Create` operations are made by sending a [POST] request to the _collection_ URI:
 
 ```http
-POST /v1/publishers/{publisher_id}/books
+POST /v1/publishers/{publisherId}/books
 ```
 
 ### Requests
@@ -58,7 +58,7 @@ Content-Type: application/json
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.requestBody' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.post.requestBody' %}
 
 {% endtabs %}
 
@@ -95,7 +95,7 @@ Content-Type: application/json
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post.responses.201' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.post.responses.201' %}
 
 {% endtabs %}
 
@@ -142,7 +142,7 @@ See [Apply] for complete guidance on its usage.
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.post' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.post' %}
 
 {% endtabs %}
 

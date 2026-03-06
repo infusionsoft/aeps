@@ -80,7 +80,7 @@ Examples:
 
 {% tab oas %}
 
-{% sample '../example.oas.yaml', '$.paths./publishers/{publisher_id}/books.get.operationId' %}
+{% sample '../example.oas.yaml', '$.paths./publishers/{publisherId}/books.get.operationId' %}
 
 {% endtabs %}
 
