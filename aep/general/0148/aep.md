@@ -1,4 +1,4 @@
-# Standard Names
+# Standard fields
 
 Certain concepts are common throughout any corpus of APIs. In these situations,
 it is useful to have a standard field name and behavior that is used
@@ -8,18 +8,6 @@ consistently to communicate that concept.
 
 Standard fields **should** be used to describe their corresponding concept, and
 **should not** be used for any other purpose.
-
-### HTTP headers
-
-#### `X-AEP-Version`
-
-Response only. Required. Identifies which set of organizational API design standards the service follows, independent of
-the API's own version number. APIs **must** include this header in all responses. Clients **must not** send this header
-in requests.
-
-#### `Organization-ID`
-
-**Must** be a string. The organization identifier for the request or response. See [AEP-218](../0218) for full guidance.
 
 ### JSON field names
 

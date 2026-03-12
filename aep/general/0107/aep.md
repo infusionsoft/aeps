@@ -57,7 +57,7 @@ Initialisms **must** be treated as words in `camelCase`:
 ### Standard fields
 
 To ensure consistency across the API ecosystem, APIs **should** use the standard field names defined
-in [Standard Names] for common terms.
+in [Standard Fields] for common terms.
 
 ### Values and types
 
@@ -238,7 +238,7 @@ and predictable handling of money regardless of client or backend implementation
 
 [Time and duration]: /time-and-duration
 
-[Standard Names]: /standard-names
+[Standard Fields]: /standard-fields
 
 ## Changelog
 
