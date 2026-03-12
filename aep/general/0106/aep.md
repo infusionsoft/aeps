@@ -49,7 +49,7 @@ Default values **must** be documented in the API specification.
 
 ### Standard query parameters
 
-To ensure consistency across the API ecosystem, APIs **should** use the query parameters defined in [Standard Names]
+To ensure consistency across the API ecosystem, APIs **should** use the query parameters defined in [Standard Fields]
 for common terms.
 
 ### Query parameters are non-actionable
@@ -93,7 +93,7 @@ including Google, Microsoft, and Stripe.
 
 [Pagination]: /pagination
 
-[Standard Names]: /standard-names
+[Standard Fields]: /standard-fields
 
 ## Changelog
 

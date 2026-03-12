@@ -101,7 +101,7 @@ APIs **must** declare which API specification version they follow using a custom
 Response header:
 
 ```
-X-AEP-Version: v3
+AEP-Version: v3
 ```
 
 This identifies which set of organizational API design standards the service follows, independent of the API's own
@@ -142,7 +142,7 @@ info:
   title: Books API
   version: 5.0.0
   description: Books management API following AEP v3 specification
-  x-aep-version: v3
+  aep-version: v3
 
 servers:
   - url: https://api.company.com/v5
