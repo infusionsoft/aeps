@@ -9,22 +9,6 @@ consistently to communicate that concept.
 Standard fields **should** be used to describe their corresponding concept, and
 **should not** be used for any other purpose.
 
-### Tenancy
-
-Our software is multi-tenanted, meaning users exist only within their own tenant instance and cannot access data from
-other tenants. A **tenant** represents an isolated instance of the application with its own data, users, and
-configuration.
-
-The following terms are synonymous and refer to the same concept:
-
-- Tenant
-- Tenant ID
-- App Name
-- App ID
-
-APIs **must** use the term "tenant" in all _**new**_ development. The legacy terms "app name" and "app ID" are
-deprecated and exist only for backward compatibility in existing APIs.
-
 ### HTTP headers
 
 #### `X-AEP-Version`
@@ -33,12 +17,9 @@ Response only. Required. Identifies which set of organizational API design stand
 the API's own version number. APIs **must** include this header in all responses. Clients **must not** send this header
 in requests.
 
-#### `X-Tenant`
+#### `Organization-ID`
 
-**Must** be a string. The tenant this request or response is scoped to. **Must** be included in both requests and
-responses for tenant-scoped operations, even if the tenant identifier appears elsewhere (path, query parameters, or
-body). **Must not** be included for non-tenanted operations. This replaces legacy headers such as `x-is-app-name`,
-`x-keap-tenant`, `x-is-tenant`, etc.
+**Must** be a string. The organization identifier for the request or response. See [AEP-218](../0218) for full guidance.
 
 ### JSON field names
 
@@ -50,11 +31,9 @@ See [JSON Payloads] for complete guidance.
 **Must** be a string. The unique identifier for the resource. This is the resource's own ID; use the pattern
 `{resource}Id` (e.g., `authorId`, `publisherId`) when referencing other resources.
 
-#### `tenant`
+#### `organizationId`
 
-**Must** be a string. The tenant identifier. The `X-Tenant` header **must** be the source of truth for tenant scope;
-this field **should** generally be omitted from request and response bodies. When a tenant identifier is needed in the
-body, use `tenant` for a single tenant or `tenants` for a list.
+**Must** be a string. The organization identifier. See AEP-218 for full guidance.
 
 #### `createdTime`
 
@@ -153,11 +132,9 @@ guidance.
 parent resource. When `cascade` is `true`, the API deletes the specified resource and all its child resources. When
 `cascade` is unset, it **must** default to `false`.
 
-#### `tenant`
+#### `organizationId`
 
-**Must** be a string. The tenant identifier. The `X-Tenant` header **must** be the source of truth for tenant scope;
-this query parameter **should** generally be omitted. When a tenant identifier is needed in the query string (like for
-filtering), use `tenant` for a single tenant or `tenants` for a list.
+**Must** be a string. The organization identifier. See AEP-218 for full guidance.
 
 #### `updateMask`
 
@@ -201,6 +178,7 @@ experience across the platform.
 
 ## Changelog
 
+* **2026-03-11**: Update tenant terminology to organization ID. Move detailed organization ID guidance to AEP-218.
 * **2026-02-20**: Add `cascade`
 * **2026-01-30**: Enforce `camelCase`, not `snake_case` for query parameters
 * **2026-01-21**: Add new terms `purgeTime` and `show_deleted`.
