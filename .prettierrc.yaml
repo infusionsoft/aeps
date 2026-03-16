@@ -2,7 +2,7 @@
 printWidth: 79
 proseWrap: always
 overrides:
-  - files: '*.md.j2'
+  - files: '*.md'
     options:
       parser: markdown
 singleQuote: true
