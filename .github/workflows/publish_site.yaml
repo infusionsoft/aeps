@@ -14,4 +14,4 @@ jobs:
         with:
           event-type: publish-event
           repository: infusionsoft/aep-site-generator
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.AEP_PUBLISH_PAT }}
