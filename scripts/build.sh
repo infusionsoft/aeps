@@ -8,9 +8,6 @@ if [ ! -d "${SG_DIRECTORY}" ]; then
 fi
 
 cd "${SG_DIRECTORY}" || exit
-# make rules / website folder
-mkdir -p src/content/docs/tooling/website
 npm install
-npx playwright install --with-deps chromium
 npm run generate
 npm run build
