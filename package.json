@@ -1,6 +1,10 @@
 {
   "name": "aep.thryv-apis.com",
   "private": true,
+  "scripts": {
+    "check": "prettier --check .",
+    "lint": "prettier --write ."
+  },
   "devDependencies": {
     "prettier": "^3.8.1"
   }
