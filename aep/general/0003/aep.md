@@ -14,7 +14,7 @@ AEPs will be published in versions, using major version numbering only (e.g., `v
 * The naming of a stable version will be the major version (e.g. `v3`, `v4`).
 * Upon promoting a preview version to a stable version, the next preview version will be created immediately (e.g.
   `v5-preview`).
-* New major versions will be published approximately every 1 year.
+* New major versions will be published as needed.
 
 Each major version represents a living specification that evolves over time within its [non-breaking](#breaking-changes)
 change boundaries.
