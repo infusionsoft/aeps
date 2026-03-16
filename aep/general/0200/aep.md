@@ -12,8 +12,8 @@ Since it often is not feasible to fix past mistakes or make the standards serve
 every use case, APIs may be stuck with these exceptions for quite some time.
 Further, since new APIs often base their designs (names, types, structures,
 etc.) on existing APIs, it is possible that a standards violation in one API
-could spill over into other APIs, even if the original reason for the exception is
-not applicable to the other APIs.
+could spill over into other APIs, even if the original reason for the exception
+is not applicable to the other APIs.
 
 As a result of this problem, it is important to "stop the bleeding" of these
 standards exceptions into new APIs and additionally document the reasons for
@@ -22,8 +22,9 @@ each exception so that historical wisdom is not lost.
 ## Guidance
 
 If an API violates "**should**" or "**should not**" AEP guidance for any
-reason, there **must** be an internal comment linking to this document to ensure others do not copy
-the violations or cite the errors as precedent of a "previously approved API".
+reason, there **must** be an internal comment linking to this document to
+ensure others do not copy the violations or cite the errors as precedent of a
+"previously approved API".
 
 **Important:** APIs **must not** violate guidance specified with "**must**" or
 "**must not**", even with a link to this AEP. Tools such as documentation
@@ -54,7 +55,8 @@ class DailyMaintenanceWindow {
 }
 ```
 
-**Important:** APIs should only be considered to be precedent-setting if they are in beta or GA.
+**Important:** APIs should only be considered to be precedent-setting if they
+are in beta or GA.
 
 ### Local consistency
 
@@ -72,14 +74,14 @@ new APIs.
 
 ```java
 public class Book {
-    // <link to doc>: This API uses snake_case for legacy reasons. 
+    // <link to doc>: This API uses snake_case for legacy reasons.
     // Ordinarily, we use default camelCase for all new REST APIs.
     @JsonProperty("published_at")
     private OffsetDateTime publishedAt;
 }
 
 public class Author {
-    // <link to doc>: 'Book' used snake_case, so we match that here 
+    // <link to doc>: 'Book' used snake_case, so we match that here
     // for local consistency. Ordinarily, this would be 'publishedAt'.
     @JsonProperty("published_at")
     private OffsetDateTime publishedAt;
@@ -132,4 +134,4 @@ makes it difficult to follow AEP guidelines.
 
 ## Changelog
 
-* **2025-12-22**: Initial creation
+- **2025-12-22**: Initial creation

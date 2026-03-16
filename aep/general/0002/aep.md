@@ -31,17 +31,18 @@ merged.
 
 ### AEP Blocks
 
-While AEP numbers are generally assigned sequentially, specific blocks are reserved to group AEPs by their primary
-function. This helps users distinguish between administrative processes, educational materials, and technical
+While AEP numbers are generally assigned sequentially, specific blocks are
+reserved to group AEPs by their primary function. This helps users distinguish
+between administrative processes, educational materials, and technical
 standards.
 
 The currently recognized blocks are:
 
-* **1–49**: Meta, general, and process AEPs.
-* **50–99**: Educational/fundamental AEPs. They provide the conceptual foundation required to understand and apply API
-  design standards.
-* **100–999**: API design guidance AEPs. They define technical standards and requirements for APIs within the
-  organization.
+- **1–49**: Meta, general, and process AEPs.
+- **50–99**: Educational/fundamental AEPs. They provide the conceptual
+  foundation required to understand and apply API design standards.
+- **100–999**: API design guidance AEPs. They define technical standards and
+  requirements for APIs within the organization.
 
 ## AEP Categories
 
@@ -90,7 +91,8 @@ And is available via the path `/create` on the site.
 In the original aip.dev project, numbers were the primary identifier for an
 AEP. However, as a number does not hint to its purpose or the guidance it
 contains, conversations around AIPs were difficult to hold and often the AIPs
-would be referred to by an unofficial colloquial name rather than by its number.
+would be referred to by an unofficial colloquial name rather than by its
+number.
 
 As such, AEPs provide the ability for a semantic slug.
 
@@ -106,8 +108,8 @@ granular categories as the need arises.
 ## Changelog
 
 - **2026-01-20**: Add section on AEP blocks, and which ones are reserved.
-- **2025-10-30**: Initial AEP-2 for Thryv, adapted from [Google AIP-2][] and aep.dev [AEP-2][].
+- **2025-10-30**: Initial AEP-2 for Thryv, adapted from [Google AIP-2][] and
+  aep.dev [AEP-2][].
 
 [Google AIP-2]: https://google.aip.dev/2
-
 [AEP-2]: https://aep.dev/2

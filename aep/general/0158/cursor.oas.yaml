@@ -32,9 +32,8 @@ paths:
             example: abc123xyz
           description: >
             An opaque, URL-safe token used to advance to the next page of
-            results. This value is obtained from the `nextPageToken` field of
-            a previous response. Must not be inspected or constructed by
-            clients.
+            results. This value is obtained from the `nextPageToken` field of a
+            previous response. Must not be inspected or constructed by clients.
       responses:
         '200':
           description: A paginated list of books.
@@ -52,10 +51,11 @@ paths:
                   nextPageToken:
                     type: string
                     description: >
-                      An opaque token used to retrieve the next page of results. If
-                      absent or empty, the end of the collection has been reached. Pass
-                      this value as the `pageToken` query parameter in a subsequent
-                      request to retrieve the next page.
+                      An opaque token used to retrieve the next page of
+                      results. If absent or empty, the end of the collection
+                      has been reached. Pass this value as the `pageToken`
+                      query parameter in a subsequent request to retrieve the
+                      next page.
 components:
   schemas:
     Book:

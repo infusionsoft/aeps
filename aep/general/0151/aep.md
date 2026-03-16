@@ -7,17 +7,20 @@ return some kind of promise to the user, and allow the user to check back in
 later.
 
 The long-running request pattern is roughly analogous to a `Future` in [Python]
-or [Java], or a [Node.js Promise][]. Essentially, the user is given a token that
-can be used to track progress and retrieve the result.
+or [Java], or a [Node.js Promise][]. Essentially, the user is given a token
+that can be used to track progress and retrieve the result.
 
 ## Guidance
 
 Operations that might take a significant amount of time to complete:
 
-* **must** return `202 Accepted` on successful submission to indicate the request has been accepted for processing.
-* **must** return an `Operation` object (see [Interface Definitions](#interface-definitions)) in the response body.
-* **must** match other AEP guidance that would apply to the method otherwise.
-* **may** include a [Location] header pointing to the operation status endpoint.
+- **must** return `202 Accepted` on successful submission to indicate the
+  request has been accepted for processing.
+- **must** return an `Operation` object (see
+  [Interface Definitions](#interface-definitions)) in the response body.
+- **must** match other AEP guidance that would apply to the method otherwise.
+- **may** include a [Location] header pointing to the operation status
+  endpoint.
 
 **Note:** User expectations can vary on what is considered "a significant
 amount of time" depending on what work is being done. A good rule of thumb is
@@ -43,37 +46,43 @@ Content-Type: application/json
 
 ### Querying an operation
 
-The service **must** provide a `GET /operations/{operationId}` endpoint to query the status of the operation. This
-endpoint:
+The service **must** provide a `GET /operations/{operationId}` endpoint to
+query the status of the operation. This endpoint:
 
-* **must** return `200 OK` with an `Operation` object (see [Interface Definitions](#interface-definitions)) when the
-  operation exists.
-* **must** return `404 Not Found` when the operation does not exist (e.g., expired or invalid ID).
+- **must** return `200 OK` with an `Operation` object (see
+  [Interface Definitions](#interface-definitions)) when the operation exists.
+- **must** return `404 Not Found` when the operation does not exist (e.g.,
+  expired or invalid ID).
 
-The service **should** provide a `GET /operations` endpoint to list operations. This endpoint:
+The service **should** provide a `GET /operations` endpoint to list operations.
+This endpoint:
 
-* **may** support filtering.
-* **must** follow standard [pagination] guidelines if implemented.
+- **may** support filtering.
+- **must** follow standard [pagination] guidelines if implemented.
 
 The `Operation` object returned:
 
-* **must** include the current `state` of the operation.
-* **should** include progress information in the `metadata` field when available (e.g., percentage complete, items
-  processed).
-* **must** include the operation result in the `result` field when state is succeeded.
-* **must** include error details in the `errors` array when state is failed.
+- **must** include the current `state` of the operation.
+- **should** include progress information in the `metadata` field when
+  available (e.g., percentage complete, items processed).
+- **must** include the operation result in the `result` field when state is
+  succeeded.
+- **must** include error details in the `errors` array when state is failed.
 
-APIs **may** include additional state values if needed, but **must** document them clearly.
+APIs **may** include additional state values if needed, but **must** document
+them clearly.
 
 ### Cancellation
 
-APIs **may** support cancelling long-running operations when feasible. Cancellation:
+APIs **may** support cancelling long-running operations when feasible.
+Cancellation:
 
-* **must** be implemented via `POST /operations/{operationId}:cancel`.
-* **must** return `200 OK` with the updated `Operation` object if the operation was successfully canceled.
-* **must** return `404 Not Found` if the operation does not exist.
-* may not take effect immediately; the operation `state` **should** transition to canceled once cancellation is
-  complete.
+- **must** be implemented via `POST /operations/{operationId}:cancel`.
+- **must** return `200 OK` with the updated `Operation` object if the operation
+  was successfully canceled.
+- **must** return `404 Not Found` if the operation does not exist.
+- may not take effect immediately; the operation `state` **should** transition
+  to canceled once cancellation is complete.
 
 Not all operations can be safely canceled. APIs must document which operations
 support cancellation.
@@ -83,21 +92,23 @@ support cancellation.
 A resource **may** accept multiple requests that will work on it in parallel
 but is not obligated to do so:
 
-* Resources that accept multiple parallel requests **may** place them in a
+- Resources that accept multiple parallel requests **may** place them in a
   queue rather than work on the requests simultaneously.
-* A resource that does not permit multiple requests in parallel (denying any
+- A resource that does not permit multiple requests in parallel (denying any
   new request until the one that is in progress finishes) **must** return
-  `409 Conflict` if a user attempts a parallel request, and include an
-  error message explaining the situation.
+  `409 Conflict` if a user attempts a parallel request, and include an error
+  message explaining the situation.
 
 ### Expiration
 
 APIs **may** allow their operation resources to expire after sufficient time
 has elapsed after the request completed.
 
-* Expired operations **should** return `404 Not Found` or `410 Gone` when queried.
-* The expiration policy **must** be documented.
-* APIs **should** retain operation records long enough for clients to retrieve results, even with retry delays.
+- Expired operations **should** return `404 Not Found` or `410 Gone` when
+  queried.
+- The expiration policy **must** be documented.
+- APIs **should** retain operation records long enough for clients to retrieve
+  results, even with retry delays.
 
 **Note:** A good rule of thumb for operation expiry is 30 days.
 
@@ -106,8 +117,9 @@ has elapsed after the request completed.
 Errors that prevent a long-running request from _starting_ **must** return an
 [error response][aep-193], similar to any other method.
 
-Errors that occur _during_ the operation's execution **must** be reflected in the `Operation` object with
-`state: "failed"` and detailed error information in the `errors` array.
+Errors that occur _during_ the operation's execution **must** be reflected in
+the `Operation` object with `state: "failed"` and detailed error information in
+the `errors` array.
 
 ## Interface Definitions
 
@@ -138,7 +150,9 @@ Operation:
       description: The current state of the operation.
     metadata:
       type: object
-      description: Service-specific metadata about the operation, such as progress information.
+      description:
+        Service-specific metadata about the operation, such as progress
+        information.
       additionalProperties: true
     result:
       type: object
@@ -156,32 +170,36 @@ Operation:
             type: string
 ```
 
-* The response body schema **must** be an `Operation` object as described above.
-* The response body schema **may** contain an object property named `metadata` to hold service-specific metadata
-  associated with the operation, for example, progress information and common metadata such as create time. The service
-  **should** define the contents of the metadata object in a separate schema, which **should** specify
-  `additionalProperties: true` to allow for future extensibility.
-* The `result` property must be a schema that defines the success response for the operation. For operations that
-  typically return `204 No Content` (such as delete), `result` **should** be defined as an empty object schema. For
-  operations that typically return a response body, `result` **should** contain a representation of the created or
-  modified resource, or a summary of the operation's outcome.
+- The response body schema **must** be an `Operation` object as described
+  above.
+- The response body schema **may** contain an object property named `metadata`
+  to hold service-specific metadata associated with the operation, for example,
+  progress information and common metadata such as create time. The service
+  **should** define the contents of the metadata object in a separate schema,
+  which **should** specify `additionalProperties: true` to allow for future
+  extensibility.
+- The `result` property must be a schema that defines the success response for
+  the operation. For operations that typically return `204 No Content` (such as
+  delete), `result` **should** be defined as an empty object schema. For
+  operations that typically return a response body, `result` **should** contain
+  a representation of the created or modified resource, or a summary of the
+  operation's outcome.
 
 {% endtabs %}
 
-[location]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
-
-[node.js promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
-
-[Python]: https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future
-
+[location]:
+  https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Location
+[node.js promise]:
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Using_promises
+[Python]:
+  https://docs.python.org/3/library/concurrent.futures.html#concurrent.futures.Future
 [Java]: https://www.baeldung.com/java-future
-
 [pagination]: /pagination
 
 ## Changelog
 
-* **2025-12-10**: Initial creation, adapted from [Google AIP-151][] and aep.dev [AEP-151][].
+- **2025-12-10**: Initial creation, adapted from [Google AIP-151][] and aep.dev
+  [AEP-151][].
 
 [Google AIP-151]: https://google.aip.dev/151
-
 [AEP-151]: https://aep.dev/151

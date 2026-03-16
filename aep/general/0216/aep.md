@@ -13,7 +13,8 @@ Resources needing to communicate their state **should** use an enum, which
 word `State`). This enum **should** be nested within the message it describes
 when only used as a field within that message.
 
-**Important:** We use the term `State`, and _not_ `Status` (to not be confused with the HTTP status).
+**Important:** We use the term `State`, and _not_ `Status` (to not be confused
+with the HTTP status).
 
 ### Enum values
 
@@ -31,9 +32,9 @@ At a high level:
   "successful"), `FAILED` (not "failure"), `DELETED`, `SUSPENDED`, and so on.
 - Resources that are currently undergoing a state change use present
   participles (usually ending in `-ING`), such as `RUNNING`, `CREATING`,
-  `DELETING`, `PENDING`, and so on. In this case, it is expected that the state is
-  temporary and will resolve to another state on its own, with no further user
-  action.
+  `DELETING`, `PENDING`, and so on. In this case, it is expected that the state
+  is temporary and will resolve to another state on its own, with no further
+  user action.
 
 **Note:** Only add states that are useful to consumers. Exposing a large number
 of states simply because they exist in your internal system is unnecessary and
@@ -44,62 +45,77 @@ it is necessary.
 
 The `state` field **must** behave and be documented as output only.
 
-APIs **must not** allow a `state` to be directly created or updated on the resource itself through standard
-create/update methods (`POST`/`PUT`/`PATCH`). For example, to publish a book, do _not_ send a `PATCH` request to the
-`book` resource with body `{"state": "PUBLISHED"}`.
+APIs **must not** allow a `state` to be directly created or updated on the
+resource itself through standard create/update methods (`POST`/`PUT`/`PATCH`).
+For example, to publish a book, do _not_ send a `PATCH` request to the `book`
+resource with body `{"state": "PUBLISHED"}`.
 
 Instead, state transitions **should** be triggered by:
 
-* Creating separate [transition resources](#state-transition-resources).
-* Defining a [custom method](#state-transition-custom-methods).
-* Using the [DELETE](/delete) method (for transitioning to a `DELETED` state).
+- Creating separate [transition resources](#state-transition-resources).
+- Defining a [custom method](#state-transition-custom-methods).
+- Using the [DELETE](/delete) method (for transitioning to a `DELETED` state).
 
-This constraint exists because standard update methods are generally not expected to have side effects, and because
-updating state directly implies that any state value can be set arbitrarily, whereas states actually reflect a
-resource's progression through a defined lifecycle with specific valid transitions.
+This constraint exists because standard update methods are generally not
+expected to have side effects, and because updating state directly implies that
+any state value can be set arbitrarily, whereas states actually reflect a
+resource's progression through a defined lifecycle with specific valid
+transitions.
 
 ### State transition resources
 
-State transitions **should** be modeled as separate resources when the transition has meaningful metadata, requires
-tracking, or involves a multistep process.
+State transitions **should** be modeled as separate resources when the
+transition has meaningful metadata, requires tracking, or involves a multistep
+process.
 
-For example, to publish a book, create a publication resource: `POST /books/{id}/publications`. This allows the capture
-of an audit trail (_who_ published, _why_, _when_, etc.).
+For example, to publish a book, create a publication resource:
+`POST /books/{id}/publications`. This allows the capture of an audit trail
+(_who_ published, _why_, _when_, etc.).
 
-For more detailed information, see the [Reification](/121#reification) section in Resource-oriented design.
+For more detailed information, see the [Reification](/121#reification) section
+in Resource-oriented design.
 
 ### State transition custom methods
 
-APIs **may** use custom methods (e.g., `POST /books/{id}:publish`) for simple, instantaneous state transitions that have
-no additional data requirements and leave no audit trail beyond the state change itself.
+APIs **may** use custom methods (e.g., `POST /books/{id}:publish`) for simple,
+instantaneous state transitions that have no additional data requirements and
+leave no audit trail beyond the state change itself.
 
-In addition to the general guidance for [custom methods](/custom-methods), the following guidance applies for state
-transition custom methods:
+In addition to the general guidance for [custom methods](/custom-methods), the
+following guidance applies for state transition custom methods:
 
 - The HTTP method **must** be `POST`.
-- The custom method **must** use an action verb (e.g., `:publish`), without any nouns (e.g., `:publish-book`).
-- The resource path parameters (e.g., `publisherId`, `bookId`) **should** be the only path variables in the URI. All
-  other parameters **should** be in the request body.
-- The request body **may** contain operational parameters that affect how the transition executes, but **should not**
-  contain metadata worth tracking or auditing.
-    - Examples of appropriate parameters: `force: true`, `skipValidation: true`, `dryRun: true`
-    - Examples of inappropriate parameters: `reason`, `publishedBy`, `notes` (these indicate the transition should be
-      modeled as a [transition resource](#state-transition-resources))
-    - If no parameters are needed, an empty object `{}` **should** be sent.
+- The custom method **must** use an action verb (e.g., `:publish`), without any
+  nouns (e.g., `:publish-book`).
+- The resource path parameters (e.g., `publisherId`, `bookId`) **should** be
+  the only path variables in the URI. All other parameters **should** be in the
+  request body.
+- The request body **may** contain operational parameters that affect how the
+  transition executes, but **should not** contain metadata worth tracking or
+  auditing.
+  - Examples of appropriate parameters: `force: true`, `skipValidation: true`,
+    `dryRun: true`
+  - Examples of inappropriate parameters: `reason`, `publishedBy`, `notes`
+    (these indicate the transition should be modeled as a
+    [transition resource](#state-transition-resources))
+  - If no parameters are needed, an empty object `{}` **should** be sent.
 - The response **should** be the resource itself (e.g., the `Book` object).
-    - If the operation is long-running, the response **should** be an `Operation` object,
-      per [long-running operations](/long-running-operations).
+  - If the operation is long-running, the response **should** be an `Operation`
+    object, per [long-running operations](/long-running-operations).
 
 ### State transition errors
 
-When a state transition is not allowed due to the resource's current state, the API **must** return a `409 Conflict`.
-For example, if attempting to publish a book that is in the `ARCHIVED` state, and only `DRAFT` books can be transitioned
-to `PUBLISHED`. The error response **should** include details on the error (e.g.,
-`"Cannot publish book: invalid transition from ARCHIVED to PUBLISHED"`). This applies to both transition resources and
-custom methods.
+When a state transition is not allowed due to the resource's current state, the
+API **must** return a `409 Conflict`. For example, if attempting to publish a
+book that is in the `ARCHIVED` state, and only `DRAFT` books can be
+transitioned to `PUBLISHED`. The error response **should** include details on
+the error (e.g.,
+`"Cannot publish book: invalid transition from ARCHIVED to PUBLISHED"`). This
+applies to both transition resources and custom methods.
 
-APIs **must not** use `400 Bad Request` for invalid state transitions, as the request itself is well-formed; it's the
-resource's state that makes the operation invalid.
+APIs **must not** use `400 Bad Request` for invalid state transitions, as the
+request itself is well-formed; it's the resource's state that makes the
+operation invalid.
 
 ## Additional Guidance
 
@@ -133,8 +149,9 @@ situations where a state has a very small number of potential values, or when
 states are not mutually exclusive.
 
 Consider the example of a state with only `ACTIVE` and `DELETED`, as discussed
-above. In this situation, the API may be better off exposing a `deletedTime` timestamp field, and instructing users to
-rely on whether it is set to determine deletion.
+above. In this situation, the API may be better off exposing a `deletedTime`
+timestamp field, and instructing users to rely on whether it is set to
+determine deletion.
 
 ### Common states
 
@@ -181,9 +198,10 @@ necessary.
 
 ## Changelog
 
-* **2026-01-21**: Add clarification on using `DELETE` method for transitioning to `DELETED` state.
-* **2025-12-23**: Initial creation, adapted from [Google AIP-216][] and aep.dev [AEP-216][].
+- **2026-01-21**: Add clarification on using `DELETE` method for transitioning
+  to `DELETED` state.
+- **2025-12-23**: Initial creation, adapted from [Google AIP-216][] and aep.dev
+  [AEP-216][].
 
 [Google AIP-216]: https://google.aip.dev/216
-
 [AEP-216]: https://aep.dev/216

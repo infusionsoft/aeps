@@ -130,7 +130,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: { }
+              schema: {}
           description: Successful response
     get:
       description: Get method for publisher
@@ -161,8 +161,8 @@ paths:
           name: updateMask
           required: true
           description: >
-            Comma-separated list of field names to update.
-            Only the fields listed here will be modified.
+            Comma-separated list of field names to update. Only the fields
+            listed here will be modified.
           schema:
             type: array
             items:
@@ -299,7 +299,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: { }
+              schema: {}
           description: Successful response
     get:
       description: Get method for book
@@ -340,8 +340,8 @@ paths:
           name: updateMask
           required: true
           description: >
-            Comma-separated list of field names to update.
-            Only the fields listed here will be modified.
+            Comma-separated list of field names to update. Only the fields
+            listed here will be modified.
           schema:
             type: array
             items:
@@ -494,7 +494,7 @@ paths:
         '204':
           content:
             application/json:
-              schema: { }
+              schema: {}
           description: Successful response
     get:
       description: Get method for book-edition

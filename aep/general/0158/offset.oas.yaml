@@ -51,8 +51,9 @@ paths:
                   total:
                     type: integer
                     description: >
-                      The total number of results available. This field is optional and
-                      may not always be present, as calculating it can be expensive.
+                      The total number of results available. This field is
+                      optional and may not always be present, as calculating it
+                      can be expensive.
 components:
   schemas:
     Book:

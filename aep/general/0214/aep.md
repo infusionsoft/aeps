@@ -20,16 +20,17 @@ library.
    general expiration (e.g., `purgeTime` for soft-deleted resources in AEP-164,
    `tokenExpireTime` for credentials with multiple expiration semantics, etc.).
 3. APIs wishing to allow a relative expiration time **must** define both the
-   `expireTime` field and a separate `ttlSeconds` field (integer, measured in seconds),
-   the latter marked as write-only (input only).
+   `expireTime` field and a separate `ttlSeconds` field (integer, measured in
+   seconds), the latter marked as write-only (input only).
 4. APIs **must** always return the expiration time in the `expireTime` field
    and **must not** return the `ttlSeconds` field when retrieving the resource.
-5. APIs **must** require exactly one of `expireTime` or `ttlSeconds` on input when
-   both are supported. If both are provided, the API **must** return [400 Bad Request].
+5. APIs **must** require exactly one of `expireTime` or `ttlSeconds` on input
+   when both are supported. If both are provided, the API **must** return [400
+   Bad Request].
 6. APIs that rely on the specific semantics of a "time to live" (e.g., DNS
    which must represent the TTL as an integer) **may** use only a `ttlSeconds`
-   field (and **should** provide a [precedent](/precedent) comment in
-   this case).
+   field (and **should** provide a [precedent](/precedent) comment in this
+   case).
 
 ### Example
 
@@ -51,8 +52,8 @@ schema:
       type: integer
       format: int64
       description: >
-        The TTL for this resource, in seconds from the current time.
-        Input only - never returned in responses.
+        The TTL for this resource, in seconds from the current time. Input only
+        - never returned in responses.
       writeOnly: true
   oneOf:
     - required:
@@ -93,12 +94,10 @@ zones, stale clocks, and other silly mistakes.
 
 ## Changelog
 
-* **2026-01-22**: Initial creation, adapted from [Google AIP-214][] and aep.dev [AEP-214][].
+- **2026-01-22**: Initial creation, adapted from [Google AIP-214][] and aep.dev
+  [AEP-214][].
 
 [Google AIP-214]: https://google.aip.dev/214
-
 [AEP-214]: https://aep.dev/214
-
 [Timestamp]: /time-and-duration
-
 [400 Bad Request]: /63#400-bad-request

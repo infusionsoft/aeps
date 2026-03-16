@@ -74,17 +74,19 @@ general/
   global-supporting-file-1.ext
 ```
 
-Each AEP **must** reside in a folder named after its AEP number, zero-padded to four digits (e.g., AEP-8 belongs in
-`0008/`).
+Each AEP **must** reside in a folder named after its AEP number, zero-padded to
+four digits (e.g., AEP-8 belongs in `0008/`).
 
 Within that folder:
 
 - The AEP content **must** be in a file named `aep.md`.
-- The AEP front matter **must** be in a file named `aep.yaml`, and **must** be valid YAML.
-- Any AEP-specific supporting files (such as images or examples) **must** be placed in the same folder as the AEP.
+- The AEP front matter **must** be in a file named `aep.yaml`, and **must** be
+  valid YAML.
+- Any AEP-specific supporting files (such as images or examples) **must** be
+  placed in the same folder as the AEP.
 
-Supporting files that apply globally across multiple AEPs **must** be placed directly in the `general/` folder. Adding
-supporting files is optional.
+Supporting files that apply globally across multiple AEPs **must** be placed
+directly in the `general/` folder. Adding supporting files is optional.
 
 AEPs **must** have appropriate front matter.
 
@@ -105,22 +107,22 @@ redirect_from:
 Front matter for AEPs **must** include:
 
 - The `aep` key:
-    - `id`: **Required**. The ID for the given AEP, as an integer.
-    - `state`: **Required**. The current state of the AEP, in all lower-case. The
-      valid states are listed in [AEP-1][], and common states are `draft`,
-      `reviewing`, and `approved`.
-    - `created`: **Required**. The ISO-8601 date (`yyyy-mm-dd`) when the AEP was
-      originally drafted, with no quotes.
-    - `updated`: The ISO-8601 date (`yyyy-mm-dd`) when the AEP was last revised.
-    - `scope`: The scope for the AEP. This **must** match the directory name for
-      that scope. Required for AEPs with IDs >= 1000, prohibited otherwise.
+  - `id`: **Required**. The ID for the given AEP, as an integer.
+  - `state`: **Required**. The current state of the AEP, in all lower-case. The
+    valid states are listed in [AEP-1][], and common states are `draft`,
+    `reviewing`, and `approved`.
+  - `created`: **Required**. The ISO-8601 date (`yyyy-mm-dd`) when the AEP was
+    originally drafted, with no quotes.
+  - `updated`: The ISO-8601 date (`yyyy-mm-dd`) when the AEP was last revised.
+  - `scope`: The scope for the AEP. This **must** match the directory name for
+    that scope. Required for AEPs with IDs >= 1000, prohibited otherwise.
 - The `permalink` key (required): This **must** be set to
   `/{aep.scope}/{aep.id}`. If there is no scope, use `/{aep.id}` instead.
 - The `redirect_from` key: This should include a list of any `/{aep.id}`
   permutations that a reader would be likely to enter, including:
-    - `/{aep.id}` (for AEPs where the permalink includes the scope)
-    - AEP IDs with zero-padding, for each level of zero-padding up to four digits
-      (for example: `/08`, `/008`, `/0008`).
+  - `/{aep.id}` (for AEPs where the permalink includes the scope)
+  - AEP IDs with zero-padding, for each level of zero-padding up to four digits
+    (for example: `/08`, `/008`, `/0008`).
 
 ### Document structure
 
@@ -143,8 +145,9 @@ The guidance section **may** include subsections that elaborate further on
 details. Subsections will automatically create an entry in the table of
 contents, and an anchor for citations.
 
-AEPs **must** contain a Changelog at the end. This **must** be a bulleted list of changes made to the AEP since the
-first writing. The list **must** be in descending order by date (newest changes at the top of the list).
+AEPs **must** contain a Changelog at the end. This **must** be a bulleted list
+of changes made to the AEP since the first writing. The list **must** be in
+descending order by date (newest changes at the top of the list).
 
 Below is an example AEP shell that uses each major section:
 
@@ -235,9 +238,9 @@ link to the relevant AEP. AEP links **may** point to a particular section of
 the AEP if appropriate.
 
 **Important:** AEP links **must** use the relative path to the file in the
-repository (such as `./0008.md`); this ensures that the link works both on the AEP site, when
-viewing the Markdown file on GitHub, using the local development server, or a
-branch.
+repository (such as `./0008.md`); this ensures that the link works both on the
+AEP site, when viewing the Markdown file on GitHub, using the local development
+server, or a branch.
 
 ### Response Codes
 
@@ -259,16 +262,13 @@ API guidance must in turn consider the impact broadly across these clients.
 ## Changelog
 
 - **2025-11-12**: Grammar fixes; make changelog mandatory
-- **2025-10-30**: Initial AEP-8 for Thryv, adapted from [Google AIP-8][] and aep.dev [AEP-8][].
+- **2025-10-30**: Initial AEP-8 for Thryv, adapted from [Google AIP-8][] and
+  aep.dev [AEP-8][].
 
 <!-- Links -->
 
 [Declarative clients]: ./0009.md#declarative-clients
-
 [OpenAPI]: https://www.openapis.org/
-
 [rfc 2119]: https://www.ietf.org/rfc/rfc2119.txt
-
 [Google AIP-8]: https://google.aip.dev/8
-
 [AEP-8]: https://aep.dev/8

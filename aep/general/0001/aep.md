@@ -1,7 +1,9 @@
 # AEP Purpose and Guidelines
 
-As Thryv's API ecosystem grows, we need consistent documentation and design patterns to ensure our APIs are intuitive,
-reliable, and easy to use. AEPs provide a standardized way to document and share API design decisions across Thryv.
+As Thryv's API ecosystem grows, we need consistent documentation and design
+patterns to ensure our APIs are intuitive, reliable, and easy to use. AEPs
+provide a standardized way to document and share API design decisions across
+Thryv.
 
 ## What is an AEP?
 
@@ -33,9 +35,10 @@ process itself and are used to enhance the way in which AEPs are handled.
 
 ### Educational
 
-These AEPs provide the prerequisite knowledge and theoretical background for effective API design. They explain
-the "what" and "why" of industry-standard technologies (like HTTP or JSON) without necessarily imposing
-company-specific constraints.
+These AEPs provide the prerequisite knowledge and theoretical background for
+effective API design. They explain the "what" and "why" of industry-standard
+technologies (like HTTP or JSON) without necessarily imposing company-specific
+constraints.
 
 ## Stakeholders
 
@@ -43,10 +46,10 @@ company-specific constraints.
 
 The AEP editors are responsible for:
 
-* Reviewing and approving AEPs
-* Maintaining AEP quality and consistency
-* Managing the AEP workflow and numbering
-* Ensuring AEPs are clear, actionable, and well-written
+- Reviewing and approving AEPs
+- Maintaining AEP quality and consistency
+- Managing the AEP workflow and numbering
+- Ensuring AEPs are clear, actionable, and well-written
 
 Current editors are the members of the [Gryffindor team][].
 
@@ -69,8 +72,8 @@ Changes may still be requested before approval.
 
 ### Approved
 
-The AEP is approved and represents Thryv's current best practice.
-This is the state you should follow for API design.
+The AEP is approved and represents Thryv's current best practice. This is the
+state you should follow for API design.
 
 ### Withdrawn
 
@@ -182,18 +185,17 @@ state and will link to the new, current AEP.
 
 ## Questions?
 
-* Slack: [#ask-pd-api][]
-* Repository: [GitHub Issues][]
+- Slack: [#ask-pd-api][]
+- Repository: [GitHub Issues][]
 
 [#ask-pd-api]: https://keaporg.enterprise.slack.com/archives/C5HG5M4FP
-
 [GitHub Issues]: https://github.com/infusionsoft/aeps/issues
 
 ## Changelog
 
 - **2026-01-20**: Add educational AEP type.
-- **2025-10-30**: Initial AEP-1 for Thryv, adapted from [Google AIP-1][] and aep.dev [AEP-1][].
+- **2025-10-30**: Initial AEP-1 for Thryv, adapted from [Google AIP-1][] and
+  aep.dev [AEP-1][].
 
 [Google AIP-1]: https://google.aip.dev/1
-
 [AEP-1]: https://aep.dev/1

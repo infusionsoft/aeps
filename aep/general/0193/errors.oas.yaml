@@ -13,9 +13,12 @@ components:
           type: string
           format: uri
           description: >
-            A URI reference that identifies the problem type. This serves as a permanent 
-            identifier for the category of problem. May be a URI that doesn't resolve 
-            (e.g., /problems/constraint-violation), about:blank for standard HTTP errors, 
+            A URI reference that identifies the problem type. This serves as a
+            permanent 
+            identifier for the category of problem. May be a URI that doesn't
+            resolve 
+            (e.g., /problems/constraint-violation), about:blank for standard
+            HTTP errors, 
             or a URL that leads to documentation.
           default: 'about:blank'
           example: '/problems/resource-unavailable'
@@ -23,7 +26,8 @@ components:
           type: integer
           format: int32
           description: >
-            The HTTP status code for this error. This matches the status code in the 
+            The HTTP status code for this error. This matches the status code
+            in the 
             HTTP response.
           minimum: 100
           maximum: 600
@@ -32,26 +36,33 @@ components:
         title:
           type: string
           description: >
-            A brief summary of the error type. This will be the same for all occurrences of 
+            A brief summary of the error type. This will be the same for all
+            occurrences of 
             this error.
           example: 'Resource Unavailable'
         detail:
           type: string
           description: >
-            A detailed explanation of what went wrong with your specific request. This 
+            A detailed explanation of what went wrong with your specific
+            request. This 
             describes the problem and may suggest how to resolve it.
-          example: 'The book "The Great Gatsby" is unavailable at the library "Garfield East". It is expected to be available again on 2199-05-13.'
+          example:
+            'The book "The Great Gatsby" is unavailable at the library
+            "Garfield East". It is expected to be available again on
+            2199-05-13.'
         instance:
           type: string
           format: uri
           description: >
-            A unique identifier for this specific error occurrence. Use this when 
+            A unique identifier for this specific error occurrence. Use this
+            when 
             contacting support to help identify your issue in logs.
           example: 'urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6'
         violations:
           type: array
           description: >
-            A list of validation errors when your request data was invalid. Each item 
+            A list of validation errors when your request data was invalid.
+            Each item 
             describes which field had an issue and what the problem was.
           items:
             type: object
@@ -70,8 +81,10 @@ components:
         parameters:
           type: object
           description: >
-            Additional data related to this error. These values are referenced in the 
-            detail message and provided in a structured format for programmatic use.
+            Additional data related to this error. These values are referenced
+            in the 
+            detail message and provided in a structured format for programmatic
+            use.
           additionalProperties: true
           example:
             bookTitle: 'The Great Gatsby'

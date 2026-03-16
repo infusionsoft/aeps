@@ -39,8 +39,8 @@ Some best practices:
 
 ## Identify resources
 
-Once your use cases are defined, consider how to represent those as resources: entities that are created, read, updated,
-and deleted.
+Once your use cases are defined, consider how to represent those as resources:
+entities that are created, read, updated, and deleted.
 
 Examples include:
 
@@ -56,8 +56,10 @@ API.
 
 Resources can relate to each other. For example:
 
-- A parent-child relationship defining ownership/scope (A user who created a VM).
-- A resource dependency, where one resource depends on another to function (A VM depending on a disk).
+- A parent-child relationship defining ownership/scope (A user who created a
+  VM).
+- A resource dependency, where one resource depends on another to function (A
+  VM depending on a disk).
 
 See the following AEPs to learn more about resource-oriented design:
 
@@ -66,17 +68,19 @@ See the following AEPs to learn more about resource-oriented design:
 
 ## Identify standard operations
 
-Once the resources are defined, identify one or more standard operations for each of those resources. Standard
-operations perform actions on resources by creating, reading, updating, deleting, and listing them. Each of these
-operations maps to a specific HTTP verb (`POST`, `GET`, `PUT`, `PATCH`, `DELETE`). See AEP-64 to learn more.
+Once the resources are defined, identify one or more standard operations for
+each of those resources. Standard operations perform actions on resources by
+creating, reading, updating, deleting, and listing them. Each of these
+operations maps to a specific HTTP verb (`POST`, `GET`, `PUT`, `PATCH`,
+`DELETE`). See AEP-64 to learn more.
 
-APIs **should** use standard methods whenever possible. However, there are cases where custom methods are more
-appropriate.
+APIs **should** use standard methods whenever possible. However, there are
+cases where custom methods are more appropriate.
 
 ## Identify custom operations
 
-As mentioned above, in some cases, it may be more appropriate to define a custom method rather than using a standard
-method. Some examples include:
+As mentioned above, in some cases, it may be more appropriate to define a
+custom method rather than using a standard method. Some examples include:
 
 - restarting a virtual machine
 - bulk create and update operations

@@ -7,8 +7,9 @@ temporarily unreachable. In this situation, it is still desirable to provide
 the user with all the available resources while indicating that something is
 missing.
 
-**Note:** This pattern is optional and addresses an edge case that may not apply to most APIs. However, if an API
-implements partial failure handling for unreachable resources, it **must** follow the guidance in this document.
+**Note:** This pattern is optional and addresses an edge case that may not
+apply to most APIs. However, if an API implements partial failure handling for
+unreachable resources, it **must** follow the guidance in this document.
 
 ## Guidance
 
@@ -31,16 +32,16 @@ a field to indicate this:
   reached. The objects listed as unreachable **may** be _parents_ (or higher
   ancestors) rather than the individual resources being requested. For example,
   if a location is unreachable, the location is listed.
-    - The response **must not** provide any other information about the issue,
-      such as error details or codes. To enable users to discover what the
-      underlying issue is, APIs **may** provide an API method that provides
-      more specific information.
-    - The service **must** provide a way for the user to get an error with
-      additional information, and **should** allow the user to repeat the
-      original call with more restrictive parameters in order to do so.
-    - The resource paths provided in this field **may** be heterogeneous. The
-      field **should** document what potential resources may be provided in this
-      field, and note that it might expand later.
+  - The response **must not** provide any other information about the issue,
+    such as error details or codes. To enable users to discover what the
+    underlying issue is, APIs **may** provide an API method that provides more
+    specific information.
+  - The service **must** provide a way for the user to get an error with
+    additional information, and **should** allow the user to repeat the
+    original call with more restrictive parameters in order to do so.
+  - The resource paths provided in this field **may** be heterogeneous. The
+    field **should** document what potential resources may be provided in this
+    field, and note that it might expand later.
 
 **Important:** If a single unreachable location or resource prevents returning
 any data by definition (for example, a list request for a single publisher
@@ -59,26 +60,26 @@ These facts lead to the following guidance:
 - The response **must** provide any outstanding unreachable locations or
   resources in the `unreachable` field on pages _following_ the final page that
   contains a resource.
-    - The response **should not** include both requested data and unreachable
-      resources on the same page.
-        - For example, if there are two pages of books and one unavailable
-          publisher, there should be three pages total: first the two pages of
-          books, and then a final page with no books and the unavailable publisher.
-    - If the number of unreachable resources to list is very large, the response
-      **should** honor the `pageSize` field in the same way as for
-      resources. In this case, all pages with requested information **should**
-      precede all pages with unavailable resources or locations.
-    - The final page's `unreachable` field **must** _only_ include resources or
-      parents that were partially provided (or missing completely) across the
-      entirety of the pagination process.
-        - For example, if a parent or resource was unreachable at the beginning of
-          pagination and it became reachable again and the entire set of previously
-          unreachable data was provided to the user on any page, the `unreachable`
-          field **must not** include the intermittently-unreachable parent or
-          resource.
-        - On the other hand, if only _some_ of the resources for a given parent are
-          provided during such an incident as described above, the parent or
-          resource **must** be included in the `unreachable` field.
+  - The response **should not** include both requested data and unreachable
+    resources on the same page.
+    - For example, if there are two pages of books and one unavailable
+      publisher, there should be three pages total: first the two pages of
+      books, and then a final page with no books and the unavailable publisher.
+  - If the number of unreachable resources to list is very large, the response
+    **should** honor the `pageSize` field in the same way as for resources. In
+    this case, all pages with requested information **should** precede all
+    pages with unavailable resources or locations.
+  - The final page's `unreachable` field **must** _only_ include resources or
+    parents that were partially provided (or missing completely) across the
+    entirety of the pagination process.
+    - For example, if a parent or resource was unreachable at the beginning of
+      pagination and it became reachable again and the entire set of previously
+      unreachable data was provided to the user on any page, the `unreachable`
+      field **must not** include the intermittently-unreachable parent or
+      resource.
+    - On the other hand, if only _some_ of the resources for a given parent are
+      provided during such an incident as described above, the parent or
+      resource **must** be included in the `unreachable` field.
 
 ## Further reading
 
@@ -87,9 +88,10 @@ These facts lead to the following guidance:
 
 ## Changelog
 
-* **2026-01-30**: Change `max_page_size` to `pageSize` to match query param spec
-* **2025-12-10**: Initial creation, adapted from [Google AIP-217][] and aep.dev [AEP-217][].
+- **2026-01-30**: Change `max_page_size` to `pageSize` to match query param
+  spec
+- **2025-12-10**: Initial creation, adapted from [Google AIP-217][] and aep.dev
+  [AEP-217][].
 
 [Google AIP-217]: https://google.aip.dev/217
-
 [AEP-217]: https://aep.dev/217

@@ -10,8 +10,8 @@ concept of time.
 Fields representing time **must** use a `string` field with values conforming
 to [RFC 3339], such as `2012-04-21T15:00:00Z`.
 
-**Note:** Date/time values in _HTTP headers_ are an exception to this rule; these
-**should** use the HTTP-date format defined in [RFC 9110, Section 5.6.7].
+**Note:** Date/time values in _HTTP headers_ are an exception to this rule;
+these **should** use the HTTP-date format defined in [RFC 9110, Section 5.6.7].
 
 Services **must** use appropriate [OpenAPI format indicators] for all date and
 time fields.
@@ -19,8 +19,8 @@ time fields.
 ### Timestamps
 
 Fields that represent an absolute point in time **must** use a `string` field
-with [RFC 3339] values. In OpenAPI, these fields **must** use `type: string` with
-`format: date-time`.
+with [RFC 3339] values. In OpenAPI, these fields **must** use `type: string`
+with `format: date-time`.
 
 These values **must** include an explicit timezone offset (`Z` or `±hh:mm`).
 Services **should** default to UTC (`Z`) for timestamps unless preserving the
@@ -34,10 +34,11 @@ These fields **should** have names ending in `Time`, such as `createdTime` or
 `expireTime`. For array fields, the names **should** end in `Times`.
 
 To maintain consistency with metadata fields like `createdBy` and `updatedBy`,
-the fields `createdTime`, `updatedTime`, and `deletedTime` **must** use the past
-tense. For all other timestamps, the field **may** be named using either the
-root form of the verb (such as `expireTime` or `publishTime`) or the past tense
-(such as `completedTime`), depending on which best conveys the field's intent.
+the fields `createdTime`, `updatedTime`, and `deletedTime` **must** use the
+past tense. For all other timestamps, the field **may** be named using either
+the root form of the verb (such as `expireTime` or `publishTime`) or the past
+tense (such as `completedTime`), depending on which best conveys the field's
+intent.
 
 Example:
 
@@ -49,12 +50,12 @@ Book:
       type: string
       format: date-time
       readOnly: true
-      example: "2025-12-18T10:00:00Z"
+      example: '2025-12-18T10:00:00Z'
     publishTime:
       type: string
       format: date-time
-      description: "The scheduled time for the book to become available."
-      example: "2025-12-25T09:00:00-05:00"
+      description: 'The scheduled time for the book to become available.'
+      example: '2025-12-25T09:00:00-05:00'
 ```
 
 ### Durations
@@ -72,9 +73,9 @@ as `durationSeconds`, `retryIntervalMillis`, or `ttlSeconds`.
 However, only fractional seconds are permitted; other fractional units (such as
 hours or days) **must not** be used.
 
-Services **should not** use [ISO 8601] duration strings (such as `PT1H`)
-unless required by an external specification or for compatibility with a
-specific library.
+Services **should not** use [ISO 8601] duration strings (such as `PT1H`) unless
+required by an external specification or for compatibility with a specific
+library.
 
 Example:
 
@@ -90,7 +91,7 @@ Session:
       format: date-time
     ttlSeconds:
       type: integer
-      description: "Remaining time before session expires."
+      description: 'Remaining time before session expires.'
       example: 3600
 ```
 
@@ -126,11 +127,11 @@ Store:
     openingDate:
       type: string
       format: date
-      example: "2025-06-01"
+      example: '2025-06-01'
     openingTimeOfDay:
       type: string
-      pattern: "^[0-9]{2}:[0-9]{2}:[0-9]{2}$"
-      example: "09:00:00"
+      pattern: '^[0-9]{2}:[0-9]{2}:[0-9]{2}$'
+      example: '09:00:00'
 ```
 
 ### Recurring time
@@ -147,15 +148,15 @@ specification that mandates that timestamps be Unix timestamp integers.
 In these situations, fields **may** use other types. If possible, the following
 naming conventions apply:
 
-* Unix timestamps **should** use a `UnixTime` suffix.
-    * Multipliers of Unix time (such as milliseconds) **should not** be used; if
-      they are unavoidable, the field name **should** use both `UnixTime` and
-      the unit, such as `unixTimeMillis`.
-* For other integers, include the meaning (examples: `time`, `duration`,
+- Unix timestamps **should** use a `UnixTime` suffix.
+  - Multipliers of Unix time (such as milliseconds) **should not** be used; if
+    they are unavoidable, the field name **should** use both `UnixTime` and the
+    unit, such as `unixTimeMillis`.
+- For other integers, include the meaning (examples: `time`, `duration`,
   `delay`, `latency`) _and_ the unit of measurement (valid values: `seconds`,
   `millis`, `micros`, `nanos`) as a final suffix. For example,
   `sendTimeMillis`.
-* For strings, include the meaning (examples: `time`, `duration`, `delay`,
+- For strings, include the meaning (examples: `time`, `duration`, `delay`,
   `latency`) but no unit suffix.
 
 In all cases, clearly document the expected format, and the rationale for its
@@ -165,26 +166,28 @@ use.
 
 Why avoid ISO 8601 duration?
 
-This is to maximize developer productivity and ensure cross-platform predictability. While ISO 8601 strings are
-syntactically standard, they lack native parsing support in many common environments; notably modern web browsers and
-standard Go or Python libraries. This often requires additional third-party dependencies to handle. Furthermore, units
-like "months" or "years" within these strings introduce calendar ambiguity that can lead to calculation errors across
-client-server boundaries. By prioritizing explicit `startTime`/`endTime` pairs or unit-suffixed integers (e.g.,
-`durationSeconds`), the API provides immediate clarity and allows developers to perform mathematical operations using
-native numeric types without the overhead of complex string parsing.
+This is to maximize developer productivity and ensure cross-platform
+predictability. While ISO 8601 strings are syntactically standard, they lack
+native parsing support in many common environments; notably modern web browsers
+and standard Go or Python libraries. This often requires additional third-party
+dependencies to handle. Furthermore, units like "months" or "years" within
+these strings introduce calendar ambiguity that can lead to calculation errors
+across client-server boundaries. By prioritizing explicit `startTime`/`endTime`
+pairs or unit-suffixed integers (e.g., `durationSeconds`), the API provides
+immediate clarity and allows developers to perform mathematical operations
+using native numeric types without the overhead of complex string parsing.
 
 [iso 8601]: https://www.iso.org/iso-8601-date-and-time-format.html
-
 [rfc 3339]: https://datatracker.ietf.org/doc/html/rfc3339
-
-[rfc 9110, section 5.6.7]: https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.7
-
-[OpenAPI format indicators]: https://swagger.io/docs/specification/v3_0/data-models/data-types/#strings
+[rfc 9110, section 5.6.7]:
+  https://datatracker.ietf.org/doc/html/rfc9110#section-5.6.7
+[OpenAPI format indicators]:
+  https://swagger.io/docs/specification/v3_0/data-models/data-types/#strings
 
 ## Changelog
 
-**2025-12-02**: Initial creation, adapted from [Google AIP-142][] and aep.dev [AEP-142][].
+**2025-12-02**: Initial creation, adapted from [Google AIP-142][] and aep.dev
+[AEP-142][].
 
 [Google AIP-142]: https://google.aip.dev/142
-
 [AEP-142]: https://aep.dev/142
