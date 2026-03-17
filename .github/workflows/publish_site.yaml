@@ -7,7 +7,7 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    container: node:20
+    container: node:24
     steps:
       - name: Trigger site generator repo
         uses: peter-evans/repository-dispatch@v4
