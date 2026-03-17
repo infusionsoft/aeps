@@ -10,7 +10,7 @@ jobs:
     container: node:20
     steps:
       - name: Trigger site generator repo
-        uses: peter-evans/repository-dispatch@v3
+        uses: peter-evans/repository-dispatch@v4
         with:
           event-type: publish-event
           repository: infusionsoft/aep-site-generator
