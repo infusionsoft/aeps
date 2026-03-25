@@ -1,5 +1,9 @@
 # Organization ID
 
+**Note:** This AEP standardizes on the term "organization ID" for the concept
+of tenancy. To keep this document simple and consistent, it uses _only_ the
+"organization ID" terminology, although the industry standard term is "tenant".
+
 Some endpoints are **organization-scoped**, meaning requests operate within the
 context of a specific organization instance. One organization instance cannot
 access data from other organizations. An **organization** represents an
@@ -8,8 +12,9 @@ configuration.
 
 ## Guidance
 
-APIs **must** refer to this concept as "organization ID". The following terms
-have historically referred to the same concept and are now deprecated:
+API code and interfaces **must** refer to this concept as "organization ID".
+The following terms have historically referred to the same concept and are now
+deprecated in code and interface definitions:
 
 - Tenant
 - Tenant Name
@@ -17,9 +22,12 @@ have historically referred to the same concept and are now deprecated:
 - App
 - App Name
 - App ID
+- Account
+- Account Name
+- Account ID
 
-APIs **should not** use deprecated terms, and **must not** introduce any
-alternate terms for this concept.
+API code **should not** use deprecated terms, and **must not** introduce any
+new alternate terms for this concept.
 
 When represented in API fields or parameters, APIs **must** use the standard
 identifier `organizationId`, formatted according to each location's naming
@@ -35,8 +43,7 @@ convention:
 ### Organization-scoped endpoints
 
 Organization-scoped endpoints are endpoints where each request operates within
-exactly one organization context. Previously, these were referred to as
-"tenanted" endpoints.
+exactly one organization context.
 
 For organization-scoped endpoints, organization ID **must** be accepted in
 exactly one location per request. An endpoint **must not** define organization
@@ -49,14 +56,13 @@ it is more appropriate, but **must** provide justification as per AEP-200.
 
 Existing services that already accept organization ID via a header are not
 required to migrate immediately, but **should** plan migration to path-based
-organization scoping. Until migration is complete, the header **must** be named
-`Organization-ID`.
+organization scoping in the next major API release for that service. Until
+migration is complete, the header **must** be named `Organization-ID`.
 
 ### Non-organization-scoped endpoints
 
 Non-organization-scoped endpoints are endpoints that do not operate within a
-single organization context. Previously, these were referred to as "untenanted"
-or "non-tenanted" endpoints.
+single organization context.
 
 When a non-organization-scoped endpoint requires one or more organization IDs,
 the endpoint **must** use the standard names (`organizationId`,
@@ -78,4 +84,5 @@ patterns while keeping existing services functional during the transition.
 
 ## Changelog
 
+- **2026-03-25**: Clarify "tenant" vs. "organization ID" terminology.
 - **2026-03-11**: Initial creation.
