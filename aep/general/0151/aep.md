@@ -38,9 +38,7 @@ Content-Type: application/json
 {
   "id": "op_abc123xyz",
   "state": "pending",
-  "metadata": {
-    "createdTime": "2025-12-02T10:30:00Z"
-  }
+  "createdTime": "2025-12-02T10:30:00Z"
 }
 ```
 
@@ -148,6 +146,10 @@ Operation:
         - failed
         - cancelled
       description: The current state of the operation.
+    createdTime:
+      type: string
+      format: date-time
+      description: The time at which the operation was created.
     metadata:
       type: object
       description:
@@ -198,6 +200,7 @@ Operation:
 
 ## Changelog
 
+- **2026-04-14**: Fix `createdTime` field in operation schema and example
 - **2025-12-10**: Initial creation, adapted from [Google AIP-151][] and aep.dev
   [AEP-151][].
 
