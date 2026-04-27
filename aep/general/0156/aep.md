@@ -41,6 +41,7 @@ The `Config` singleton would have the following methods:
 ```yaml
 paths:
   users/{user}/config:
+    x-aep-resource-pattern: singleton
     get:
       operationId: getUserConfig
       parameters:
@@ -70,6 +71,8 @@ paths:
 
 {% endtabs %}
 
+- Singleton resources **must** identify their path item with the
+  `x-aep-resource-pattern: singleton` OpenAPI extension.
 - Singleton resources **must not** have a user-provided or system-generated ID;
   their [resource path][aep-122] includes the name of their parent followed by
   one static-segment.
@@ -143,6 +146,8 @@ collection, should a Singleton be found lacking.
 
 ## Changelog
 
+- **2026-04-27**: Added requirement to identify singleton path items with
+  `x-aep-resource-pattern: singleton`.
 - **2025-12-22**: Initial creation, adapted from [Google AIP-156][] and aep.dev
   [AEP-156][].
 
