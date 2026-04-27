@@ -134,7 +134,7 @@ paths:
           description: Successful response
     get:
       description: Get method for publisher
-      operationId: getPublisher
+      operationId: fetchPublisher
       parameters:
         - in: path
           name: publisherId
@@ -303,7 +303,7 @@ paths:
           description: Successful response
     get:
       description: Get method for book
-      operationId: getBook
+      operationId: fetchBook
       parameters:
         - in: path
           name: publisherId
@@ -498,7 +498,7 @@ paths:
           description: Successful response
     get:
       description: Get method for book-edition
-      operationId: getBookEdition
+      operationId: fetchBookEdition
       parameters:
         - in: path
           name: publisherId
