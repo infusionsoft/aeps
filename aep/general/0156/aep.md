@@ -43,7 +43,7 @@ paths:
   users/{user}/config:
     x-aep-resource-pattern: singleton
     get:
-      operationId: getUserConfig
+      operationId: fetchUserConfig
       parameters:
         - $ref: '#/components/parameters/user'
       responses:

@@ -75,7 +75,7 @@ default.
 
 Examples:
 
-- `getBook`
+- `fetchBook`
 - `listBooks`
 - `createBook`
 - `updateBook`
