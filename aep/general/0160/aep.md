@@ -182,7 +182,7 @@ approach avoids single-parameter filter DSLs, which historically struggle with
 cross-language consistency, require custom parsers, and often result in partial
 implementations that defeat standardization benefits. For an in-depth analysis
 of filtering strategies and the decision process behind these guidelines, see
-[ADR-001: REST API Filtering and Searching Strategy](https://github.com/infusionsoft/aeps/blob/main/docs/arch/adr-001.md).
+[ADR-001: REST API Filtering and Searching Strategy](https://github.com/ThryvLabs/aeps/blob/main/docs/arch/adr-001.md).
 
 [Sorting]: /132#ordering
 [Pagination]: /pagination
@@ -201,4 +201,4 @@ of filtering strategies and the decision process behind these guidelines, see
 
 [Google AIP-160]: https://google.aip.dev/160
 [AEP-160]: https://aep.dev/160
-[ADR-001]: https://github.com/infusionsoft/aeps/blob/main/docs/arch/adr-001.md
+[ADR-001]: https://github.com/ThryvLabs/aeps/blob/main/docs/arch/adr-001.md

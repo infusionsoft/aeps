@@ -15,7 +15,7 @@ API-related documentation, and the means by which service producers discuss and
 come to consensus on API guidance. AEPs are maintained as Markdown files with
 metadata in the [AEP GitHub repository][].
 
-[AEP GitHub repository]: https://github.com/infusionsoft/aeps
+[AEP GitHub repository]: https://github.com/ThryvLabs/aeps
 
 ## Types of AEPs
 
@@ -53,7 +53,7 @@ The AEP editors are responsible for:
 
 Current editors are the members of the [Gryffindor team][].
 
-[Gryffindor team]: https://github.com/orgs/infusionsoft/teams/gryffindor
+[Gryffindor team]: https://github.com/orgs/ThryvLabs/teams/gryffindor
 
 ## States
 
@@ -189,7 +189,7 @@ state and will link to the new, current AEP.
 - Repository: [GitHub Issues][]
 
 [#ask-pd-api]: https://keaporg.enterprise.slack.com/archives/C5HG5M4FP
-[GitHub Issues]: https://github.com/infusionsoft/aeps/issues
+[GitHub Issues]: https://github.com/ThryvLabs/aeps/issues
 
 ## Changelog
 

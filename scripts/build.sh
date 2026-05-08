@@ -2,7 +2,7 @@
 set -euo pipefail
 export AEP_LOCATION="${PWD}"
 export SG_DIRECTORY="/tmp/site-generator"
-export SG_REPO_URL="${SG_REPO_URL:-https://github.com/infusionsoft/aep-site-generator.git}"
+export SG_REPO_URL="${SG_REPO_URL:-https://github.com/ThryvLabs/aep-site-generator.git}"
 
 if [ ! -d "${SG_DIRECTORY}" ]; then
     git clone "${SG_REPO_URL}" "${SG_DIRECTORY}"

@@ -13,5 +13,5 @@ jobs:
         uses: peter-evans/repository-dispatch@v4
         with:
           event-type: publish-event
-          repository: infusionsoft/aep-site-generator
+          repository: ThryvLabs/aep-site-generator
           token: ${{ secrets.AEP_PUBLISH_PAT }}
